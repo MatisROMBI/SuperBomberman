@@ -13,10 +13,19 @@ public class GameOverController {
     @FXML
     private Button mainMenuButton;
 
+    // Variable statique pour passer le score
+    private static int lastScore = 0;
+
+    public static void setLastScore(int score) {
+        lastScore = score;
+    }
+
     @FXML
     private void initialize() {
         playAgainButton.setOnAction(e -> playAgain());
         mainMenuButton.setOnAction(e -> goToMainMenu());
+        // Affiche le score dès l'arrivée sur l'écran
+        gameOverLabel.setText("GAME OVER !\nVotre score : " + lastScore);
     }
 
     private void playAgain() {
@@ -27,6 +36,7 @@ public class GameOverController {
         SceneManager.switchScene("MainMenu");
     }
 
+    // Optionnel si tu veux modifier dynamiquement le texte plus tard
     public void setGameResult(String result) {
         gameOverLabel.setText(result);
     }

@@ -1,6 +1,7 @@
 package com.bomberman.controller;
 
 import com.bomberman.model.Game;
+import com.bomberman.model.GameOverListener;
 import com.bomberman.model.enums.Direction;
 import com.bomberman.model.enums.GameState;
 import com.bomberman.utils.SceneManager;
@@ -14,7 +15,7 @@ import javafx.scene.layout.VBox;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GameController {
+public class GameController implements GameOverListener {
     @FXML
     private VBox gameContainer;
     @FXML
@@ -28,6 +29,8 @@ public class GameController {
     @FXML
     private void initialize() {
         game = new Game();
+        // On connecte le listener (important!)
+        game.getPlayer().setGameOverListener(this);
         renderer = new GameRenderer(gameCanvas);
         pressedKeys = new HashSet<>();
 
@@ -98,7 +101,8 @@ public class GameController {
                 if (game.getGameState() == GameState.GAME_OVER ||
                         game.getGameState() == GameState.VICTORY) {
                     stop();
-                    SceneManager.switchScene("GameOver");
+                    // Ici tu peux choisir ce que tu fais en cas de victoire ou défaite
+                    // Le GameOverListener prendra la main pour le GAME_OVER
                 }
             }
         };
@@ -114,4 +118,10 @@ public class GameController {
         }
     }
 
+    // Implémentation du callback
+    @Override
+    public void onGameOver(int score) {
+        GameOverController.setLastScore(score);
+        SceneManager.switchScene("GameOver");
+    }
 }

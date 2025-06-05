@@ -6,9 +6,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fxml.GameOver"
+            fx:controller="com.bomberman.controller.GameOverController"
             prefHeight="400.0" prefWidth="600.0">
+
+    <!-- Tu peux ajouter ici tes éléments graphiques, exemple : -->
+    <Label fx:id="gameOverLabel" layoutX="200" layoutY="80" text="GAME OVER !" style="-fx-font-size: 32px;"/>
+    <Button fx:id="playAgainButton" layoutX="200" layoutY="180" text="Rejouer" prefWidth="200"/>
+    <Button fx:id="mainMenuButton" layoutX="200" layoutY="240" text="Menu Principal" prefWidth="200"/>
 
 </AnchorPane>
