@@ -8,9 +8,9 @@ import java.util.*;
 public class Board {
     private Cell[][] grid;
     private List<Bomb> bombs;
-    private List<Explosion> explosions; // AJOUT
+    private List<Explosion> explosions;
     private List<Enemy> enemies;
-    private Player player; // Pour infliger les dégâts
+    private Player player;
 
     public Board() {
         grid = new Cell[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
@@ -42,11 +42,24 @@ public class Board {
         addEnemies();
     }
 
+    // Ajout corrigé : placement aléatoire, pas sur le joueur ni superposé ni dans les murs
     private void addEnemies() {
-        enemies.add(new Enemy(Constants.BOARD_WIDTH - 2, Constants.BOARD_HEIGHT - 2));
-        enemies.add(new Enemy(Constants.BOARD_WIDTH - 3, Constants.BOARD_HEIGHT - 2));
-        for (Enemy enemy : enemies) {
-            grid[enemy.getX()][enemy.getY()].setHasEnemy(true);
+        int enemyCount = 4; // Change ce nombre si tu veux plus/moins d'ennemis
+        Random random = new Random();
+        int tries = 0;
+        while (enemies.size() < enemyCount && tries < 1000) {
+            int x = random.nextInt(Constants.BOARD_WIDTH);
+            int y = random.nextInt(Constants.BOARD_HEIGHT);
+
+            // Pas dans la zone de départ du joueur
+            if (x <= 2 && y <= 2) continue;
+
+            // Case vide, pas d’ennemi, pas de joueur, pas de mur
+            if (grid[x][y].getType() == CellType.EMPTY && !grid[x][y].hasEnemy() && !grid[x][y].hasPlayer()) {
+                enemies.add(new Enemy(x, y));
+                grid[x][y].setHasEnemy(true);
+            }
+            tries++;
         }
     }
 
@@ -111,7 +124,6 @@ public class Board {
                 }
                 createExplosion(x, y);
 
-                // Réaction en chaîne :
                 if (cell.getBomb() != null && !cell.getBomb().hasExploded()) {
                     explodeBomb(cell.getBomb());
                 }
@@ -132,7 +144,7 @@ public class Board {
         }
         if (cell.hasPlayer() && player != null) {
             player.takeDamage();
-            player.respawnAtStart(this); // Ajoute cette ligne !
+            player.respawnAtStart(this);
         }
     }
 

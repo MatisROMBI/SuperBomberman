@@ -1,6 +1,8 @@
 package com.bomberman.model;
 
 import com.bomberman.model.enums.Direction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Enemy {
@@ -9,7 +11,7 @@ public class Enemy {
     private Direction currentDirection;
     private Random random;
     private long lastMoveTime;
-    private static final int MOVE_DELAY = 800; // Plus rapide que joueur
+    private static final int MOVE_DELAY = 800; // ms
 
     public Enemy(int startX, int startY) {
         this.x = startX;
@@ -30,18 +32,32 @@ public class Enemy {
     }
 
     private void move(Board board) {
-        // IA simple (aléatoire)
         Direction[] directions = Direction.values();
-        Direction newDirection = directions[random.nextInt(4)];
-        int newX = x + newDirection.getDx();
-        int newY = y + newDirection.getDy();
-        if (board.isValidPosition(newX, newY) && board.getCell(newX, newY).isWalkable()) {
-            board.getCell(x, y).setHasEnemy(false);
-            this.x = newX;
-            this.y = newY;
-            board.getCell(x, y).setHasEnemy(true);
-            this.currentDirection = newDirection;
+        List<Direction> possibleMoves = new ArrayList<>();
+
+        for (Direction dir : directions) {
+            int nx = x + dir.getDx();
+            int ny = y + dir.getDy();
+            if (board.isValidPosition(nx, ny)) {
+                Cell targetCell = board.getCell(nx, ny);
+                if (targetCell.isWalkable() && !targetCell.hasEnemy()) {
+                    possibleMoves.add(dir);
+                }
+            }
         }
+
+        if (!possibleMoves.isEmpty()) {
+            Direction chosen = possibleMoves.get(random.nextInt(possibleMoves.size()));
+            int newX = x + chosen.getDx();
+            int newY = y + chosen.getDy();
+
+            board.getCell(x, y).setHasEnemy(false);
+            x = newX;
+            y = newY;
+            board.getCell(x, y).setHasEnemy(true);
+            currentDirection = chosen;
+        }
+        // Sinon il ne bouge pas
     }
 
     public void die() {
