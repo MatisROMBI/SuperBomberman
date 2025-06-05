@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.bomberman.controller.VictoryController"
+            prefHeight="400.0" prefWidth="600.0">
+    <Label fx:id="victoryLabel" layoutX="140" layoutY="80" text="VICTOIRE !" style="-fx-font-size: 32px;"/>
+    <Button fx:id="playAgainButton" layoutX="200" layoutY="180" text="Rejouer" prefWidth="200"/>
+    <Button fx:id="mainMenuButton" layoutX="200" layoutY="240" text="Menu Principal" prefWidth="200"/>
+</AnchorPane>

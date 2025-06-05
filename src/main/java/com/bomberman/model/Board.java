@@ -9,14 +9,14 @@ public class Board {
     private Cell[][] grid;
     private List<Bomb> bombs;
     private List<Explosion> explosions;
-    private List<Enemy> enemies;
     private Player player;
+    private List<PlayerBot> bots; // 3 bots
 
     public Board() {
         grid = new Cell[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
         bombs = new ArrayList<>();
         explosions = new ArrayList<>();
-        enemies = new ArrayList<>();
+        bots = new ArrayList<>();
         initializeBoard();
     }
 
@@ -27,46 +27,45 @@ public class Board {
                         y == Constants.BOARD_HEIGHT - 1 || (x % 2 == 0 && y % 2 == 0)) {
                     grid[x][y] = new Cell(CellType.WALL);
                 } else {
-                    if (Math.random() < 0.7 && !(x <= 2 && y <= 2)) {
-                        grid[x][y] = new Cell(CellType.DESTRUCTIBLE_WALL);
-                    } else {
-                        grid[x][y] = new Cell(CellType.EMPTY);
-                    }
+                    grid[x][y] = new Cell(Math.random() < 0.7 ? CellType.DESTRUCTIBLE_WALL : CellType.EMPTY);
                 }
             }
         }
+        // Débloquer les 4 coins pour les joueurs
         grid[1][1] = new Cell(CellType.EMPTY);
-        grid[2][1] = new Cell(CellType.EMPTY);
         grid[1][2] = new Cell(CellType.EMPTY);
+        grid[2][1] = new Cell(CellType.EMPTY);
 
-        addEnemies();
-    }
+        int xMax = Constants.BOARD_WIDTH - 2, yMax = Constants.BOARD_HEIGHT - 2;
+        grid[xMax][yMax] = new Cell(CellType.EMPTY);
+        grid[xMax - 1][yMax] = new Cell(CellType.EMPTY);
+        grid[xMax][yMax - 1] = new Cell(CellType.EMPTY);
 
-    // Ajout corrigé : placement aléatoire, pas sur le joueur ni superposé ni dans les murs
-    private void addEnemies() {
-        int enemyCount = 4; // Change ce nombre si tu veux plus/moins d'ennemis
-        Random random = new Random();
-        int tries = 0;
-        while (enemies.size() < enemyCount && tries < 1000) {
-            int x = random.nextInt(Constants.BOARD_WIDTH);
-            int y = random.nextInt(Constants.BOARD_HEIGHT);
+        grid[xMax][1] = new Cell(CellType.EMPTY);
+        grid[xMax - 1][1] = new Cell(CellType.EMPTY);
+        grid[xMax][2] = new Cell(CellType.EMPTY);
 
-            // Pas dans la zone de départ du joueur
-            if (x <= 2 && y <= 2) continue;
+        grid[1][yMax] = new Cell(CellType.EMPTY);
+        grid[2][yMax] = new Cell(CellType.EMPTY);
+        grid[1][yMax - 1] = new Cell(CellType.EMPTY);
 
-            // Case vide, pas d’ennemi, pas de joueur, pas de mur
-            if (grid[x][y].getType() == CellType.EMPTY && !grid[x][y].hasEnemy() && !grid[x][y].hasPlayer()) {
-                enemies.add(new Enemy(x, y));
-                grid[x][y].setHasEnemy(true);
-            }
-            tries++;
-        }
+        // Placement des joueurs
+        player = new Player(1, 1);
+        grid[1][1].setHasPlayer(true);
+
+        // 3 bots dans les autres coins
+        bots.add(new PlayerBot(xMax, yMax));       // bas droite
+        grid[xMax][yMax].setHasPlayer(true);
+        bots.add(new PlayerBot(xMax, 1));          // haut droite
+        grid[xMax][1].setHasPlayer(true);
+        bots.add(new PlayerBot(1, yMax));          // bas gauche
+        grid[1][yMax].setHasPlayer(true);
     }
 
     public void update(Player player) {
         this.player = player;
         updateBombs();
-        updateEnemies();
+        updateBots();
         updateExplosions();
     }
 
@@ -78,13 +77,18 @@ public class Board {
                 explodeBomb(bomb);
                 bombIterator.remove();
                 player.onBombExploded();
+                for (PlayerBot bot : bots) {
+                    bot.onBombExploded();
+                }
             }
         }
     }
 
-    private void updateEnemies() {
-        for (Enemy enemy : enemies) {
-            enemy.update(this);
+    private void updateBots() {
+        for (PlayerBot bot : bots) {
+            if (bot.isAlive()) {
+                bot.playTurn(this);
+            }
         }
     }
 
@@ -115,6 +119,8 @@ public class Board {
                 Cell cell = grid[x][y];
                 if (cell.getType() == CellType.WALL) break;
                 if (cell.getType() == CellType.DESTRUCTIBLE_WALL) {
+                    // Ajout du score pour bloc cassé
+                    player.addScore(50); // +50 points pour bloc cassé
                     cell.setType(CellType.EMPTY);
                     if (Math.random() < 0.25) {
                         cell.setPowerUp(PowerUp.random());
@@ -134,17 +140,23 @@ public class Board {
     private void createExplosion(int x, int y) {
         explosions.add(new Explosion(x, y));
         Cell cell = grid[x][y];
-        if (cell.hasEnemy()) {
-            for (Enemy enemy : enemies) {
-                if (enemy.getX() == x && enemy.getY() == y && enemy.isAlive()) {
-                    enemy.die();
-                    cell.setHasEnemy(false);
-                }
-            }
-        }
-        if (cell.hasPlayer() && player != null) {
+
+        // Humain
+        if (cell.hasPlayer() && player != null && player.getX() == x && player.getY() == y) {
             player.takeDamage();
             player.respawnAtStart(this);
+        }
+        // Bots
+        for (PlayerBot bot : bots) {
+            if (bot.isAlive() && bot.getX() == x && bot.getY() == y) {
+                boolean botWasAlive = bot.isAlive();
+                bot.takeDamage();
+                bot.respawnAtStart(this);
+                // S'il vient d'être éliminé
+                if (botWasAlive && !bot.isAlive()) {
+                    player.addScore(600); // +600 points pour chaque bot éliminé
+                }
+            }
         }
     }
 
@@ -161,8 +173,8 @@ public class Board {
         return grid[x][y];
     }
 
-    public List<Enemy> getEnemies() {
-        return enemies;
+    public List<PlayerBot> getBots() {
+        return bots;
     }
 
     public List<Bomb> getBombs() {
@@ -171,5 +183,9 @@ public class Board {
 
     public List<Explosion> getExplosions() {
         return explosions;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

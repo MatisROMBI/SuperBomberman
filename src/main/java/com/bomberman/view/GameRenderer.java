@@ -7,6 +7,7 @@ import com.bomberman.utils.Constants;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class GameRenderer {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
         canvas.setWidth(Constants.WINDOW_WIDTH);
-        canvas.setHeight(Constants.WINDOW_HEIGHT - 50);
+        canvas.setHeight(Constants.WINDOW_HEIGHT); // Plus de "-50" ni rien d'autre
     }
 
     public void render(Game game) {
@@ -27,7 +28,7 @@ public class GameRenderer {
         renderExplosions(game.getBoard().getExplosions());
         renderBombs(game.getBoard().getBombs());
         renderPowerUps(game.getBoard());
-        renderEnemies(game.getBoard().getEnemies());
+        renderBots(game.getBoard().getBots());
         renderPlayer(game.getPlayer());
         renderHUD(game.getPlayer());
     }
@@ -97,16 +98,19 @@ public class GameRenderer {
         }
     }
 
-    private void renderEnemies(List<Enemy> enemies) {
-        for (Enemy enemy : enemies) {
-            if (enemy.isAlive()) {
-                double px = enemy.getX() * Constants.CELL_SIZE + 8;
-                double py = enemy.getY() * Constants.CELL_SIZE + 8;
-                gc.setFill(Color.CRIMSON);
+    private void renderBots(List<PlayerBot> bots) {
+        Color[] botColors = {Color.CRIMSON, Color.GOLD, Color.MEDIUMVIOLETRED};
+        int idx = 0;
+        for (PlayerBot bot : bots) {
+            if (bot.isAlive()) {
+                double px = bot.getX() * Constants.CELL_SIZE + 8;
+                double py = bot.getY() * Constants.CELL_SIZE + 8;
+                gc.setFill(botColors[idx % botColors.length]);
                 gc.fillOval(px, py, Constants.CELL_SIZE - 16, Constants.CELL_SIZE - 16);
                 gc.setFill(Color.WHITE);
-                gc.fillOval(px + 7, py + 8, 8, 8); // visage
+                gc.fillOval(px + 7, py + 8, 8, 8);
             }
+            idx++;
         }
     }
 
@@ -142,15 +146,21 @@ public class GameRenderer {
     }
 
     private void renderHUD(Player player) {
-        double y = canvas.getHeight() + 18;
+        double hudY = Constants.BOARD_HEIGHT * Constants.CELL_SIZE; // Position Y juste SOUS le plateau
+        double textY = hudY + 22; // Décalage vertical pour centrer le texte dans le bandeau
+
         gc.setFill(Color.BLACK);
-        gc.fillRect(0, canvas.getHeight(), Constants.WINDOW_WIDTH, 32);
+        gc.fillRect(0, hudY, Constants.WINDOW_WIDTH, Constants.HUD_HEIGHT);
 
         gc.setFill(Color.WHITE);
-        gc.fillText("Vies : " + player.getLives(), 10, y);
-        gc.fillText("Bombes max : " + player.getMaxBombs(), 120, y);
-        gc.fillText("Bombes restantes : " + player.getBombsAvailable(), 300, y);
-        gc.fillText("Portée : " + player.getExplosionRange(), 250, y);
-        gc.fillText("Bomberman 90 JavaFX", Constants.WINDOW_WIDTH - 170, y);
+        gc.setFont(Font.font("Arial", 18));
+        gc.fillText("SCORE : " + player.getScore(), Constants.WINDOW_WIDTH / 2.0 - 60, textY);
+
+        gc.setFont(Font.font("Arial", 12));
+        gc.fillText("Vies : " + player.getLives(), 10, textY);
+        gc.fillText("Bombes max : " + player.getMaxBombs(), 120, textY);
+        gc.fillText("Bombes restantes : " + player.getBombsAvailable(), 300, textY);
+        gc.fillText("Portée : " + player.getExplosionRange(), 250, textY);
+        gc.fillText("Bomberman 90 JavaFX", Constants.WINDOW_WIDTH - 170, textY);
     }
 }

@@ -17,7 +17,7 @@ public class Game {
 
     private void initialize() {
         board = new Board();
-        player = new Player(1, 1);
+        player = board.getPlayer(); // Utilise le joueur du Board
         gameState = GameState.PLAYING;
         board.getCell(player.getX(), player.getY()).setHasPlayer(true);
         startGameLoop();
@@ -46,9 +46,14 @@ public class Game {
         if (!player.isAlive()) {
             gameState = GameState.GAME_OVER;
             gameLoop.stop();
-        } else if (board.getEnemies().stream().noneMatch(Enemy::isAlive)) {
+            // (le reste : passage à l'écran Game Over)
+        } else if (board.getBots().stream().noneMatch(PlayerBot::isAlive)) {
             gameState = GameState.VICTORY;
             gameLoop.stop();
+            // AJOUTE CETTE LIGNE :
+            player.addScore(1000); // +1000 points pour la victoire
+            com.bomberman.controller.VictoryController.LAST_SCORE = player.getScore();
+            com.bomberman.utils.SceneManager.switchScene("Victory");
         }
     }
 

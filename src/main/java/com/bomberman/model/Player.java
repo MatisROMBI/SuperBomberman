@@ -13,7 +13,7 @@ public class Player {
     private boolean isAlive = true;
     private boolean speedBoost = false;
     private int respawnDelay = 1000;
-    private long deathTime = -1;
+    protected long deathTime = -1;
 
     // Ajout du listener
     private GameOverListener gameOverListener;
@@ -51,6 +51,7 @@ public class Player {
             board.getCell(x, y).setHasPlayer(true);
 
             if (cell.hasPowerUp()) {
+                addScore(300); // +300 points pour un bonus
                 applyPowerUp(cell.getPowerUp());
                 cell.setPowerUp(null);
             }
@@ -94,24 +95,57 @@ public class Player {
 
     public void addScore(int pts) { score += pts; }
 
-    private void applyPowerUp(PowerUp powerUp) {
+    // Permet la surcharge pour les bots
+    protected void applyPowerUp(PowerUp powerUp) {
         switch (powerUp.getType()) {
-            case EXTRA_BOMB: maxBombs++; bombsAvailable++; break;
-            case RANGE_UP: explosionRange++; break;
-            case LIFE: lives++; break;
-            case SPEED: speedBoost = true; break;
+            case EXTRA_BOMB:
+                maxBombs++;
+                bombsAvailable++;
+                break;
+            case RANGE_UP:
+                explosionRange++;
+                break;
+            case LIFE:
+                lives++;
+                break;
+            case SPEED:
+                speedBoost = true;
+                break;
         }
     }
 
-    // Getters & Setters compressÃ©s
+    // ----------- Getters & Setters complets -----------
+
     public int getX() { return x; }
+    public void setX(int v) { this.x = v; }
+
     public int getY() { return y; }
+    public void setY(int v) { this.y = v; }
+
+    public int getStartX() { return startX; }
+    public int getStartY() { return startY; }
+
     public int getLives() { return lives; }
+    public void setLives(int l) { this.lives = l; }
+
     public int getBombsAvailable() { return bombsAvailable; }
+    public void setBombsAvailable(int b) { this.bombsAvailable = b; }
+
     public int getMaxBombs() { return maxBombs; }
+    public void setMaxBombs(int m) { this.maxBombs = m; }
+
     public int getExplosionRange() { return explosionRange; }
+    public void setExplosionRange(int r) { this.explosionRange = r; }
+
     public boolean isAlive() { return isAlive; }
+    public void setIsAlive(boolean b) { this.isAlive = b; }
+
     public int getScore() { return score; }
+    public void setScore(int s) { this.score = s; }
+
     public boolean hasSpeedBoost() { return speedBoost; }
     public void setSpeedBoost(boolean s) { speedBoost = s; }
+
+    public long getDeathTime() { return deathTime; }
+    public void setDeathTime(long t) { this.deathTime = t; }
 }
