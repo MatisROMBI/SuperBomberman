@@ -1,8 +1,8 @@
-module com.example.superbomberman {
+module com.bomberman {
     requires javafx.controls;
     requires javafx.fxml;
 
+    opens com.bomberman.controller to javafx.fxml;
 
-    opens com.example.superbomberman to javafx.fxml;
-    exports com.example.superbomberman;
+    exports com.bomberman;
 }
