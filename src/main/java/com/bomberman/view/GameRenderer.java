@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.util.List;
 
@@ -17,27 +18,40 @@ public class GameRenderer {
     private Canvas canvas;
     private GraphicsContext gc;
 
-    // Images pour le HUD
     private Image bombermanFaceIcon;
+    private Image bombermanBlackIcon;
+    private Image bombPixelIcon;
+    private Image[] playerSprites = new Image[4]; // p1 = humain, p2/p3/p4 = bots
 
     public GameRenderer(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
         canvas.setWidth(Constants.WINDOW_WIDTH);
-        // Le HUD fait 56px de haut (bandeau orange + marges)
-        canvas.setHeight(Constants.WINDOW_HEIGHT + 56 - Constants.HUD_HEIGHT);
+        canvas.setHeight(Constants.WINDOW_HEIGHT);
 
-        // Charge ton icône Bomberman pour le HUD
         try {
             bombermanFaceIcon = new Image(getClass().getResourceAsStream("/images/bomberman_face.png"));
-        } catch (Exception e) {
-            bombermanFaceIcon = null;
+        } catch (Exception e) { bombermanFaceIcon = null; }
+        try {
+            bombermanBlackIcon = new Image(getClass().getResourceAsStream("/images/bomberman_black.png"));
+        } catch (Exception e) { bombermanBlackIcon = null; }
+        try {
+            bombPixelIcon = new Image(getClass().getResourceAsStream("/images/bombe_pixel.png"));
+        } catch (Exception e) { bombPixelIcon = null; }
+
+        // --- CHARGE LES SPRITES JOUEUR & BOTS ---
+        for (int i = 0; i < 4; i++) {
+            try {
+                playerSprites[i] = new Image(getClass().getResourceAsStream("/images/bomberman_p" + (i + 1) + ".png"));
+            } catch (Exception e) {
+                playerSprites[i] = null;
+            }
         }
     }
 
     public void render(Game game) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        renderHUD(game.getPlayer()); // Affiche le HUD EN HAUT !
+        renderHUD(game.getPlayer());
         renderBoard(game.getBoard());
         renderExplosions(game.getBoard().getExplosions());
         renderBombs(game.getBoard().getBombs());
@@ -47,69 +61,76 @@ public class GameRenderer {
     }
 
     private void renderHUD(Player player) {
-        // Bandeau orange, 56px de haut, en haut de la fenêtre
-        double hudHeight = 56;
+        double hudHeight = Constants.HUD_HEIGHT;
         gc.setFill(Color.web("#FF8800"));
         gc.fillRect(0, 0, Constants.WINDOW_WIDTH, hudHeight);
 
-        // Ombre rétro
         gc.setFill(Color.web("#CC6A00"));
         gc.fillRect(0, hudHeight - 6, Constants.WINDOW_WIDTH, 6);
 
-        // --- Vies Bomberman en icône ---
-        double iconX = 18, iconY = 8;
-        for (int i = 0; i < player.getLives(); i++) {
-            double offsetX = iconX + i * 28;
-            if (bombermanFaceIcon != null) {
-                gc.drawImage(bombermanFaceIcon, offsetX, iconY, 24, 24);
-            } else {
-                // fallback cercle blanc/rouge
-                gc.setFill(Color.WHITE);
-                gc.fillOval(offsetX, iconY, 24, 24);
-                gc.setStroke(Color.BLACK);
-                gc.setLineWidth(2);
-                gc.strokeOval(offsetX, iconY, 24, 24);
-                gc.setFill(Color.RED);
-                gc.fillOval(offsetX + 13, iconY - 3, 6, 6);
-            }
+        // Bomberman blanc (HUD)
+        double iconX = 26, iconY = 8, iconSize = 38;
+        if (bombermanFaceIcon != null) {
+            gc.drawImage(bombermanFaceIcon, iconX, iconY, iconSize, iconSize);
         }
 
-        // --- "SC" (Score) : blanc, centré verticalement ---
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        // Vies = player.getLives() - 1 (convention Bomberman)
+        int livesDisplay = Math.max(0, player.getLives() - 1);
+        double lifeBoxX = iconX + iconSize + 12;
+        double lifeBoxY = iconY + 10;
+        double lifeBoxW = 30;
+        double lifeBoxH = 28;
         gc.setFill(Color.WHITE);
-        gc.fillText("SC", 140, 34);
-
-        // --- Score en blanc sur fond noir, bien aligné ---
+        gc.fillRect(lifeBoxX, lifeBoxY, lifeBoxW, lifeBoxH);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(3);
+        gc.strokeRect(lifeBoxX, lifeBoxY, lifeBoxW, lifeBoxH);
+        gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
         gc.setFill(Color.BLACK);
-        gc.fillRect(180, 12, 120, 30);
+        gc.fillText(String.valueOf(livesDisplay), lifeBoxX + 6, lifeBoxY + 22);
 
+        // "SC"
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 38));
         gc.setFill(Color.WHITE);
-        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 26));
+        double scX = lifeBoxX + lifeBoxW + 20;
+        gc.fillText("SC", scX, 38);
+
+        // Score sur fond noir, barre plus courte
+        gc.setFill(Color.BLACK);
+        double scoreRectX = scX + 60;
+        double scoreRectW = 140;
+        double scoreRectH = 40;
+        gc.fillRect(scoreRectX, 8, scoreRectW, scoreRectH);
+
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 34));
+        gc.setFill(Color.WHITE);
         String scoreStr = String.valueOf(player.getScore());
-        // Centré à l'intérieur du rectangle
-        double scoreRectX = 180;
-        double scoreRectW = 120;
-        int charWidth = 18; // estimation large, style console
-        double totalWidth = scoreStr.length() * charWidth;
-        double scoreX = scoreRectX + scoreRectW/2 - totalWidth/2;
-        gc.fillText(scoreStr, scoreX, 35);
+        Text scoreText = new Text(scoreStr);
+        scoreText.setFont(gc.getFont());
+        double scoreStrWidth = scoreText.getLayoutBounds().getWidth();
+        double scoreTextX = scoreRectX + (scoreRectW - scoreStrWidth) / 2;
+        gc.fillText(scoreStr, scoreTextX, 40);
 
+        // Bomberman noir (à droite du score)
+        double blackIconX = scoreRectX + scoreRectW + 30;
+        if (bombermanBlackIcon != null) {
+            gc.drawImage(bombermanBlackIcon, blackIconX, 12, 32, 32);
+        }
 
-        // --- "PRESS START" jaune à droite ---
+        // "PRESS START" plus petit, bien placé pour être visible en entier
         gc.setFill(Color.YELLOW);
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 22));
-        gc.fillText("PRESS START", Constants.WINDOW_WIDTH - 200, 36);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 26)); // Plus petit
+        double pressStartX = blackIconX + 40;
+        gc.fillText("PRESS START", pressStartX, 38);
     }
 
     private void renderBoard(Board board) {
-        // Décale le plateau sous le HUD
-        double yOffset = 56;
+        double yOffset = Constants.HUD_HEIGHT;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
                 Cell cell = board.getCell(x, y);
                 double pixelX = x * Constants.CELL_SIZE;
                 double pixelY = y * Constants.CELL_SIZE + yOffset;
-
                 switch (cell.getType()) {
                     case WALL:
                         gc.setFill(Color.DARKGRAY);
@@ -132,21 +153,23 @@ public class GameRenderer {
     }
 
     private void renderBombs(List<Bomb> bombs) {
-        double yOffset = 56;
+        double yOffset = Constants.HUD_HEIGHT;
         for (Bomb bomb : bombs) {
             if (!bomb.hasExploded()) {
-                double px = bomb.getX() * Constants.CELL_SIZE + 8;
-                double py = bomb.getY() * Constants.CELL_SIZE + 8 + yOffset;
-                gc.setFill(Color.BLACK);
-                gc.fillOval(px, py, Constants.CELL_SIZE - 16, Constants.CELL_SIZE - 16);
-                gc.setFill(Color.YELLOW);
-                gc.fillOval(px + 8, py + 8, 6, 6);
+                double px = bomb.getX() * Constants.CELL_SIZE + 4;
+                double py = bomb.getY() * Constants.CELL_SIZE + 4 + yOffset;
+                if (bombPixelIcon != null) {
+                    gc.drawImage(bombPixelIcon, px, py, Constants.CELL_SIZE - 8, Constants.CELL_SIZE - 8);
+                } else {
+                    gc.setFill(Color.BLACK);
+                    gc.fillOval(px, py, Constants.CELL_SIZE - 8, Constants.CELL_SIZE - 8);
+                }
             }
         }
     }
 
     private void renderExplosions(List<Explosion> explosions) {
-        double yOffset = 56;
+        double yOffset = Constants.HUD_HEIGHT;
         for (Explosion explosion : explosions) {
             double px = explosion.getX() * Constants.CELL_SIZE;
             double py = explosion.getY() * Constants.CELL_SIZE + yOffset;
@@ -157,37 +180,42 @@ public class GameRenderer {
         }
     }
 
+    // ----------- HUMAIN en sprite -----------
     private void renderPlayer(Player player) {
         if (player.isAlive()) {
-            double yOffset = 56;
-            double px = player.getX() * Constants.CELL_SIZE + 6;
-            double py = player.getY() * Constants.CELL_SIZE + 6 + yOffset;
-            gc.setFill(Color.DODGERBLUE);
-            gc.fillOval(px, py, Constants.CELL_SIZE - 12, Constants.CELL_SIZE - 12);
-            gc.setFill(Color.WHITE);
-            gc.fillOval(px + 7, py + 10, 8, 8);
+            double yOffset = Constants.HUD_HEIGHT;
+            double px = player.getX() * Constants.CELL_SIZE;
+            double py = player.getY() * Constants.CELL_SIZE + yOffset;
+            if (playerSprites[0] != null) {
+                gc.drawImage(playerSprites[0], px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else {
+                gc.setFill(Color.DODGERBLUE);
+                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            }
         }
     }
 
+    // ----------- BOTS en sprites -----------
     private void renderBots(List<PlayerBot> bots) {
-        double yOffset = 56;
-        Color[] botColors = {Color.CRIMSON, Color.GOLD, Color.MEDIUMVIOLETRED};
-        int idx = 0;
-        for (PlayerBot bot : bots) {
+        double yOffset = Constants.HUD_HEIGHT;
+        for (int i = 0; i < bots.size(); i++) {
+            PlayerBot bot = bots.get(i);
             if (bot.isAlive()) {
-                double px = bot.getX() * Constants.CELL_SIZE + 8;
-                double py = bot.getY() * Constants.CELL_SIZE + 8 + yOffset;
-                gc.setFill(botColors[idx % botColors.length]);
-                gc.fillOval(px, py, Constants.CELL_SIZE - 16, Constants.CELL_SIZE - 16);
-                gc.setFill(Color.WHITE);
-                gc.fillOval(px + 7, py + 8, 8, 8);
+                double px = bot.getX() * Constants.CELL_SIZE;
+                double py = bot.getY() * Constants.CELL_SIZE + yOffset;
+                int spriteIdx = Math.min(i + 1, playerSprites.length - 1); // bots: p2,p3,p4
+                if (playerSprites[spriteIdx] != null) {
+                    gc.drawImage(playerSprites[spriteIdx], px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                } else {
+                    gc.setFill(Color.RED);
+                    gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                }
             }
-            idx++;
         }
     }
 
     private void renderPowerUps(Board board) {
-        double yOffset = 56;
+        double yOffset = Constants.HUD_HEIGHT;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
                 Cell cell = board.getCell(x, y);
