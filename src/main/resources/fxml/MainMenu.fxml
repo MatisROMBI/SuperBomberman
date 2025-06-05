@@ -2,34 +2,40 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0"
-      styleClass="main-menu" xmlns="http://javafx.com/javafx/11.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.bomberman.controller.MainMenuController">
+<StackPane xmlns="http://javafx.com/javafx/11.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.bomberman.controller.MainMenuController"
+           prefWidth="800" prefHeight="600">
+
     <children>
-        <Label styleClass="title" text="BOMBERMAN">
-            <font>
-                <Font name="Arial Bold" size="48.0" />
-            </font>
-        </Label>
-        <Button fx:id="playButton" prefHeight="50.0" prefWidth="200.0"
-                styleClass="menu-button" text="JOUER">
-            <font>
-                <Font name="Arial Bold" size="18.0" />
-            </font>
-        </Button>
-        <Button fx:id="quitButton" prefHeight="50.0" prefWidth="200.0"
-                styleClass="menu-button" text="QUITTER">
-            <font>
-                <Font name="Arial Bold" size="18.0" />
-            </font>
-        </Button>
+        <!-- Image de fond (adapter le fitWidth si tu veux du plein écran) -->
+        <ImageView fx:id="backgroundImage"
+                   fitWidth="800"
+                   fitHeight="600"
+                   preserveRatio="false"
+                   StackPane.alignment="CENTER"/>
+        <!-- Boutons au centre -->
+        <VBox alignment="CENTER" spacing="20">
+            <children>
+                <Button fx:id="playButton" text="JOUER" prefWidth="200" prefHeight="50">
+                    <font>
+                        <Font name="Arial Bold" size="18.0" />
+                    </font>
+                </Button>
+                <Button fx:id="quitButton" text="QUITTER" prefWidth="200" prefHeight="50">
+                    <font>
+                        <Font name="Arial Bold" size="18.0" />
+                    </font>
+                </Button>
+            </children>
+            <padding>
+                <Insets top="20" bottom="20" left="20" right="20"/>
+            </padding>
+        </VBox>
     </children>
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-</VBox>
+</StackPane>
