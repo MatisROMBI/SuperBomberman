@@ -6,6 +6,7 @@ import com.bomberman.model.enums.PowerUpType;
 import com.bomberman.utils.Constants;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -16,12 +17,22 @@ public class GameRenderer {
     private Canvas canvas;
     private GraphicsContext gc;
 
+    // Images pour le HUD
+    private Image bombermanFaceIcon;
+
     public GameRenderer(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
         canvas.setWidth(Constants.WINDOW_WIDTH);
         // Le HUD fait 56px de haut (bandeau orange + marges)
         canvas.setHeight(Constants.WINDOW_HEIGHT + 56 - Constants.HUD_HEIGHT);
+
+        // Charge ton icône Bomberman pour le HUD
+        try {
+            bombermanFaceIcon = new Image(getClass().getResourceAsStream("/images/bomberman_face.png"));
+        } catch (Exception e) {
+            bombermanFaceIcon = null;
+        }
     }
 
     public void render(Game game) {
@@ -33,7 +44,6 @@ public class GameRenderer {
         renderPowerUps(game.getBoard());
         renderBots(game.getBoard().getBots());
         renderPlayer(game.getPlayer());
-        // (Plus de HUD en bas)
     }
 
     private void renderHUD(Player player) {
@@ -42,47 +52,57 @@ public class GameRenderer {
         gc.setFill(Color.web("#FF8800"));
         gc.fillRect(0, 0, Constants.WINDOW_WIDTH, hudHeight);
 
-        // Ombre pour l'effet "rétro"
+        // Ombre rétro
         gc.setFill(Color.web("#CC6A00"));
         gc.fillRect(0, hudHeight - 6, Constants.WINDOW_WIDTH, 6);
 
-        // Icône Bomberman stylisé (cercle blanc+noir+rouge) + vies
-        double iconX = 16, iconY = 10, iconR = 18;
+        // --- Vies Bomberman en icône ---
+        double iconX = 18, iconY = 8;
         for (int i = 0; i < player.getLives(); i++) {
-            double offsetX = iconX + i * 26;
-            // Bombe blanche
-            gc.setFill(Color.WHITE);
-            gc.fillOval(offsetX, iconY, iconR, iconR);
-            // Contour noir
-            gc.setStroke(Color.BLACK);
-            gc.setLineWidth(2);
-            gc.strokeOval(offsetX, iconY, iconR, iconR);
-            // Petite mèche rouge
-            gc.setFill(Color.RED);
-            gc.fillOval(offsetX + 13, iconY - 5, 6, 6);
+            double offsetX = iconX + i * 28;
+            if (bombermanFaceIcon != null) {
+                gc.drawImage(bombermanFaceIcon, offsetX, iconY, 24, 24);
+            } else {
+                // fallback cercle blanc/rouge
+                gc.setFill(Color.WHITE);
+                gc.fillOval(offsetX, iconY, 24, 24);
+                gc.setStroke(Color.BLACK);
+                gc.setLineWidth(2);
+                gc.strokeOval(offsetX, iconY, 24, 24);
+                gc.setFill(Color.RED);
+                gc.fillOval(offsetX + 13, iconY - 3, 6, 6);
+            }
         }
 
-        // Texte "SC" jaune style arcade
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 26));
-        gc.setFill(Color.YELLOW);
-        gc.fillText("SC", 120, 30);
+        // --- "SC" (Score) : blanc, centré verticalement ---
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        gc.setFill(Color.WHITE);
+        gc.fillText("SC", 140, 34);
 
-        // Score en blanc sur fond noir (style original)
+        // --- Score en blanc sur fond noir, bien aligné ---
         gc.setFill(Color.BLACK);
-        gc.fillRect(170, 12, 100, 28);
+        gc.fillRect(180, 12, 120, 30);
+
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 26));
         String scoreStr = String.valueOf(player.getScore());
-        gc.fillText(scoreStr, 260 - scoreStr.length() * 14, 34); // aligné à droite dans le rectangle
+        // Centré à l'intérieur du rectangle
+        double scoreRectX = 180;
+        double scoreRectW = 120;
+        int charWidth = 18; // estimation large, style console
+        double totalWidth = scoreStr.length() * charWidth;
+        double scoreX = scoreRectX + scoreRectW/2 - totalWidth/2;
+        gc.fillText(scoreStr, scoreX, 35);
 
-        // (Optionnel) Texte "PRESS START" à droite (en jaune)
+
+        // --- "PRESS START" jaune à droite ---
         gc.setFill(Color.YELLOW);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 22));
-        gc.fillText("PRESS START", Constants.WINDOW_WIDTH - 180, 34);
+        gc.fillText("PRESS START", Constants.WINDOW_WIDTH - 200, 36);
     }
 
     private void renderBoard(Board board) {
-        // Décale le plateau vers le bas sous le HUD
+        // Décale le plateau sous le HUD
         double yOffset = 56;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
