@@ -120,7 +120,9 @@ public class Board {
                 if (cell.getType() == CellType.WALL) break;
                 if (cell.getType() == CellType.DESTRUCTIBLE_WALL) {
                     // Ajout du score pour bloc cassé
-                    player.addScore(50); // +50 points pour bloc cassé
+                    if (bomb.getOwner() == 1) {
+                        player.addScore(50); // +50 points pour bloc cassé
+                    }
                     cell.setType(CellType.EMPTY);
                     if (Math.random() < 0.25) {
                         cell.setPowerUp(PowerUp.random());

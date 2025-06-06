@@ -7,6 +7,16 @@ public class Bomb {
     private int explosionRange;
     private long plantTime;
     private boolean hasExploded;
+    private int owner;
+
+    public Bomb(int x, int y, int explosionRange, int owner) {
+        this.x = x;
+        this.y = y;
+        this.explosionRange = explosionRange;
+        this.plantTime = System.currentTimeMillis();
+        this.hasExploded = false;
+        this.owner = owner;
+    }
 
     public Bomb(int x, int y, int explosionRange) {
         this.x = x;
@@ -14,6 +24,7 @@ public class Bomb {
         this.explosionRange = explosionRange;
         this.plantTime = System.currentTimeMillis();
         this.hasExploded = false;
+        this.owner = 0;
     }
 
     public boolean shouldExplode() {
@@ -28,4 +39,5 @@ public class Bomb {
     public int getY() { return y; }
     public int getExplosionRange() { return explosionRange; }
     public boolean hasExploded() { return hasExploded; }
+    public int getOwner() { return owner; }
 }

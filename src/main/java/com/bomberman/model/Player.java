@@ -60,7 +60,7 @@ public class Player {
 
     public void placeBomb(Board board) {
         if (bombsAvailable > 0 && board.getCell(x, y).getBomb() == null) {
-            Bomb bomb = new Bomb(x, y, explosionRange);
+            Bomb bomb = new Bomb(x, y, explosionRange, 1);
             board.getCell(x, y).setBomb(bomb);
             board.addBomb(bomb);
             bombsAvailable--;
