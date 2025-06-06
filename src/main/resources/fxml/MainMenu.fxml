@@ -25,22 +25,18 @@
         <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="BOTTOM_LEFT" />
 
         <!-- Les boutons centrés -->
-        <VBox alignment="CENTER" spacing="20">
+        <VBox alignment="CENTER" spacing="20" translateY="150">
             <children>
-                <Button fx:id="playButton" text="JOUER" prefWidth="200" prefHeight="50">
-                    <font>
-                        <Font name="Arial Bold" size="18.0" />
-                    </font>
-                </Button>
-                <Button fx:id="quitButton" text="QUITTER" prefWidth="200" prefHeight="50">
-                    <font>
-                        <Font name="Arial Bold" size="18.0" />
-                    </font>
-                </Button>
+                <Button fx:id="playButton" text="JOUER" prefWidth="200" prefHeight="50"
+                        style="-fx-background-color: #3cba54; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18px; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 4, 0, 0, 2);"/>
+                <Button fx:id="quitButton" text="QUITTER" prefWidth="200" prefHeight="50"
+                        style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18px; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 4, 0, 0, 2);"/>
             </children>
             <padding>
                 <Insets top="20" bottom="20" left="20" right="20"/>
             </padding>
         </VBox>
+
+
     </children>
 </StackPane>
