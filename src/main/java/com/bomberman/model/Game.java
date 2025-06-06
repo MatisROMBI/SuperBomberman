@@ -4,13 +4,12 @@ import com.bomberman.model.enums.GameState;
 import com.bomberman.utils.Constants;
 import javafx.animation.AnimationTimer;
 
-public class Game implements GameOverListener {
+public class Game {
     private Board board;
     private Player player;
     private GameState gameState;
     private AnimationTimer gameLoop;
     private long lastUpdate;
-    //private Music music = new Music();
 
     public Game() {
         initialize();
@@ -21,7 +20,6 @@ public class Game implements GameOverListener {
         player = board.getPlayer(); // Utilise le joueur du Board
         gameState = GameState.PLAYING;
         board.getCell(player.getX(), player.getY()).setHasPlayer(true);
-        //music.demarrerMusique();
         startGameLoop();
     }
 
@@ -47,8 +45,6 @@ public class Game implements GameOverListener {
     private void checkGameState() {
         if (!player.isAlive()) {
             gameState = GameState.GAME_OVER;
-            //music.arreterMusique();
-            System.out.println("GAME OVER");
             gameLoop.stop();
             // (le reste : passage à l'écran Game Over)
         } else if (board.getBots().stream().noneMatch(PlayerBot::isAlive)) {
@@ -78,10 +74,4 @@ public class Game implements GameOverListener {
     public Board getBoard() { return board; }
     public Player getPlayer() { return player; }
     public GameState getGameState() { return gameState; }
-
-    @Override
-    public void onGameOver(int score) {
-        System.out.println("GAME OVER");
-        //music.arreterMusique();
-    }
 }

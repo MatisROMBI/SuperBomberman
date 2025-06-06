@@ -72,12 +72,7 @@ public class MainMenuController {
     }
 
     private void startGame() {
-        // Lancement de la musique au début du jeu
-        // InGameMusic.demarrerMusique();
-
         // Changement de la scène
         SceneManager.switchScene("Game");
-
-
     }
 }

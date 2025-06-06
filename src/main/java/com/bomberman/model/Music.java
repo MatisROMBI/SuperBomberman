@@ -20,6 +20,7 @@ public class Music {
         gameOver = new AudioClip(getClass().getResource("/sons/est-ce-que-tu-veux-abandonner-made-with-Voicemod.mp3").toExternalForm());
 
         Media InGameMusic = new Media(getClass().getResource("/sons/MusiqueMonde3.mp3").toExternalForm());
+
         musiquePlayer = new MediaPlayer(InGameMusic);
         musiquePlayer.setCycleCount(MediaPlayer.INDEFINITE); // boucle la musique
     }
@@ -38,16 +39,21 @@ public class Music {
         }
     }
 
+    // Méthode pour arrêter la musique
+    public void arreterMusique() {
+        musiquePlayer.pause();
+    }
+
     public void demarrerGameOverMusique() {
         if (musiqueActif) {
             gameOver.play();
         }
     }
 
-    // Méthode pour arrêter la musique
-    public void arreterMusique() {
-        musiquePlayer.pause();
+    public void arreterGameOverMusique() {
+        gameOver.stop();
     }
+
 
     // Pour activer/désactiver les sons
     public void setSonActif(boolean actif) {

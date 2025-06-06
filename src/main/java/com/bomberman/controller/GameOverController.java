@@ -15,8 +15,6 @@ public class GameOverController {
     @FXML
     private Button mainMenuButton;
 
-    Music GameOverMusic = new Music();
-
     // Variable statique pour passer le score
     private static int lastScore = 0;
 
@@ -31,9 +29,6 @@ public class GameOverController {
 
         // Affiche le score dès l'arrivée sur l'écran
         gameOverLabel.setText("GAME OVER !\nVotre score : " + lastScore);
-
-        // Lancement de la musique dans le menu du game over
-        GameOverMusic.demarrerGameOverMusique();
     }
 
 
