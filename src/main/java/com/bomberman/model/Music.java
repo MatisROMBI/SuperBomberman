@@ -13,9 +13,12 @@ public class Music {
     private AudioClip explosionClip;
     private MediaPlayer musiquePlayer;
     private AudioClip gameOver;
+    private AudioClip musiqueDepart;
 
     public Music() {
         explosionClip = new AudioClip(getClass().getResource("/sons/explosion.mp3").toExternalForm());
+
+        musiqueDepart = new AudioClip(getClass().getResource("/sons/MusiqueDeDepart.mp3").toExternalForm());
 
         gameOver = new AudioClip(getClass().getResource("/sons/est-ce-que-tu-veux-abandonner-made-with-Voicemod.mp3").toExternalForm());
 
@@ -39,9 +42,10 @@ public class Music {
         }
     }
 
-    // Méthode pour arrêter la musique
-    public void arreterMusique() {
-        musiquePlayer.pause();
+    public void demarrerMusiqueDepart() {
+        if (musiqueActif) {
+            musiqueDepart.play();
+        }
     }
 
     public void demarrerGameOverMusique() {
@@ -50,10 +54,19 @@ public class Music {
         }
     }
 
+    // Méthode pour arrêter la musique
+    public void arreterMusique() {
+        musiquePlayer.pause();
+    }
+
     public void arreterGameOverMusique() {
         gameOver.stop();
     }
 
+
+    public void arreterMusiqueDepart() {
+        musiqueDepart.stop();
+    }
 
     // Pour activer/désactiver les sons
     public void setSonActif(boolean actif) {

@@ -17,11 +17,13 @@ public class MainMenuController {
     @FXML private ImageView balloon2; // Ballon rouge (rouge)
     @FXML private ImageView balloon3; // Dirigeable FIRE (fire)
 
-    Music InGameMusic = new Music();
+    Music music = new Music();
 
     @FXML
     private void initialize() {
         try {
+            music.arreterGameOverMusique();
+            music.demarrerMusiqueDepart();
             backgroundImage.setImage(new Image(getClass().getResourceAsStream("/images/menu_bg.png")));
             balloon1.setImage(new Image(getClass().getResourceAsStream("/images/dirigeable_bleu.png")));
             balloon2.setImage(new Image(getClass().getResourceAsStream("/images/ballon_rouge.png")));
@@ -72,6 +74,8 @@ public class MainMenuController {
     }
 
     private void startGame() {
+        // Arrêt de la musique du menu
+        music.arreterMusiqueDepart();
         // Changement de la scène
         SceneManager.switchScene("Game");
     }
