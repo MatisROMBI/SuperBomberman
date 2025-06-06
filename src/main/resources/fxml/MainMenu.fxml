@@ -5,12 +5,12 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.bomberman.controller.MainMenuController"
            prefWidth="800" prefHeight="600">
+
     <children>
         <!-- Image de fond plein écran -->
         <ImageView fx:id="backgroundImage"
@@ -19,28 +19,18 @@
                    preserveRatio="false"
                    StackPane.alignment="CENTER"/>
 
-        <!-- Ballons animés -->
+        <!-- Dirigeables/Ballons animés -->
         <ImageView fx:id="balloon1" fitWidth="150" fitHeight="110" StackPane.alignment="TOP_LEFT" />
-        <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="CENTER" />
-        <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="BOTTOM_LEFT" />
+        <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="TOP_LEFT" />
+        <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="TOP_LEFT" />
 
-        <!-- Les boutons centrés -->
-        <VBox alignment="CENTER" spacing="20">
-            <children>
-                <Button fx:id="playButton" text="JOUER" prefWidth="200" prefHeight="50">
-                    <font>
-                        <Font name="Arial Bold" size="18.0" />
-                    </font>
-                </Button>
-                <Button fx:id="quitButton" text="QUITTER" prefWidth="200" prefHeight="50">
-                    <font>
-                        <Font name="Arial Bold" size="18.0" />
-                    </font>
-                </Button>
-            </children>
-            <padding>
-                <Insets top="20" bottom="20" left="20" right="20"/>
-            </padding>
-        </VBox>
+        <!-- Les deux modes de jeu style pixel arcade -->
+    <VBox alignment="CENTER" spacing="30">
+        <children>
+            <Button fx:id="robotSurvivorButton" text="ROBOT SURVIVOR" styleClass="arcade-button" prefWidth="500" prefHeight="70"/>
+            <Button fx:id="legend1v1Button" text="1V1 LEGEND" styleClass="arcade-button" prefWidth="500" prefHeight="70"/>
+            <Button fx:id="quitButton" text="QUIT" prefWidth="300" prefHeight="60"/>
+        </children>
+    </VBox>
     </children>
 </StackPane>
