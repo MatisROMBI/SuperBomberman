@@ -46,7 +46,7 @@ public class Music {
 
     // Méthode pour arrêter la musique
     public void arreterMusique() {
-        musiquePlayer.stop();
+        musiquePlayer.pause();
     }
 
     // Pour activer/désactiver les sons

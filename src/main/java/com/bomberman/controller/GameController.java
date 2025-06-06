@@ -2,6 +2,7 @@ package com.bomberman.controller;
 
 import com.bomberman.model.Game;
 import com.bomberman.model.GameOverListener;
+import com.bomberman.model.Music;
 import com.bomberman.model.enums.Direction;
 import com.bomberman.model.enums.GameState;
 import com.bomberman.utils.SceneManager;
@@ -26,13 +27,17 @@ public class GameController implements GameOverListener {
     private Set<String> pressedKeys;
     private AnimationTimer renderLoop;
 
+    private Music music = new Music();
+
     @FXML
     private void initialize() {
         game = new Game();
+        music.demarrerMusique();
         // On connecte le listener (important!)
         game.getPlayer().setGameOverListener(this);
         renderer = new GameRenderer(gameCanvas);
         pressedKeys = new HashSet<>();
+
 
         setupSoundHandling();
         setupKeyboardHandling();
@@ -68,22 +73,22 @@ public class GameController implements GameOverListener {
             switch (keyCode) {
                 case "UP":
                 case "Z":
-                    game.getPlayer().move(Direction.UP, game.getBoard());
+                    game.getPlayer().move(Direction.UP, game.getBoard(), game.getGameState());
                     break;
                 case "DOWN":
                 case "S":
-                    game.getPlayer().move(Direction.DOWN, game.getBoard());
+                    game.getPlayer().move(Direction.DOWN, game.getBoard(), game.getGameState());
                     break;
                 case "LEFT":
                 case "Q":
-                    game.getPlayer().move(Direction.LEFT, game.getBoard());
+                    game.getPlayer().move(Direction.LEFT, game.getBoard(), game.getGameState());
                     break;
                 case "RIGHT":
                 case "D":
-                    game.getPlayer().move(Direction.RIGHT, game.getBoard());
+                    game.getPlayer().move(Direction.RIGHT, game.getBoard(), game.getGameState());
                     break;
                 case "SPACE":
-                    game.getPlayer().placeBomb(game.getBoard());
+                    game.getPlayer().placeBomb(game.getBoard(), game.getGameState());
                     break;
                 case "ESCAPE":
                     game.pause();
@@ -125,6 +130,7 @@ public class GameController implements GameOverListener {
     // Implémentation du callback
     @Override
     public void onGameOver(int score) {
+        music.arreterMusique();
         GameOverController.setLastScore(score);
         SceneManager.switchScene("GameOver");
     }

@@ -1,6 +1,8 @@
 package com.bomberman.model;
 
 import com.bomberman.model.enums.Direction;
+import com.bomberman.model.enums.GameState;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +58,7 @@ public class PlayerBot extends Player {
                 int ny = getY() + dir.getDy();
                 if (board.isValidPosition(nx, ny)) {
                     if (board.getCell(nx, ny).isWalkable() && !board.getCell(nx, ny).hasPlayer()) {
-                        move(dir, board);
+                        move(dir, board, GameState.PLAYING);
                         moved = true;
                         break;
                     }

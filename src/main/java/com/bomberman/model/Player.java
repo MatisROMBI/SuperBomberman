@@ -1,6 +1,7 @@
 package com.bomberman.model;
 
 import com.bomberman.model.enums.Direction;
+import com.bomberman.model.enums.GameState;
 
 public class Player {
     private int x, y;
@@ -37,7 +38,8 @@ public class Player {
         isAlive = true;
     }
 
-    public void move(Direction direction, Board board) {
+    public void move(Direction direction, Board board, GameState gameState) {
+        if (gameState != GameState.PLAYING) return;
         int newX = x + direction.getDx();
         int newY = y + direction.getDy();
 
@@ -58,8 +60,8 @@ public class Player {
         }
     }
 
-    public void placeBomb(Board board) {
-        if (bombsAvailable > 0 && board.getCell(x, y).getBomb() == null) {
+    public void placeBomb(Board board, GameState gameState) {
+        if (bombsAvailable > 0 && board.getCell(x, y).getBomb() == null && gameState == GameState.PLAYING) {
             Bomb bomb = new Bomb(x, y, explosionRange, 1);
             board.getCell(x, y).setBomb(bomb);
             board.addBomb(bomb);
