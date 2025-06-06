@@ -1,5 +1,6 @@
 package com.bomberman.controller;
 
+import com.bomberman.model.Music;
 import com.bomberman.utils.SceneManager;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
@@ -16,6 +17,8 @@ public class MainMenuController {
     @FXML private ImageView balloon2; // Ballon rouge (rouge)
     @FXML private ImageView balloon3; // Dirigeable FIRE (fire)
 
+    Music InGameMusic = new Music();
+
     @FXML
     private void initialize() {
         try {
@@ -26,6 +29,7 @@ public class MainMenuController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
 
         playButton.setOnAction(e -> startGame());
         quitButton.setOnAction(e -> System.exit(0));
@@ -68,6 +72,12 @@ public class MainMenuController {
     }
 
     private void startGame() {
+        // Lancement de la musique au début du jeu
+        InGameMusic.demarrerMusique();
+
+        // Changement de la scène
         SceneManager.switchScene("Game");
+
+
     }
 }

@@ -1,9 +1,11 @@
 package com.bomberman.controller;
 
+import com.bomberman.model.Music;
 import com.bomberman.utils.SceneManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.media.AudioClip;
 
 public class GameOverController {
     @FXML
@@ -12,6 +14,8 @@ public class GameOverController {
     private Button playAgainButton;
     @FXML
     private Button mainMenuButton;
+
+    Music GameOverMusic = new Music();
 
     // Variable statique pour passer le score
     private static int lastScore = 0;
@@ -24,9 +28,14 @@ public class GameOverController {
     private void initialize() {
         playAgainButton.setOnAction(e -> playAgain());
         mainMenuButton.setOnAction(e -> goToMainMenu());
+
         // Affiche le score dès l'arrivée sur l'écran
         gameOverLabel.setText("GAME OVER !\nVotre score : " + lastScore);
+
+        // Lancement de la musique dans le menu du game over
+        GameOverMusic.demarrerGameOverMusique();
     }
+
 
     private void playAgain() {
         SceneManager.switchScene("Game");
@@ -41,3 +50,4 @@ public class GameOverController {
         gameOverLabel.setText(result);
     }
 }
+

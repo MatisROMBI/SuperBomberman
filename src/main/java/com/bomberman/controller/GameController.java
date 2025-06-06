@@ -34,8 +34,12 @@ public class GameController implements GameOverListener {
         renderer = new GameRenderer(gameCanvas);
         pressedKeys = new HashSet<>();
 
+        setupSoundHandling();
         setupKeyboardHandling();
         startRenderLoop();
+    }
+
+    private void setupSoundHandling() {
     }
 
     private void setupKeyboardHandling() {
