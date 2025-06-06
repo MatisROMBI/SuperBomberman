@@ -10,8 +10,8 @@ public class PlayerBot extends Player {
     private Random random = new Random();
     private long lastMoveTime = 0;
     private static final int BOT_MOVE_DELAY = 1800; // 1.8 secondes entre actions
-    private int maxBombsBot = 2;
-    private int bombsAvailableBot = 2;
+    private int maxBombsBot = 0;
+    private int bombsAvailableBot = 0;
 
     public PlayerBot(int startX, int startY) {
         super(startX, startY);

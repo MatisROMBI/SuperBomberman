@@ -5,7 +5,7 @@ import com.bomberman.model.enums.Direction;
 public class Player {
     private int x, y;
     private int startX, startY;
-    private int lives = 6;
+    private int lives = 1;
     private int maxBombs = 2;
     private int bombsAvailable = 2;
     private int explosionRange = 1;

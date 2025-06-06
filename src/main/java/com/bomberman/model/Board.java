@@ -108,7 +108,7 @@ public class Board {
         int bombX = bomb.getX();
         int bombY = bomb.getY();
         grid[bombX][bombY].setBomb(null);
-        createExplosion(bombX, bombY);
+        createExplosion(bombX, bombY, bomb.getOwner());
 
         for (Direction direction : Direction.values()) {
             for (int i = 1; i <= bomb.getExplosionRange(); i++) {
@@ -120,17 +120,17 @@ public class Board {
                 if (cell.getType() == CellType.WALL) break;
                 if (cell.getType() == CellType.DESTRUCTIBLE_WALL) {
                     // Ajout du score pour bloc cassé
-                    if (bomb.getOwner() == 1) {
+                    if (bomb.getOwner() != 0) {
                         player.addScore(50); // +50 points pour bloc cassé
                     }
+                    createExplosion(x, y, bomb.getOwner());
                     cell.setType(CellType.EMPTY);
                     if (Math.random() < 0.25) {
                         cell.setPowerUp(PowerUp.random());
                     }
-                    createExplosion(x, y);
                     break;
                 }
-                createExplosion(x, y);
+                createExplosion(x, y, bomb.getOwner());
 
                 if (cell.getBomb() != null && !cell.getBomb().hasExploded()) {
                     explodeBomb(cell.getBomb());
@@ -139,7 +139,7 @@ public class Board {
         }
     }
 
-    private void createExplosion(int x, int y) {
+    private void createExplosion(int x, int y, int owner) {
         explosions.add(new Explosion(x, y));
         Cell cell = grid[x][y];
 
@@ -155,7 +155,7 @@ public class Board {
                 bot.takeDamage();
                 bot.respawnAtStart(this);
                 // S'il vient d'être éliminé
-                if (botWasAlive && !bot.isAlive()) {
+                if (botWasAlive && !bot.isAlive() && owner != 0) {
                     player.addScore(600); // +600 points pour chaque bot éliminé
                 }
             }
