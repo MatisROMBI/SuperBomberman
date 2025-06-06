@@ -11,15 +11,20 @@
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.bomberman.controller.MainMenuController"
            prefWidth="800" prefHeight="600">
-
     <children>
-        <!-- Image de fond (adapter le fitWidth si tu veux du plein écran) -->
+        <!-- Image de fond plein écran -->
         <ImageView fx:id="backgroundImage"
                    fitWidth="800"
                    fitHeight="600"
                    preserveRatio="false"
                    StackPane.alignment="CENTER"/>
-        <!-- Boutons au centre -->
+
+        <!-- Ballons animés -->
+        <ImageView fx:id="balloon1" fitWidth="150" fitHeight="110" StackPane.alignment="TOP_LEFT" />
+        <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="CENTER" />
+        <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="BOTTOM_LEFT" />
+
+        <!-- Les boutons centrés -->
         <VBox alignment="CENTER" spacing="20">
             <children>
                 <Button fx:id="playButton" text="JOUER" prefWidth="200" prefHeight="50">
