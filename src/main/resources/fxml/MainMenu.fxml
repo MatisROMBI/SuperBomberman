@@ -27,7 +27,7 @@
             <children>
                 <ImageView fx:id="robotSurvivorButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
                 <ImageView fx:id="legend1v1ButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
-                <ImageView fx:id="quitButtonImg" fitWidth="100" fitHeight="40" pickOnBounds="true"/>
+                <ImageView fx:id="quitButtonImg" fitWidth="100" fitHeight="39" pickOnBounds="true"/>
             </children>
         </VBox>
     </children>

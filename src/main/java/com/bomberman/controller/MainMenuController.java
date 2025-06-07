@@ -76,7 +76,7 @@ public class MainMenuController {
     }
 
     private void animateBalloons() {
-        double width = 800;
+        double width = 799;
         balloon1.setTranslateX(-balloon1.getFitWidth());
         balloon1.setTranslateY(100);
         TranslateTransition ttBleu = new TranslateTransition(Duration.seconds(7), balloon1);
