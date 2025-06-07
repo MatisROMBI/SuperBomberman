@@ -30,7 +30,7 @@ public class GameOverController {
         mainMenuButton.setOnAction(e -> goToMainMenu());
 
         // Affiche le score dès l'arrivée sur l'écran
-        gameOverLabel.setText("GAME OVER !\nVotre score : " + lastScore);
+
 
         // Lancement de la musique dans le menu du game over
         GameOverMusic.demarrerGameOverMusique();

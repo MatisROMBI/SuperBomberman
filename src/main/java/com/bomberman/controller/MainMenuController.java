@@ -4,7 +4,6 @@ import com.bomberman.utils.SceneManager;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
@@ -13,43 +12,44 @@ import javafx.util.Duration;
 import java.net.URL;
 
 public class MainMenuController {
-    @FXML private Button robotSurvivorButton;
-    @FXML private Button legend1v1Button;
-    @FXML private Button quitButton;
     @FXML private ImageView backgroundImage;
-    @FXML private ImageView balloon1; // Dirigeable bleu
-    @FXML private ImageView balloon2; // Ballon rouge
-    @FXML private ImageView balloon3; // Dirigeable FIRE
+    @FXML private ImageView balloon1;
+    @FXML private ImageView balloon2;
+    @FXML private ImageView balloon3;
+
+    @FXML private ImageView robotSurvivorButtonImg;
+    @FXML private ImageView legend1v1ButtonImg;
+    @FXML private ImageView quitButtonImg;
 
     private MediaPlayer menuMusicPlayer;
 
     @FXML
     private void initialize() {
-        // Images
         try {
             backgroundImage.setImage(new Image(getClass().getResourceAsStream("/images/menu_bg.png")));
             balloon1.setImage(new Image(getClass().getResourceAsStream("/images/dirigeable_bleu.png")));
             balloon2.setImage(new Image(getClass().getResourceAsStream("/images/ballon_rouge.png")));
             balloon3.setImage(new Image(getClass().getResourceAsStream("/images/fire_dirigeable.png")));
+            robotSurvivorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/ROBOT-SURVIVOR.png")));
+            legend1v1ButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/1V1_LEGEND.png")));
+            quitButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/QUIT_text.png")));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Musique du menu
         playMenuMusic();
 
-        // Actions boutons
-        robotSurvivorButton.setOnAction(e -> {
+        robotSurvivorButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("Game"); // À adapter si ton FXML est nommé différemment
+            SceneManager.switchScene("Game");
         });
 
-        legend1v1Button.setOnAction(e -> {
+        legend1v1ButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("Versus"); // À adapter, ou choisis une autre scène pour le mode 1v1
+            SceneManager.switchScene("Versus");
         });
 
-        quitButton.setOnAction(e -> System.exit(0));
+        quitButtonImg.setOnMouseClicked(e -> System.exit(0));
         animateBalloons();
     }
 
@@ -77,29 +77,24 @@ public class MainMenuController {
 
     private void animateBalloons() {
         double width = 800;
-
-        // Dirigeable BLEU (gauche -> droite)
         balloon1.setTranslateX(-balloon1.getFitWidth());
         balloon1.setTranslateY(100);
         TranslateTransition ttBleu = new TranslateTransition(Duration.seconds(7), balloon1);
         ttBleu.setFromX(-balloon1.getFitWidth());
         ttBleu.setToX(width);
 
-        // Dirigeable FIRE (droite -> gauche)
         balloon3.setTranslateX(width + balloon3.getFitWidth());
         balloon3.setTranslateY(170);
         TranslateTransition ttFire = new TranslateTransition(Duration.seconds(9), balloon3);
         ttFire.setFromX(width + balloon3.getFitWidth());
         ttFire.setToX(-balloon3.getFitWidth());
 
-        // Ballon ROUGE (droite -> gauche)
         balloon2.setTranslateX(width + balloon2.getFitWidth());
         balloon2.setTranslateY(320);
         TranslateTransition ttRouge = new TranslateTransition(Duration.seconds(8), balloon2);
         ttRouge.setFromX(width + balloon2.getFitWidth());
         ttRouge.setToX(-balloon2.getFitWidth());
 
-        // Lancements espacés de 2 secondes
         ttBleu.play();
 
         PauseTransition pauseFire = new PauseTransition(Duration.seconds(2));

@@ -1,9 +1,3 @@
-/* --- Police Arcade Pixel --- */
-@font-face {
-    font-family: "PressStart2P";
-    src: url("/fonts/PressStart2P-Regular.ttf");
-}
-
 /* Styles généraux */
 .root {
     -fx-font-family: "Arial";
@@ -43,9 +37,9 @@
     -fx-scale-y: 0.95;
 }
 
-/* --- Boutons Arcade/Pixels pour modes de jeu --- */
+/* --- Nettoyage de arcade-button : POLICE STANDARD --- */
 .arcade-button {
-    -fx-font-family: "PressStart2P";
+    -fx-font-family: "Arial";
     -fx-font-size: 22px;
     -fx-text-fill: #FFF700;
     -fx-background-color: transparent;
@@ -62,8 +56,6 @@
     -fx-scale-x: 1.06;
     -fx-scale-y: 1.06;
 }
-
-/* Pour s'assurer qu'il n'y ait pas de bordure ou fond au hover/pressed */
 .arcade-button:pressed {
     -fx-background-color: transparent;
     -fx-text-fill: #FFBF00;

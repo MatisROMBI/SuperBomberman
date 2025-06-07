@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -10,27 +9,26 @@
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.bomberman.controller.MainMenuController"
            prefWidth="800" prefHeight="600">
-
     <children>
-        <!-- Image de fond plein écran -->
         <ImageView fx:id="backgroundImage"
                    fitWidth="800"
                    fitHeight="600"
                    preserveRatio="false"
                    StackPane.alignment="CENTER"/>
-
-        <!-- Dirigeables/Ballons animés -->
         <ImageView fx:id="balloon1" fitWidth="150" fitHeight="110" StackPane.alignment="TOP_LEFT" />
         <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="TOP_LEFT" />
         <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="TOP_LEFT" />
 
-        <!-- Les deux modes de jeu style pixel arcade -->
-    <VBox alignment="CENTER" spacing="30">
-        <children>
-            <Button fx:id="robotSurvivorButton" text="ROBOT SURVIVOR" styleClass="arcade-button" prefWidth="500" prefHeight="70"/>
-            <Button fx:id="legend1v1Button" text="1V1 LEGEND" styleClass="arcade-button" prefWidth="500" prefHeight="70"/>
-            <Button fx:id="quitButton" text="QUIT" prefWidth="300" prefHeight="60"/>
-        </children>
-    </VBox>
+        <!-- CORRECTION : VBox bien centrée en bas, sans trop de padding -->
+        <VBox alignment="CENTER" spacing="22" StackPane.alignment="BOTTOM_CENTER">
+            <padding>
+                <Insets top="0" right="0" bottom="30" left="0"/>
+            </padding>
+            <children>
+                <ImageView fx:id="robotSurvivorButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
+                <ImageView fx:id="legend1v1ButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
+                <ImageView fx:id="quitButtonImg" fitWidth="100" fitHeight="40" pickOnBounds="true"/>
+            </children>
+        </VBox>
     </children>
 </StackPane>
