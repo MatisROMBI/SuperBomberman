@@ -1,5 +1,6 @@
 package com.bomberman.controller;
 
+import com.bomberman.controller.GameOverController;
 import com.bomberman.model.Game;
 import com.bomberman.model.GameOverListener;
 import com.bomberman.model.Music;
@@ -32,6 +33,7 @@ public class GameController implements GameOverListener {
     @FXML
     private void initialize() {
         game = new Game();
+        music.arreterGameOverMusique();
         music.demarrerMusique();
         // On connecte le listener (important!)
         game.getPlayer().setGameOverListener(this);
@@ -132,6 +134,7 @@ public class GameController implements GameOverListener {
     public void onGameOver(int score) {
         music.arreterMusique();
         GameOverController.setLastScore(score);
+        music.demarrerGameOverMusique();
         SceneManager.switchScene("GameOver");
     }
 }

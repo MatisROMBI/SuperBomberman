@@ -1,21 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.bomberman.controller.GameOverController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefWidth="800.0" prefHeight="600.0"
+            style="-fx-background-color: rgba(0, 0, 0, 0.8);">
 
-    <!-- Tu peux ajouter ici tes éléments graphiques, exemple : -->
-    <Label fx:id="gameOverLabel" layoutX="200" layoutY="80" text="GAME OVER !" style="-fx-font-size: 32px;"/>
-    <Button fx:id="playAgainButton" layoutX="200" layoutY="180" text="Rejouer" prefWidth="200"/>
-    <Button fx:id="mainMenuButton" layoutX="200" layoutY="240" text="Menu Principal" prefWidth="200"/>
+    <VBox layoutX="100" layoutY="80" spacing="25" alignment="CENTER"
+          prefWidth="600" prefHeight="460"
+          style="-fx-background-color: #2b2b2b; -fx-background-radius: 20; -fx-border-radius: 20; -fx-effect: dropshadow(gaussian, black, 10, 0, 0, 4);">
+        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+        <!-- Texte principal sans les points -->
+        <Label fx:id="gameOverLabel"
+               text="GAME OVER"
+               style="-fx-font-size: 56px; -fx-text-fill: red; -fx-font-weight: bold;"
+               wrapText="true"/>
+
+        <Label text="Votre score :"
+               style="-fx-font-size: 24px; -fx-text-fill: white;"/>
+
+        <Label fx:id="lastScoreLabel"
+               text="0"
+               style="-fx-font-size: 32px; -fx-text-fill: orange; -fx-font-weight: bold;"/>
+
+
+        <Button fx:id="playAgainButton"
+                text="Rejouer"
+                prefWidth="300"
+                style="-fx-font-size: 20px; -fx-background-color: #3cba54; -fx-text-fill: white; -fx-background-radius: 12;"/>
+
+        <Button fx:id="mainMenuButton"
+                text="Menu Principal"
+                prefWidth="300"
+                style="-fx-font-size: 20px; -fx-background-color: #f4c20d; -fx-text-fill: black; -fx-background-radius: 12;"/>
+    </VBox>
 
 </AnchorPane>

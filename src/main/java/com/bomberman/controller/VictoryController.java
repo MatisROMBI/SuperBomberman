@@ -14,13 +14,16 @@ public class VictoryController {
     private Button playAgainButton;
     @FXML
     private Button mainMenuButton;
+    @FXML
+    private Label scoreLabel;
 
     @FXML
     private void initialize() {
         playAgainButton.setOnAction(e -> playAgain());
         mainMenuButton.setOnAction(e -> goToMainMenu());
         // Affiche le score lors de l'ouverture de la scène
-        victoryLabel.setText("VICTOIRE !\nVous avez éliminé tous les bots !\nSCORE FINAL : " + LAST_SCORE);
+        victoryLabel.setText("VICTOIRE !\n");
+        scoreLabel.setText("SCORE FINAL : " + LAST_SCORE);
     }
 
     private void playAgain() {

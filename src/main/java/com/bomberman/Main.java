@@ -5,7 +5,7 @@ import com.bomberman.utils.SceneManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class  Main extends Application {
+public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         SceneManager.initialize(primaryStage);
