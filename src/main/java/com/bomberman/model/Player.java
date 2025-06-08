@@ -6,7 +6,7 @@ import com.bomberman.model.enums.GameState;
 public class Player {
     private int x, y;
     private int startX, startY;
-    private int lives = 1;
+    private int lives = 6; // <-- CORRIGÉ : 6 vies de départ
     private int maxBombs = 2;
     private int bombsAvailable = 2;
     private int explosionRange = 1;
@@ -97,7 +97,6 @@ public class Player {
 
     public void addScore(int pts) { score += pts; }
 
-    // Permet la surcharge pour les bots
     protected void applyPowerUp(PowerUp powerUp) {
         switch (powerUp.getType()) {
             case EXTRA_BOMB:
@@ -149,5 +148,5 @@ public class Player {
     public void setSpeedBoost(boolean s) { speedBoost = s; }
 
     public long getDeathTime() { return deathTime; }
-    public void setDeathTime(long t) { this.deathTime = t; }
+    public void setDeathTime(long t) { deathTime = t; }
 }

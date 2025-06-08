@@ -1,16 +1,17 @@
 package com.bomberman.controller;
 
 import com.bomberman.controller.GameOverController;
-import com.bomberman.model.Game;
-import com.bomberman.model.GameOverListener;
-import com.bomberman.model.Music;
+import com.bomberman.model.*;
+import com.bomberman.model.enums.PowerUpType;
 import com.bomberman.model.enums.Direction;
 import com.bomberman.model.enums.GameState;
 import com.bomberman.utils.SceneManager;
 import com.bomberman.view.GameRenderer;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
@@ -22,6 +23,8 @@ public class GameController implements GameOverListener {
     private VBox gameContainer;
     @FXML
     private Canvas gameCanvas;
+    @FXML
+    private Label bonusLabel; // <-- POUR LE TEXTE BONUS
 
     private Game game;
     private GameRenderer renderer;
@@ -40,10 +43,12 @@ public class GameController implements GameOverListener {
         renderer = new GameRenderer(gameCanvas);
         pressedKeys = new HashSet<>();
 
-
         setupSoundHandling();
         setupKeyboardHandling();
         startRenderLoop();
+
+        // Vide le label au début
+        if (bonusLabel != null) bonusLabel.setText("");
     }
 
     private void setupSoundHandling() {
@@ -52,7 +57,7 @@ public class GameController implements GameOverListener {
     private void setupKeyboardHandling() {
         gameContainer.setFocusTraversable(true);
 
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             gameContainer.requestFocus();
 
             if (gameContainer.getScene() != null) {
@@ -112,8 +117,6 @@ public class GameController implements GameOverListener {
                 if (game.getGameState() == GameState.GAME_OVER ||
                         game.getGameState() == GameState.VICTORY) {
                     stop();
-                    // Ici tu peux choisir ce que tu fais en cas de victoire ou défaite
-                    // Le GameOverListener prendra la main pour le GAME_OVER
                 }
             }
         };
@@ -129,7 +132,33 @@ public class GameController implements GameOverListener {
         }
     }
 
-    // Implémentation du callback
+    // Affiche le nom du bonus en bas de page
+    public void showBonusText(PowerUpType type) {
+        if (bonusLabel == null) return;
+        String text = getBonusName(type);
+        bonusLabel.setText(text);
+        // Efface après 2s
+        new Thread(() -> {
+            try { Thread.sleep(2000); } catch (Exception e) {}
+            Platform.runLater(() -> bonusLabel.setText(""));
+        }).start();
+    }
+
+    // Méthode utilitaire
+    public static String getBonusName(PowerUpType type) {
+        switch(type) {
+            case EXTRA_BOMB: return "Bonus : Bombe supplémentaire !";
+            case RANGE_UP:   return "Bonus : Portée augmentée !";
+            case LIFE:       return "Bonus : Vie supplémentaire !";
+            case SPEED:      return "Bonus : Vitesse augmentée !";
+            default:         return "";
+        }
+    }
+
+    // === À APPELER quand le joueur ramasse un bonus ===
+    // Exemple : dans Player.applyPowerUp(PowerUp powerUp), ajoute :
+    // ((GameController) SceneManager.getCurrentController()).showBonusText(powerUp.getType());
+
     @Override
     public void onGameOver(int score) {
         music.arreterMusique();

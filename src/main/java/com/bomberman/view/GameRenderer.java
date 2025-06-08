@@ -23,6 +23,12 @@ public class GameRenderer {
     private Image bombPixelIcon;
     private Image[] playerSprites = new Image[4]; // p1 = humain, p2/p3/p4 = bots
 
+    // AJOUT : Images de bonus
+    private Image bonusBombIcon;
+    private Image bonusRangeIcon;
+    private Image bonusLifeIcon;
+    private Image bonusSpeedIcon;
+
     public GameRenderer(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
@@ -47,6 +53,12 @@ public class GameRenderer {
                 playerSprites[i] = null;
             }
         }
+
+        // --- CHARGE LES IMAGES DE BONUS ---
+        try { bonusBombIcon = new Image(getClass().getResourceAsStream("/images/EXTRAT_BOMB.png")); } catch (Exception e) { bonusBombIcon = null; }
+        try { bonusRangeIcon = new Image(getClass().getResourceAsStream("/images/RANGE_UP.png")); } catch (Exception e) { bonusRangeIcon = null; }
+        try { bonusLifeIcon = new Image(getClass().getResourceAsStream("/images/LIFE.png")); } catch (Exception e) { bonusLifeIcon = null; }
+        try { bonusSpeedIcon = new Image(getClass().getResourceAsStream("/images/SPEED.png")); } catch (Exception e) { bonusSpeedIcon = null; }
     }
 
     public void render(Game game) {
@@ -55,7 +67,7 @@ public class GameRenderer {
         renderBoard(game.getBoard());
         renderExplosions(game.getBoard().getExplosions());
         renderBombs(game.getBoard().getBombs());
-        renderPowerUps(game.getBoard());
+        renderPowerUps(game.getBoard()); // Images de bonus ici !
         renderBots(game.getBoard().getBots());
         renderPlayer(game.getPlayer());
     }
@@ -68,13 +80,11 @@ public class GameRenderer {
         gc.setFill(Color.web("#CC6A00"));
         gc.fillRect(0, hudHeight - 6, Constants.WINDOW_WIDTH, 6);
 
-        // Bomberman blanc (HUD)
         double iconX = 26, iconY = 8, iconSize = 38;
         if (bombermanFaceIcon != null) {
             gc.drawImage(bombermanFaceIcon, iconX, iconY, iconSize, iconSize);
         }
 
-        // Vies = player.getLives() - 1 (convention Bomberman)
         int livesDisplay = Math.max(0, player.getLives() - 1);
         double lifeBoxX = iconX + iconSize + 12;
         double lifeBoxY = iconY + 10;
@@ -89,13 +99,11 @@ public class GameRenderer {
         gc.setFill(Color.BLACK);
         gc.fillText(String.valueOf(livesDisplay), lifeBoxX + 6, lifeBoxY + 22);
 
-        // "SC"
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 38));
         gc.setFill(Color.WHITE);
         double scX = lifeBoxX + lifeBoxW + 20;
         gc.fillText("SC", scX, 38);
 
-        // Score sur fond noir, barre plus courte
         gc.setFill(Color.BLACK);
         double scoreRectX = scX + 60;
         double scoreRectW = 140;
@@ -111,15 +119,13 @@ public class GameRenderer {
         double scoreTextX = scoreRectX + (scoreRectW - scoreStrWidth) / 2;
         gc.fillText(scoreStr, scoreTextX, 40);
 
-        // Bomberman noir (à droite du score)
         double blackIconX = scoreRectX + scoreRectW + 30;
         if (bombermanBlackIcon != null) {
             gc.drawImage(bombermanBlackIcon, blackIconX, 12, 32, 32);
         }
 
-        // "PRESS START" plus petit, bien placé pour être visible en entier
         gc.setFill(Color.YELLOW);
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 26)); // Plus petit
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 26));
         double pressStartX = blackIconX + 40;
         gc.fillText("PRESS START", pressStartX, 38);
     }
@@ -180,7 +186,6 @@ public class GameRenderer {
         }
     }
 
-    // ----------- HUMAIN en sprite -----------
     private void renderPlayer(Player player) {
         if (player.isAlive()) {
             double yOffset = Constants.HUD_HEIGHT;
@@ -195,7 +200,6 @@ public class GameRenderer {
         }
     }
 
-    // ----------- BOTS en sprites -----------
     private void renderBots(List<PlayerBot> bots) {
         double yOffset = Constants.HUD_HEIGHT;
         for (int i = 0; i < bots.size(); i++) {
@@ -203,7 +207,7 @@ public class GameRenderer {
             if (bot.isAlive()) {
                 double px = bot.getX() * Constants.CELL_SIZE;
                 double py = bot.getY() * Constants.CELL_SIZE + yOffset;
-                int spriteIdx = Math.min(i + 1, playerSprites.length - 1); // bots: p2,p3,p4
+                int spriteIdx = Math.min(i + 1, playerSprites.length - 1);
                 if (playerSprites[spriteIdx] != null) {
                     gc.drawImage(playerSprites[spriteIdx], px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
                 } else {
@@ -214,6 +218,7 @@ public class GameRenderer {
         }
     }
 
+    // VERSION CORRIGÉE : Images de bonus à la place des formes
     private void renderPowerUps(Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -221,24 +226,20 @@ public class GameRenderer {
                 Cell cell = board.getCell(x, y);
                 if (cell.hasPowerUp()) {
                     PowerUpType type = cell.getPowerUp().getType();
-                    double px = x * Constants.CELL_SIZE + 14;
-                    double py = y * Constants.CELL_SIZE + 14 + yOffset;
+                    double px = x * Constants.CELL_SIZE + 7;
+                    double py = y * Constants.CELL_SIZE + 7 + yOffset;
                     switch (type) {
                         case EXTRA_BOMB:
-                            gc.setFill(Color.BLUE);
-                            gc.fillOval(px, py, 12, 12);
+                            if (bonusBombIcon != null) gc.drawImage(bonusBombIcon, px, py, 28, 28);
                             break;
                         case RANGE_UP:
-                            gc.setFill(Color.ORANGERED);
-                            gc.fillRect(px, py, 12, 12);
+                            if (bonusRangeIcon != null) gc.drawImage(bonusRangeIcon, px, py, 28, 28);
                             break;
                         case LIFE:
-                            gc.setFill(Color.MEDIUMVIOLETRED);
-                            gc.fillPolygon(new double[]{px + 6, px, px + 12}, new double[]{py, py + 12, py + 12}, 3);
+                            if (bonusLifeIcon != null) gc.drawImage(bonusLifeIcon, px, py, 28, 28);
                             break;
                         case SPEED:
-                            gc.setFill(Color.GREEN);
-                            gc.fillOval(px, py, 12, 8);
+                            if (bonusSpeedIcon != null) gc.drawImage(bonusSpeedIcon, px, py, 28, 28);
                             break;
                     }
                 }

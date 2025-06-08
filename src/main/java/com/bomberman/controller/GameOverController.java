@@ -32,10 +32,12 @@ public class GameOverController {
         mainMenuButton.setOnAction(e -> goToMainMenu());
 
         // Texte "GAME OVER"
-        gameOverLabel.setText("GAME OVER");
+        if (gameOverLabel != null)
+            gameOverLabel.setText("GAME OVER");
 
         // Affiche le score dans le Label prévu
-        lastScoreLabel.setText(String.valueOf(lastScore));
+        if (lastScoreLabel != null)
+            lastScoreLabel.setText("Score : " + lastScore);
     }
 
     private void playAgain() {

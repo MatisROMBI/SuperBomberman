@@ -122,7 +122,7 @@ public class Board {
                 Cell cell = grid[x][y];
                 if (cell.getType() == CellType.WALL) break;
                 if (cell.getType() == CellType.DESTRUCTIBLE_WALL) {
-                    // Ajout du score pour bloc cassé
+                    // Score +50 pour caisse détruite par le joueur humain (owner != 0)
                     if (bomb.getOwner() != 0) {
                         player.addScore(50); // +50 points pour bloc cassé
                     }
@@ -146,20 +146,20 @@ public class Board {
         explosions.add(new Explosion(x, y));
         Cell cell = grid[x][y];
 
-        // Humain
+        // Dommages sur le joueur humain
         if (cell.hasPlayer() && player != null && player.getX() == x && player.getY() == y) {
             player.takeDamage();
             player.respawnAtStart(this);
         }
-        // Bots
+        // Dommages sur les bots
         for (PlayerBot bot : bots) {
             if (bot.isAlive() && bot.getX() == x && bot.getY() == y) {
                 boolean botWasAlive = bot.isAlive();
                 bot.takeDamage();
                 bot.respawnAtStart(this);
-                // S'il vient d'être éliminé
+                // Si le bot vient d'être éliminé et que la bombe appartient au joueur humain
                 if (botWasAlive && !bot.isAlive() && owner != 0) {
-                    player.addScore(600); // +600 points pour chaque bot éliminé
+                    player.addScore(300); // +300 points pour chaque bot éliminé
                 }
             }
         }

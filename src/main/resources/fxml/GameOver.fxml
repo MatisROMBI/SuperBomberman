@@ -1,43 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.bomberman.controller.GameOverController"
             prefWidth="800.0" prefHeight="600.0"
-            style="-fx-background-color: rgba(0, 0, 0, 0.8);">
+            style="-fx-background-color: rgba(0, 0, 0, 0.85);">
 
-    <VBox layoutX="100" layoutY="80" spacing="25" alignment="CENTER"
-          prefWidth="600" prefHeight="460"
-          style="-fx-background-color: #2b2b2b; -fx-background-radius: 20; -fx-border-radius: 20; -fx-effect: dropshadow(gaussian, black, 10, 0, 0, 4);">
-        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+    <VBox layoutX="100" layoutY="80" spacing="32" alignment="CENTER"
+          prefWidth="600" prefHeight="440"
+          style="-fx-background-color: #212121; -fx-background-radius: 26; -fx-border-radius: 26; -fx-effect: dropshadow(gaussian, black, 16, 0, 0, 8);">
+        <padding><Insets top="36" right="36" bottom="36" left="36"/></padding>
 
-        <!-- Texte principal sans les points -->
+        <!-- Titre principal -->
         <Label fx:id="gameOverLabel"
                text="GAME OVER"
-               style="-fx-font-size: 56px; -fx-text-fill: red; -fx-font-weight: bold;"
-               wrapText="true"/>
+               style="-fx-font-size: 60px; -fx-text-fill: #e53935; -fx-font-weight: bold;"
+               wrapText="true"
+               alignment="CENTER"/>
 
+        <!-- Sous-titre score -->
         <Label text="Votre score :"
-               style="-fx-font-size: 24px; -fx-text-fill: white;"/>
+               style="-fx-font-size: 25px; -fx-text-fill: #fff; -fx-font-weight: normal;"/>
 
+        <!-- Score final -->
         <Label fx:id="lastScoreLabel"
                text="0"
-               style="-fx-font-size: 32px; -fx-text-fill: orange; -fx-font-weight: bold;"/>
+               style="-fx-font-size: 38px; -fx-text-fill: orange; -fx-font-weight: bold;"/>
 
+        <!-- Message facultatif (victoire/échec/etc.) -->
+        <!-- <Label fx:id="customMessageLabel"
+               style="-fx-font-size: 20px; -fx-text-fill: #fff;"/> -->
 
+        <!-- Bouton rejouer -->
         <Button fx:id="playAgainButton"
                 text="Rejouer"
-                prefWidth="300"
-                style="-fx-font-size: 20px; -fx-background-color: #3cba54; -fx-text-fill: white; -fx-background-radius: 12;"/>
+                prefWidth="320"
+                style="-fx-font-size: 22px; -fx-background-color: #43a047; -fx-text-fill: white; -fx-background-radius: 14;"/>
 
+        <!-- Bouton menu principal -->
         <Button fx:id="mainMenuButton"
                 text="Menu Principal"
-                prefWidth="300"
-                style="-fx-font-size: 20px; -fx-background-color: #f4c20d; -fx-text-fill: black; -fx-background-radius: 12;"/>
+                prefWidth="320"
+                style="-fx-font-size: 22px; -fx-background-color: #fdd835; -fx-text-fill: #212121; -fx-background-radius: 14;"/>
     </VBox>
 
 </AnchorPane>
