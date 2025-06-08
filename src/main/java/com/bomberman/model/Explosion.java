@@ -11,7 +11,6 @@ public class Explosion {
         this.x = x;
         this.y = y;
         this.startTime = System.currentTimeMillis();
-        explosion.jouerExplosion();
     }
 
     public int getX() { return x; }
