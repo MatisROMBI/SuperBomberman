@@ -1,5 +1,6 @@
 package com.bomberman.controller;
 
+import com.bomberman.model.Music;
 import com.bomberman.utils.SceneManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,8 +18,11 @@ public class VictoryController {
     @FXML
     private Label scoreLabel;
 
+    Music music = new Music();
+
     @FXML
     private void initialize() {
+        music.demarrerMusiqueDeVictoire();
         playAgainButton.setOnAction(e -> playAgain());
         mainMenuButton.setOnAction(e -> goToMainMenu());
         // Affiche le score lors de l'ouverture de la scène
@@ -27,10 +31,12 @@ public class VictoryController {
     }
 
     private void playAgain() {
+        music.arreterMusiqueDeVictoire();
         SceneManager.switchScene("Game");
     }
 
     private void goToMainMenu() {
+        music.arreterMusiqueDeVictoire();
         SceneManager.switchScene("MainMenu");
     }
 }

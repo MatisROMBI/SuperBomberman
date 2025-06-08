@@ -11,6 +11,7 @@ public class Game {
     private AnimationTimer gameLoop;
     private long lastUpdate;
 
+
     public Game() {
         initialize();
     }
@@ -50,7 +51,6 @@ public class Game {
         } else if (board.getBots().stream().noneMatch(PlayerBot::isAlive)) {
             gameState = GameState.VICTORY;
             gameLoop.stop();
-            // AJOUTE CETTE LIGNE :
             player.addScore(1000); // +1000 points pour la victoire
             com.bomberman.controller.VictoryController.LAST_SCORE = player.getScore();
             com.bomberman.utils.SceneManager.switchScene("Victory");
