@@ -14,6 +14,7 @@ public class Music {
     private MediaPlayer musiquePlayer;
     private AudioClip gameOver;
     private AudioClip musiqueDepart;
+    private AudioClip musiqueDeVictoire;
 
     public Music() {
         explosionClip = new AudioClip(getClass().getResource("/sons/explosion.mp3").toExternalForm());
@@ -21,6 +22,8 @@ public class Music {
         musiqueDepart = new AudioClip(getClass().getResource("/sons/MusiqueDeDepart.mp3").toExternalForm());
 
         gameOver = new AudioClip(getClass().getResource("/sons/est-ce-que-tu-veux-abandonner-made-with-Voicemod.mp3").toExternalForm());
+
+        musiqueDeVictoire = new AudioClip(getClass().getResource("/sons/MusiqueDeVictoire.mp3").toExternalForm());
 
         Media InGameMusic = new Media(getClass().getResource("/sons/MusiqueMonde3.mp3").toExternalForm());
 
@@ -54,6 +57,12 @@ public class Music {
         }
     }
 
+    public void demarrerMusiqueDeVictoire() {
+        if (musiqueActif) {
+            musiqueDeVictoire.play();
+        }
+    }
+
     // Méthode pour arrêter la musique
     public void arreterMusique() {
         musiquePlayer.pause();
@@ -63,9 +72,12 @@ public class Music {
         gameOver.stop();
     }
 
-
     public void arreterMusiqueDepart() {
         musiqueDepart.stop();
+    }
+
+    public void arreterMusiqueDeVictoire() {
+        musiqueDeVictoire.stop();
     }
 
     // Pour activer/désactiver les sons

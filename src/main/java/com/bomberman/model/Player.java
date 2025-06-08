@@ -115,6 +115,7 @@ public class Player {
         }
     }
 
+
     // ----------- Getters & Setters complets -----------
 
     public int getX() { return x; }
