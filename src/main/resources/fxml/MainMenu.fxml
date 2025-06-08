@@ -20,10 +20,7 @@
         <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="TOP_LEFT" />
 
         <!-- CORRECTION : VBox bien centrée en bas, sans trop de padding -->
-        <VBox alignment="CENTER" spacing="22" StackPane.alignment="BOTTOM_CENTER">
-            <padding>
-                <Insets top="0" right="0" bottom="30" left="0"/>
-            </padding>
+        <VBox alignment="CENTER" spacing="22" StackPane.alignment="BOTTOM_CENTER" translateY="150">
             <children>
                 <ImageView fx:id="robotSurvivorButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
                 <ImageView fx:id="legend1v1ButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
