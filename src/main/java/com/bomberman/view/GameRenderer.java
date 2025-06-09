@@ -15,22 +15,22 @@ import javafx.scene.text.Text;
 import java.util.List;
 
 /**
- * Gère tout le rendu du jeu (affichage plateau, joueurs, ennemis, HUD...)
- * Prend en charge plusieurs modes (classique, legend 1v1).
- *
- * Optimisé : chaque bloc/méthode fait une tâche précise, les ressources sont chargées proprement,
- * et les cases destructibles utilisent un sprite PNG (glacon).
+ * Affichage principal du jeu Bomberman (tous modes)
+ *  - Mode classique/survivor
+ *  - Mode LEGEND 1v1 (thème bleu, bonus neige)
  */
 public class GameRenderer {
     private final Canvas canvas;
     private final GraphicsContext gc;
 
-    // ==== Sprites & icônes ====
+    // Sprites joueurs, ennemis, bombes, etc.
     private final Image[] playerSprites = new Image[4];
     private final Image legendWhiteIcon, legendBlackIcon, bomberEnemyIcon, yellowEnemyIcon;
     private final Image bombermanFaceIcon, bombermanBlackIcon, bombPixelIcon;
+    // BONUS classiques
     private final Image bonusBombIcon, bonusRangeIcon, bonusLifeIcon, bonusSpeedIcon;
-
+    // BONUS neige/glace (pour le mode legend)
+    private final Image snowBombIcon, snowRangeIcon, snowLifeIcon, snowSpeedIcon;
     // Sprite du bloc de glace (mur destructible)
     private final Image iceCubeIcon;
 
@@ -40,7 +40,7 @@ public class GameRenderer {
         canvas.setWidth(Constants.WINDOW_WIDTH);
         canvas.setHeight(Constants.WINDOW_HEIGHT);
 
-        // Chargement robuste (évite de crasher si image absente)
+        // Chargement robuste des ressources
         bombermanFaceIcon = tryLoad("/images/bomberman_face.png");
         bombermanBlackIcon = tryLoad("/images/bomberman_black.png");
         bombPixelIcon = tryLoad("/images/bombe_pixel.png");
@@ -53,33 +53,37 @@ public class GameRenderer {
         bonusLifeIcon = tryLoad("/images/LIFE.png");
         bonusSpeedIcon = tryLoad("/images/SPEED.png");
 
-        // Chargement de l’image du bloc de glace (mur destructible)
+        // Nouveaux bonus "neige/hiver" pour LEGEND
+        snowBombIcon  = tryLoad("/images/EXTRAT_BOMB_SNOW.png");
+        snowRangeIcon = tryLoad("/images/RANGE_UP_SNOW.png");
+        snowLifeIcon  = tryLoad("/images/LIFE_SNOW.png");
+        snowSpeedIcon = tryLoad("/images/SPEED_SNOW.png");
+
         iceCubeIcon = tryLoad("/images/ice_cube.png");
 
-        // Sprites joueurs classiques
         for (int i = 0; i < 4; i++)
             playerSprites[i] = tryLoad("/images/bomberman_p" + (i + 1) + ".png");
     }
 
-    /** Charge une image ou retourne null si non trouvée (code propre) */
+    /** Charge une image ou retourne null si manquante */
     private Image tryLoad(String path) {
         try { return new Image(getClass().getResourceAsStream(path)); }
         catch (Exception e) { return null; }
     }
 
-    // =================== MODE CLASSIQUE/SURVIVOR ===================
+    // ======= MODE CLASSIQUE/SURVIVOR =======
     public void render(Game game) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         renderHUD(game.getPlayer());
         renderBoard(game.getBoard());
         renderExplosions(game.getBoard().getExplosions());
         renderBombs(game.getBoard().getBombs());
-        renderPowerUps(game.getBoard());
+        renderPowerUps(game.getBoard()); // Bonus classique
         renderBots(game.getBoard().getBots());
         renderPlayer(game.getPlayer());
     }
 
-    // ----- HUD score/vies en haut -----
+    // HUD classique
     private void renderHUD(Player player) {
         double hudHeight = Constants.HUD_HEIGHT;
         gc.setFill(Color.web("#FF8800"));
@@ -129,7 +133,6 @@ public class GameRenderer {
         gc.fillText("PRESS START", pressStartX, 38);
     }
 
-    // ----- Plateau classique -----
     private void renderBoard(Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -150,7 +153,6 @@ public class GameRenderer {
         }
     }
 
-    // ----- Bombes -----
     private void renderBombs(List<Bomb> bombs) {
         double yOffset = Constants.HUD_HEIGHT;
         for (Bomb bomb : bombs) {
@@ -167,7 +169,6 @@ public class GameRenderer {
         }
     }
 
-    // ----- Explosions -----
     private void renderExplosions(List<Explosion> explosions) {
         double yOffset = Constants.HUD_HEIGHT;
         for (Explosion explosion : explosions) {
@@ -180,7 +181,6 @@ public class GameRenderer {
         }
     }
 
-    // ----- Joueur principal -----
     private void renderPlayer(Player player) {
         if (player.isAlive()) {
             double yOffset = Constants.HUD_HEIGHT;
@@ -195,7 +195,6 @@ public class GameRenderer {
         }
     }
 
-    // ----- Bots (mode classique) -----
     private void renderBots(List<PlayerBot> bots) {
         double yOffset = Constants.HUD_HEIGHT;
         for (int i = 0; i < bots.size(); i++) {
@@ -214,7 +213,6 @@ public class GameRenderer {
         }
     }
 
-    // ----- PowerUps -----
     private void renderPowerUps(Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -235,10 +233,9 @@ public class GameRenderer {
         }
     }
 
-    // ============ MODE LEGEND 1v1 AVEC DAMIER BLEU + GLAÇON ================
+    // ========== MODE LEGEND 1v1 BLEU + BONUS NEIGE =============
     public void renderLegend1v1(Legend1v1Board board) {
-        // Fond bleu global (propre, pas d’artefacts)
-        gc.setFill(Color.web("#1882f7"));
+        gc.setFill(Color.web("#1882f7")); // fond
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         renderLegendHUD(board);
@@ -247,11 +244,10 @@ public class GameRenderer {
         renderLegendEnemies(board);
         renderBombs(board.getBombs());
         renderExplosions(board.getExplosions());
-        // Pour afficher les bonus : dé-commente ci-dessous si besoin
-        // renderPowerUps(board);
+        renderLegendPowerUps(board); // <- BONUS NEIGE affichés ici !
     }
 
-    // ----- HUD du mode LEGEND (score/vies) -----
+    // HUD legend
     private void renderLegendHUD(Legend1v1Board board) {
         double hudHeight = Constants.HUD_HEIGHT;
         gc.setFill(Color.web("#2257ad"));
@@ -263,17 +259,11 @@ public class GameRenderer {
         gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
         gc.fillText("J1 - Score: " + p1.getScore() + " | Vies: " + p1.getLives(), 32, hudHeight - 16);
-
         gc.setFill(Color.LIGHTYELLOW);
         gc.fillText("J2 - Score: " + p2.getScore() + " | Vies: " + p2.getLives(), Constants.WINDOW_WIDTH - 285, hudHeight - 16);
     }
 
-    /**
-     * Plateau LEGEND 1v1 :
-     * - Cases vides : damier bleu
-     * - Murs fixes : bleu plus foncé
-     * - Murs destructibles : sprite ice_cube.png
-     */
+    // Plateau bleu + murs glaçons
     private void renderLegendBoard(Legend1v1Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         Color blue1 = Color.web("#7ed5fa"); // Bleu clair
@@ -285,17 +275,14 @@ public class GameRenderer {
                 double px = x * Constants.CELL_SIZE;
                 double py = y * Constants.CELL_SIZE + yOffset;
 
-                // Cases vides = damier
                 if (cell.getType() == CellType.EMPTY) {
                     gc.setFill(((x + y) % 2 == 0) ? blue1 : blue2);
                     gc.fillRect(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
                 }
-                // Murs fixes
                 else if (cell.getType() == CellType.WALL) {
                     gc.setFill(Color.web("#3657a6"));
                     gc.fillRect(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
                 }
-                // Murs destructibles (glaçon PNG)
                 else if (cell.getType() == CellType.DESTRUCTIBLE_WALL) {
                     if (iceCubeIcon != null)
                         gc.drawImage(iceCubeIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
@@ -304,7 +291,6 @@ public class GameRenderer {
                         gc.fillRect(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
                     }
                 }
-                // Contour noir pour tout le monde
                 gc.setStroke(Color.BLACK);
                 gc.setLineWidth(1);
                 gc.strokeRect(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
@@ -312,7 +298,28 @@ public class GameRenderer {
         }
     }
 
-    // ----- Affichage joueurs (sprites, positions) -----
+    // BONUS version hiver (images snow)
+    private void renderLegendPowerUps(Legend1v1Board board) {
+        double yOffset = Constants.HUD_HEIGHT;
+        for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
+            for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
+                Cell cell = board.getCell(x, y);
+                if (cell.hasPowerUp()) {
+                    PowerUpType type = cell.getPowerUp().getType();
+                    double px = x * Constants.CELL_SIZE + 7;
+                    double py = y * Constants.CELL_SIZE + 7 + yOffset;
+                    switch (type) {
+                        case EXTRA_BOMB: if (snowBombIcon != null) gc.drawImage(snowBombIcon, px, py, 28, 28); break;
+                        case RANGE_UP:   if (snowRangeIcon != null) gc.drawImage(snowRangeIcon, px, py, 28, 28); break;
+                        case LIFE:       if (snowLifeIcon != null) gc.drawImage(snowLifeIcon, px, py, 28, 28); break;
+                        case SPEED:      if (snowSpeedIcon != null) gc.drawImage(snowSpeedIcon, px, py, 28, 28); break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Joueurs
     private void renderLegendPlayers(Legend1v1Board board) {
         Player p1 = board.getPlayer1(), p2 = board.getPlayer2();
         double yOffset = Constants.HUD_HEIGHT;
@@ -343,7 +350,7 @@ public class GameRenderer {
         }
     }
 
-    // ----- Ennemis legend -----
+    // Ennemis Legend
     private void renderLegendEnemies(Legend1v1Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         for (LegendEnemyBomber b : board.getBomberEnemies()) {
