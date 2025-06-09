@@ -24,6 +24,10 @@ public class Player {
     // Pour callback fin de partie
     private GameOverListener gameOverListener;
 
+    public Player() {
+        this(0, 0); // Position par défaut
+    }
+
     public Player(int startX, int startY) {
         this.x = startX;
         this.y = startY;
