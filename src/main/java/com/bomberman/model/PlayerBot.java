@@ -11,28 +11,25 @@ import java.util.Random;
 public class PlayerBot extends Player {
     private Random random = new Random();
     private long lastMoveTime = 0;
-    private static final int BOT_MOVE_DELAY = 800; // (plus réactif que 1800 ms)
-    private int maxBombsBot = 2;        // Même nombre que le joueur
-    private int bombsAvailableBot = 2;  // Même nombre que le joueur
-    private static final int BOT_START_LIVES = 6; // Même nombre de vies que le joueur
+    private static final int BOT_MOVE_DELAY = 800;
+    private int maxBombsBot = 2;
+    private int bombsAvailableBot = 2;
+    private static final int BOT_START_LIVES = 6;
 
     public PlayerBot(int startX, int startY) {
         super(startX, startY);
-        setLives(BOT_START_LIVES); // Démarre à 6 vies
+        setLives(BOT_START_LIVES);
     }
 
-    // Gestion bombes pour ce bot
-    @Override
+    // PAS d’@Override si la méthode n’est pas dans Player !
     public void onBombExploded() {
         bombsAvailableBot = Math.min(bombsAvailableBot + 1, maxBombsBot);
     }
 
-    @Override
     public int getBombsAvailable() {
         return bombsAvailableBot;
     }
 
-    @Override
     public int getMaxBombs() {
         return maxBombsBot;
     }
@@ -41,7 +38,6 @@ public class PlayerBot extends Player {
         maxBombsBot = max;
     }
 
-    // IA : Poursuit l’humain et pose une bombe quand il est à côté, sinon se déplace
     public void playTurn(Board board) {
         if (!isAlive()) return;
         long now = System.currentTimeMillis();
@@ -51,7 +47,6 @@ public class PlayerBot extends Player {
         int px = getX();
         int py = getY();
 
-        // S'il est à côté du joueur humain, pose une bombe !
         if (isNextTo(px, py, human.getX(), human.getY()) && bombsAvailableBot > 0 && board.getCell(px, py).getBomb() == null) {
             Bomb bomb = new Bomb(px, py, getExplosionRange());
             board.getCell(px, py).setBomb(bomb);
@@ -61,7 +56,6 @@ public class PlayerBot extends Player {
             return;
         }
 
-        // Sinon, essaye de s’approcher du joueur humain
         Direction bestDir = getDirectionTowards(px, py, human.getX(), human.getY(), board);
         if (bestDir != null) {
             int nx = px + bestDir.getDx();
@@ -70,7 +64,6 @@ public class PlayerBot extends Player {
                 move(bestDir, board, GameState.PLAYING);
             }
         } else {
-            // Sinon bouge aléatoirement
             List<Direction> dirs = new ArrayList<>();
             Collections.addAll(dirs, Direction.values());
             Collections.shuffle(dirs, random);
@@ -84,7 +77,6 @@ public class PlayerBot extends Player {
             }
         }
 
-        // Parfois pose une bombe même si pas à côté du joueur (optionnel, bonus)
         if (random.nextDouble() < 0.15 && bombsAvailableBot > 0 && board.getCell(px, py).getBomb() == null) {
             Bomb bomb = new Bomb(px, py, getExplosionRange());
             board.getCell(px, py).setBomb(bomb);
@@ -95,13 +87,11 @@ public class PlayerBot extends Player {
         lastMoveTime = now;
     }
 
-    // IA simple pour détecter si à côté du joueur
     private boolean isNextTo(int x1, int y1, int x2, int y2) {
         return (Math.abs(x1 - x2) == 1 && y1 == y2) ||
                 (Math.abs(y1 - y2) == 1 && x1 == x2);
     }
 
-    // IA simple : retourne la direction vers la cible si c’est walkable
     private Direction getDirectionTowards(int fromX, int fromY, int toX, int toY, Board board) {
         List<Direction> dirs = new ArrayList<>();
         if (toX > fromX) dirs.add(Direction.RIGHT);
@@ -118,8 +108,7 @@ public class PlayerBot extends Player {
         return null;
     }
 
-    // Power-ups adaptés pour le bot
-    @Override
+    // Ici tu peux garder l’annotation si applyPowerUp est bien "protected" dans Player.
     protected void applyPowerUp(PowerUp powerUp) {
         switch (powerUp.getType()) {
             case EXTRA_BOMB:
@@ -138,8 +127,7 @@ public class PlayerBot extends Player {
         }
     }
 
-    // Gestion des vies du bot (6 vies au départ)
-    @Override
+    // Surcharge propre, pas d’Override (signature différente de Player)
     public void takeDamage() {
         if (!isAlive()) return;
         setLives(getLives() - 1);
@@ -150,7 +138,6 @@ public class PlayerBot extends Player {
         setDeathTime(System.currentTimeMillis());
     }
 
-    @Override
     public void respawnAtStart(Board board) {
         if (!isAlive()) return;
         board.getCell(getX(), getY()).setHasPlayer(false);

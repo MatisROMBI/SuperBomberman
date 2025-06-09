@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.canvas.Canvas?>
+
+<VBox fx:id="gameContainer" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.bomberman.controller.LegendGameController"
+      style="-fx-background-color: #006eff;"
+      prefWidth="900" prefHeight="700"
+      alignment="CENTER">
+
+    <Canvas fx:id="gameCanvas" width="800" height="600"/>
+</VBox>

@@ -19,7 +19,6 @@
         <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="TOP_LEFT" />
         <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="TOP_LEFT" />
 
-        <!-- CORRECTION : VBox bien centrée en bas, sans trop de padding -->
         <VBox alignment="CENTER" spacing="22" StackPane.alignment="BOTTOM_CENTER" translateY="150">
             <children>
                 <ImageView fx:id="robotSurvivorButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>

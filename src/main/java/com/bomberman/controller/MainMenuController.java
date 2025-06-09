@@ -41,12 +41,12 @@ public class MainMenuController {
 
         robotSurvivorButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("Game");
+            SceneManager.switchScene("Game"); // Mode solo classique
         });
 
         legend1v1ButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("Versus");
+            SceneManager.switchScene("LegendGame"); // **=> Redirige vers le FXML LegendGame.fxml**
         });
 
         quitButtonImg.setOnMouseClicked(e -> System.exit(0));

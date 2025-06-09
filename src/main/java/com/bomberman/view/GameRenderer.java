@@ -3,6 +3,9 @@ package com.bomberman.view;
 import com.bomberman.model.*;
 import com.bomberman.model.enums.CellType;
 import com.bomberman.model.enums.PowerUpType;
+import com.bomberman.model.Legend1v1Board;
+import com.bomberman.model.LegendEnemyBomber;
+import com.bomberman.model.LegendEnemyYellow;
 import com.bomberman.utils.Constants;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -18,16 +21,25 @@ public class GameRenderer {
     private Canvas canvas;
     private GraphicsContext gc;
 
+    // --- Sprites classiques et legend ---
     private Image bombermanFaceIcon;
     private Image bombermanBlackIcon;
     private Image bombPixelIcon;
-    private Image[] playerSprites = new Image[4]; // p1 = humain, p2/p3/p4 = bots
+    private Image[] playerSprites = new Image[4];
 
-    // AJOUT : Images de bonus
+    // Sprites legendaires
+    private Image legendWhiteIcon;
+    private Image legendBlackIcon;
+
+    // Bonus
     private Image bonusBombIcon;
     private Image bonusRangeIcon;
     private Image bonusLifeIcon;
     private Image bonusSpeedIcon;
+
+    // Ennemis legend
+    private Image bomberEnemyIcon;
+    private Image yellowEnemyIcon;
 
     public GameRenderer(Canvas canvas) {
         this.canvas = canvas;
@@ -35,39 +47,34 @@ public class GameRenderer {
         canvas.setWidth(Constants.WINDOW_WIDTH);
         canvas.setHeight(Constants.WINDOW_HEIGHT);
 
-        try {
-            bombermanFaceIcon = new Image(getClass().getResourceAsStream("/images/bomberman_face.png"));
-        } catch (Exception e) { bombermanFaceIcon = null; }
-        try {
-            bombermanBlackIcon = new Image(getClass().getResourceAsStream("/images/bomberman_black.png"));
-        } catch (Exception e) { bombermanBlackIcon = null; }
-        try {
-            bombPixelIcon = new Image(getClass().getResourceAsStream("/images/bombe_pixel.png"));
-        } catch (Exception e) { bombPixelIcon = null; }
+        try { bombermanFaceIcon = new Image(getClass().getResourceAsStream("/images/bomberman_face.png")); } catch (Exception e) { bombermanFaceIcon = null; }
+        try { bombermanBlackIcon = new Image(getClass().getResourceAsStream("/images/bomberman_black.png")); } catch (Exception e) { bombermanBlackIcon = null; }
+        try { bombPixelIcon = new Image(getClass().getResourceAsStream("/images/bombe_pixel.png")); } catch (Exception e) { bombPixelIcon = null; }
 
-        // --- CHARGE LES SPRITES JOUEUR & BOTS ---
         for (int i = 0; i < 4; i++) {
-            try {
-                playerSprites[i] = new Image(getClass().getResourceAsStream("/images/bomberman_p" + (i + 1) + ".png"));
-            } catch (Exception e) {
-                playerSprites[i] = null;
-            }
+            try { playerSprites[i] = new Image(getClass().getResourceAsStream("/images/bomberman_p" + (i + 1) + ".png")); } catch (Exception e) { playerSprites[i] = null; }
         }
 
-        // --- CHARGE LES IMAGES DE BONUS ---
+        try { legendWhiteIcon = new Image(getClass().getResourceAsStream("/images/nija_white_bomberman.png")); } catch (Exception e) { legendWhiteIcon = null; }
+        try { legendBlackIcon = new Image(getClass().getResourceAsStream("/images/nija_black_bomberman.png")); } catch (Exception e) { legendBlackIcon = null; }
+
         try { bonusBombIcon = new Image(getClass().getResourceAsStream("/images/EXTRAT_BOMB.png")); } catch (Exception e) { bonusBombIcon = null; }
         try { bonusRangeIcon = new Image(getClass().getResourceAsStream("/images/RANGE_UP.png")); } catch (Exception e) { bonusRangeIcon = null; }
         try { bonusLifeIcon = new Image(getClass().getResourceAsStream("/images/LIFE.png")); } catch (Exception e) { bonusLifeIcon = null; }
         try { bonusSpeedIcon = new Image(getClass().getResourceAsStream("/images/SPEED.png")); } catch (Exception e) { bonusSpeedIcon = null; }
+
+        try { bomberEnemyIcon = new Image(getClass().getResourceAsStream("/images/bomber_perso.png")); } catch (Exception e) { bomberEnemyIcon = null; }
+        try { yellowEnemyIcon = new Image(getClass().getResourceAsStream("/images/yellow_perso.png")); } catch (Exception e) { yellowEnemyIcon = null; }
     }
 
+    // --- Mode classique ---
     public void render(Game game) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         renderHUD(game.getPlayer());
         renderBoard(game.getBoard());
         renderExplosions(game.getBoard().getExplosions());
         renderBombs(game.getBoard().getBombs());
-        renderPowerUps(game.getBoard()); // Images de bonus ici !
+        renderPowerUps(game.getBoard());
         renderBots(game.getBoard().getBots());
         renderPlayer(game.getPlayer());
     }
@@ -81,9 +88,7 @@ public class GameRenderer {
         gc.fillRect(0, hudHeight - 6, Constants.WINDOW_WIDTH, 6);
 
         double iconX = 26, iconY = 8, iconSize = 38;
-        if (bombermanFaceIcon != null) {
-            gc.drawImage(bombermanFaceIcon, iconX, iconY, iconSize, iconSize);
-        }
+        if (bombermanFaceIcon != null) gc.drawImage(bombermanFaceIcon, iconX, iconY, iconSize, iconSize);
 
         int livesDisplay = Math.max(0, player.getLives() - 1);
         double lifeBoxX = iconX + iconSize + 12;
@@ -120,9 +125,7 @@ public class GameRenderer {
         gc.fillText(scoreStr, scoreTextX, 40);
 
         double blackIconX = scoreRectX + scoreRectW + 30;
-        if (bombermanBlackIcon != null) {
-            gc.drawImage(bombermanBlackIcon, blackIconX, 12, 32, 32);
-        }
+        if (bombermanBlackIcon != null) gc.drawImage(bombermanBlackIcon, blackIconX, 12, 32, 32);
 
         gc.setFill(Color.YELLOW);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 26));
@@ -218,7 +221,6 @@ public class GameRenderer {
         }
     }
 
-    // VERSION CORRIGÉE : Images de bonus à la place des formes
     private void renderPowerUps(Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -243,6 +245,101 @@ public class GameRenderer {
                             break;
                     }
                 }
+            }
+        }
+    }
+
+    // ======================= MODE 1V1 LEGEND =======================
+
+    public void renderLegend1v1(Legend1v1Board board) {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        renderLegendBoard(board);
+        renderLegendPlayers(board);
+        renderLegendEnemies(board);
+        renderBombs(board.getBombs());
+        renderExplosions(board.getExplosions());
+        // renderPowerUps(board); // dé-commente si tu veux afficher les bonus dans legend
+    }
+
+    private void renderLegendBoard(Legend1v1Board board) {
+        double yOffset = 0;
+        for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
+            for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
+                Cell cell = board.getCell(x, y);
+                double pixelX = x * Constants.CELL_SIZE;
+                double pixelY = y * Constants.CELL_SIZE + yOffset;
+                switch (cell.getType()) {
+                    case WALL:
+                        gc.setFill(Color.DARKBLUE);
+                        gc.fillRect(pixelX, pixelY, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                        break;
+                    case DESTRUCTIBLE_WALL:
+                        gc.setFill(Color.DEEPSKYBLUE);
+                        gc.fillRect(pixelX, pixelY, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                        break;
+                    default:
+                        gc.setFill(Color.LIGHTCYAN);
+                        gc.fillRect(pixelX, pixelY, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                        break;
+                }
+                gc.setStroke(Color.NAVY);
+                gc.setLineWidth(1);
+                gc.strokeRect(pixelX, pixelY, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            }
+        }
+    }
+
+    private void renderLegendPlayers(Legend1v1Board board) {
+        Player p1 = board.getPlayer1();
+        Player p2 = board.getPlayer2();
+
+        if (p1.isAlive()) {
+            double px = p1.getX() * Constants.CELL_SIZE;
+            double py = p1.getY() * Constants.CELL_SIZE;
+            if (legendWhiteIcon != null) {
+                gc.drawImage(legendWhiteIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else if (playerSprites[0] != null) {
+                gc.drawImage(playerSprites[0], px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else {
+                gc.setFill(Color.WHITE);
+                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            }
+        }
+        if (p2.isAlive()) {
+            double px = p2.getX() * Constants.CELL_SIZE;
+            double py = p2.getY() * Constants.CELL_SIZE;
+            if (legendBlackIcon != null) {
+                gc.drawImage(legendBlackIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else if (playerSprites[1] != null) {
+                gc.drawImage(playerSprites[1], px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else {
+                gc.setFill(Color.BLACK);
+                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            }
+        }
+    }
+
+    private void renderLegendEnemies(Legend1v1Board board) {
+        // Bomber (noir explosif)
+        for (LegendEnemyBomber b : board.getBomberEnemies()) {
+            double px = b.getX() * Constants.CELL_SIZE;
+            double py = b.getY() * Constants.CELL_SIZE;
+            if (bomberEnemyIcon != null) {
+                gc.drawImage(bomberEnemyIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else {
+                gc.setFill(Color.DARKRED);
+                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            }
+        }
+        // Yellow (qui tue au contact)
+        for (LegendEnemyYellow y : board.getYellowEnemies()) {
+            double px = y.getX() * Constants.CELL_SIZE;
+            double py = y.getY() * Constants.CELL_SIZE;
+            if (yellowEnemyIcon != null) {
+                gc.drawImage(yellowEnemyIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            } else {
+                gc.setFill(Color.GOLD);
+                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
             }
         }
     }
