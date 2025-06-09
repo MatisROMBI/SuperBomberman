@@ -155,12 +155,13 @@ public class Board {
         for (PlayerBot bot : bots) {
             if (bot.isAlive() && bot.getX() == x && bot.getY() == y) {
                 boolean botWasAlive = bot.isAlive();
-                bot.takeDamage();
-                bot.respawnAtStart(this);
-                // Si le bot vient d'être éliminé et que la bombe appartient au joueur humain
-                if (botWasAlive && !bot.isAlive() && owner != 0) {
-                    player.addScore(300); // +300 points pour chaque bot éliminé
+                bot.takeDamage(this);
+                if (bot.isAlive()) {
+                    bot.respawnAtStart(this);
+                } else if (botWasAlive && owner != 0) {
+                    player.addScore(300);
                 }
+
             }
         }
     }
@@ -193,4 +194,13 @@ public class Board {
     public Player getPlayer() {
         return player;
     }
+
+    public int getWidth() {
+        return Constants.BOARD_WIDTH;
+    }
+
+    public int getHeight() {
+        return Constants.BOARD_HEIGHT;
+    }
+
 }

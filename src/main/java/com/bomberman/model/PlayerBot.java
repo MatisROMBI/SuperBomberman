@@ -128,15 +128,19 @@ public class PlayerBot extends Player {
     }
 
     // Surcharge propre, pas d’Override (signature différente de Player)
-    public void takeDamage() {
+    public void takeDamage(Board board) {
         if (!isAlive()) return;
+
         setLives(getLives() - 1);
         if (getLives() <= 0) {
             setLives(0);
+            board.getCell(getX(), getY()).setHasPlayer(false); // Libérer la cellule
             setIsAlive(false);
         }
         setDeathTime(System.currentTimeMillis());
     }
+
+
 
     public void respawnAtStart(Board board) {
         if (!isAlive()) return;
