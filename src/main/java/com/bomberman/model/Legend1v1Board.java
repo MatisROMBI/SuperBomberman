@@ -122,15 +122,22 @@ public class Legend1v1Board {
         if (!isValidPosition(x, y)) return;
         explosions.add(new Explosion(x, y));
         Cell cell = grid[x][y];
-        if (cell.hasPlayer() && player1.getX() == x && player1.getY() == y) {
+
+        if (cell.hasPlayer() && player1.isAlive() && player1.getX() == x && player1.getY() == y) {
             player1.takeDamage();
-            player1.respawnAtStart(this);
+            if (player1.isAlive()) {
+                player1.respawnAtStart(this);
+            }
         }
-        if (cell.hasPlayer() && player2.getX() == x && player2.getY() == y) {
+
+        if (cell.hasPlayer() && player2.isAlive() && player2.getX() == x && player2.getY() == y) {
             player2.takeDamage();
-            player2.respawnAtStart(this);
+            if (player2.isAlive()) {
+                player2.respawnAtStart(this);
+            }
         }
     }
+
 
     public boolean isValidPosition(int x, int y) {
         return x >= 0 && x < Constants.BOARD_WIDTH && y >= 0 && y < Constants.BOARD_HEIGHT;

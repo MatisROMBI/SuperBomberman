@@ -142,6 +142,7 @@ public class PlayerBot extends Player {
 
 
 
+
     public void respawnAtStart(Board board) {
         if (!isAlive()) return;
         board.getCell(getX(), getY()).setHasPlayer(false);
