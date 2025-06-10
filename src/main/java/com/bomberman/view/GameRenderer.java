@@ -70,7 +70,7 @@ public class GameRenderer {
             playerSprites[i] = tryLoad("/images/bomberman_p" + (i + 1) + ".png");
     }
 
-    /** Charge une image depuis les ressources, retourne null si manquante. */
+    /** Charge une image depuis les ressources , retourne null si manquante. */
     private Image tryLoad(String path) {
         try { return new Image(getClass().getResourceAsStream(path)); }
         catch (Exception e) { return null; }
@@ -277,20 +277,109 @@ public class GameRenderer {
     }
 
     /** HUD haut bleu (legend) */
+    /**
+     * Affiche la barre de score custom pixel art en haut (mode LEGEND 1v1).
+     * Affiche vie et score de chaque joueur avec avatar correspondant.
+     */
     private void renderLegendHUD(Legend1v1Board board) {
         double hudHeight = Constants.HUD_HEIGHT;
-        gc.setFill(Color.web("#2257ad"));
+        double hudPadding = 16;
+
+        // Couleur de fond bleue
+        gc.setFill(Color.web("#38b6ff")); // Bleu pixel art
         gc.fillRect(0, 0, Constants.WINDOW_WIDTH, hudHeight);
 
-        Player p1 = board.getPlayer1();
-        Player p2 = board.getPlayer2();
+        // --- Paramètres d'affichage ---
+        double avatarSize = 42;    // Taille des têtes joueurs
+        double boxW = 34, boxH = 34; // Box blanche pour le nombre de vies
+        double scOffset = 12;         // Décalage "SC"
+        double scoreW = 140, scoreH = 38;
 
-        gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
+        // --- Joueur 1 (gauche) ---
+        Player p1 = board.getPlayer1();
+        // Avatars personnalisés
+        Image avatar1 = tryLoad("/images/head_ninja_white.png");
+        double x1 = hudPadding;
+        double y = (hudHeight - avatarSize) / 2;
+        if (avatar1 != null) gc.drawImage(avatar1, x1, y, avatarSize, avatarSize);
+
+        // Vies dans carré blanc contour noir
+        int vies1 = Math.max(0, Math.min(p1.getLives(), 5)); // clamp 0-5
+        double lifeBoxX1 = x1 + avatarSize + 6;
+        double lifeBoxY = (hudHeight - boxH) / 2;
         gc.setFill(Color.WHITE);
-        gc.fillText("J1 - Score: " + p1.getScore() + " | Vies: " + p1.getLives(), 32, hudHeight - 16);
-        gc.setFill(Color.LIGHTYELLOW);
-        gc.fillText("J2 - Score: " + p2.getScore() + " | Vies: " + p2.getLives(), Constants.WINDOW_WIDTH - 285, hudHeight - 16);
+        gc.fillRect(lifeBoxX1, lifeBoxY, boxW, boxH);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(3);
+        gc.strokeRect(lifeBoxX1, lifeBoxY, boxW, boxH);
+        gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
+        gc.setFill(Color.BLACK);
+        // Affiche le nombre de vies
+        gc.fillText("" + vies1, lifeBoxX1 + 10, lifeBoxY + 26);
+
+        // Texte "SC"
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
+        gc.setFill(Color.WHITE);
+        double scX1 = lifeBoxX1 + boxW + scOffset;
+        gc.fillText("SC", scX1, hudHeight - 15);
+
+        // Rectangle noir pour le score
+        double scoreRectX1 = scX1 + 44;
+        gc.setFill(Color.BLACK);
+        gc.fillRect(scoreRectX1, (hudHeight - scoreH) / 2, scoreW, scoreH);
+
+        // Score en blanc centré dans le rectangle
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
+        gc.setFill(Color.WHITE);
+        String score1 = String.valueOf(p1.getScore());
+        Text t1 = new Text(score1);
+        t1.setFont(gc.getFont());
+        double strW1 = t1.getLayoutBounds().getWidth();
+        gc.fillText(score1, scoreRectX1 + (scoreW-strW1)/2, (hudHeight+16));
+
+        // --- Joueur 2 (droite) ---
+        Player p2 = board.getPlayer2();
+        Image avatar2 = tryLoad("/images/head_ninja_black.png");
+        // Décalage de la barre droite
+        double x2 = Constants.WINDOW_WIDTH - hudPadding - avatarSize;
+        // Vies et score à droite
+        double lifeBoxX2 = x2 - boxW - 6;
+        double scX2 = lifeBoxX2 - 44;
+        double scoreRectX2 = scX2 - scoreW - scOffset;
+
+        // Score rectangle
+        gc.setFill(Color.BLACK);
+        gc.fillRect(scoreRectX2, (hudHeight - scoreH) / 2, scoreW, scoreH);
+
+        // Score en blanc centré dans le rectangle
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
+        gc.setFill(Color.WHITE);
+        String score2 = String.valueOf(p2.getScore());
+        Text t2 = new Text(score2);
+        t2.setFont(gc.getFont());
+        double strW2 = t2.getLayoutBounds().getWidth();
+        gc.fillText(score2, scoreRectX2 + (scoreW-strW2)/2, (hudHeight+16));
+
+        // Texte "SC"
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
+        gc.setFill(Color.WHITE);
+        gc.fillText("SC", scX2, hudHeight - 15);
+
+        // Vies box
+        int vies2 = Math.max(0, Math.min(p2.getLives(), 5));
+        gc.setFill(Color.WHITE);
+        gc.fillRect(lifeBoxX2, lifeBoxY, boxW, boxH);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(3);
+        gc.strokeRect(lifeBoxX2, lifeBoxY, boxW, boxH);
+        gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
+        gc.setFill(Color.BLACK);
+        gc.fillText("" + vies2, lifeBoxX2 + 10, lifeBoxY + 26);
+
+        // Avatar
+        if (avatar2 != null) gc.drawImage(avatar2, x2, y, avatarSize, avatarSize);
     }
+
 
     /** Damier bleu + murs fixes (bleu) + murs cassables (glace) */
     private void renderLegendBoard(Legend1v1Board board) {
