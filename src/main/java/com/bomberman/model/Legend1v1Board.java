@@ -4,6 +4,11 @@ import com.bomberman.model.enums.CellType;
 import com.bomberman.utils.Constants;
 import java.util.*;
 
+/**
+ * Plateau du mode LEGEND 1v1 :
+ * - Gère la map, les joueurs, les ennemis et les explosions.
+ * - Optimisé pour IA intelligente (ennemis évitent de se marcher dessus, meurent dans une explosion, etc.)
+ */
 public class Legend1v1Board {
     private final Cell[][] grid;
     private final List<Bomb> bombs;
@@ -23,8 +28,11 @@ public class Legend1v1Board {
         initializeBoard();
     }
 
+    /**
+     * Initialise la map, les positions de départ des joueurs et des ennemis.
+     */
     private void initializeBoard() {
-        // Génère la map avec murs fixes, destructibles et coins ouverts (style Bomberman)
+        // Génère la map avec murs fixes, destructibles, et coins ouverts (style Bomberman)
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
                 if (x == 0 || y == 0 || x == Constants.BOARD_WIDTH - 1 ||
@@ -35,7 +43,7 @@ public class Legend1v1Board {
                 }
             }
         }
-        // Coins ouverts (spawn safe)
+        // Coins ouverts pour spawn safe
         grid[1][1].setType(CellType.EMPTY);
         grid[1][2].setType(CellType.EMPTY);
         grid[2][1].setType(CellType.EMPTY);
@@ -59,12 +67,17 @@ public class Legend1v1Board {
         grid[xMax][1].setHasEnemy(true);
     }
 
+    /**
+     * Met à jour la logique du plateau à chaque tick : bombes, explosions, IA ennemie.
+     */
     public void update() {
         updateBombs();
         updateExplosions();
         updateEnemies();
+        cleanDeadEnemies();
     }
 
+    /** Gère les explosions de bombes et retire les bombes qui ont explosé. */
     private void updateBombs() {
         Iterator<Bomb> it = bombs.iterator();
         while (it.hasNext()) {
@@ -78,16 +91,33 @@ public class Legend1v1Board {
         }
     }
 
+    /** Retire les explosions terminées. */
     private void updateExplosions() {
         long now = System.currentTimeMillis();
         explosions.removeIf(e -> e.isExpired(now, Constants.EXPLOSION_DURATION));
     }
 
+    /**
+     * Fait jouer le tour de chaque ennemi vivant (IA optimisée).
+     */
     private void updateEnemies() {
-        for (LegendEnemyBomber b : bomberEnemies) b.playTurn(this, player1, player2);
-        for (LegendEnemyYellow y : yellowEnemies) y.playTurn(this, player1, player2);
+        for (LegendEnemyBomber b : bomberEnemies)
+            if (b.isAlive()) b.playTurn(this, player1, player2);
+        for (LegendEnemyYellow y : yellowEnemies)
+            if (y.isAlive()) y.playTurn(this, player1, player2);
     }
 
+    /**
+     * Nettoie les ennemis morts (tombés dans une explosion).
+     */
+    private void cleanDeadEnemies() {
+        bomberEnemies.removeIf(b -> !b.isAlive());
+        yellowEnemies.removeIf(y -> !y.isAlive());
+    }
+
+    /**
+     * Déclenche une explosion de bombe : propagation et gestion des collisions.
+     */
     private void explodeBomb(Bomb bomb) {
         bomb.explode();
         int bombX = bomb.getX(), bombY = bomb.getY();
@@ -118,26 +148,62 @@ public class Legend1v1Board {
         }
     }
 
-    private void createExplosion(int x, int y) {
+    /**
+     * Crée une explosion à la case (x,y), gère les collisions avec joueurs et ennemis.
+     */
+    public void createExplosion(int x, int y) {
         if (!isValidPosition(x, y)) return;
         explosions.add(new Explosion(x, y));
         Cell cell = grid[x][y];
 
-        if (cell.hasPlayer() && player1.isAlive() && player1.getX() == x && player1.getY() == y) {
+        // Dommages aux joueurs
+        if (player1.isAlive() && player1.getX() == x && player1.getY() == y) {
             player1.takeDamage();
-            if (player1.isAlive()) {
-                player1.respawnAtStart(this);
-            }
+            if (player1.isAlive()) player1.respawnAtStart(this);
+        }
+        if (player2.isAlive() && player2.getX() == x && player2.getY() == y) {
+            player2.takeDamage();
+            if (player2.isAlive()) player2.respawnAtStart(this);
         }
 
-        if (cell.hasPlayer() && player2.isAlive() && player2.getX() == x && player2.getY() == y) {
-            player2.takeDamage();
-            if (player2.isAlive()) {
-                player2.respawnAtStart(this);
-            }
-        }
+        // Dommages aux ennemis
+        for (LegendEnemyBomber b : bomberEnemies)
+            if (b.getX() == x && b.getY() == y && b.isAlive()) b.kill();
+        for (LegendEnemyYellow yel : yellowEnemies)
+            if (yel.getX() == x && yel.getY() == y && yel.isAlive()) yel.kill();
     }
 
+    /**
+     * Utilitaire : true s'il y a une explosion à la case (x,y).
+     */
+    public boolean isExplosionAt(int x, int y) {
+        for (Explosion e : explosions)
+            if (e.getX() == x && e.getY() == y)
+                return true;
+        return false;
+    }
+
+    /**
+     * Utilitaire : true s'il y a déjà un ennemi vivant sur la case (x,y).
+     */
+    /**
+     * Retourne vrai s'il y a déjà un ennemi vivant (bomber ou yellow) à la case (x, y).
+     */
+    public boolean hasEnemyAt(int x, int y) {
+        // Vérifie tous les bomber ennemis
+        for (LegendEnemyBomber b : bomberEnemies)
+            if (b.getX() == x && b.getY() == y && b.isAlive())
+                return true;
+        // Vérifie tous les yellow ennemis (utilise un autre nom que y)
+        for (LegendEnemyYellow yel : yellowEnemies)
+            if (yel.getX() == x && yel.getY() == y && yel.isAlive())
+                return true;
+        return false;
+    }
+
+    // ===========================
+    // GETTERS ET METHODES UTILITAIRES
+    // ===========================
 
     public boolean isValidPosition(int x, int y) {
         return x >= 0 && x < Constants.BOARD_WIDTH && y >= 0 && y < Constants.BOARD_HEIGHT;
