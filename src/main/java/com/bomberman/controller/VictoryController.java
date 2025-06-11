@@ -33,8 +33,10 @@ public class VictoryController {
         if (victoryLabel != null) {
             if (WINNER_NAME != null && !WINNER_NAME.isBlank()) {
                 victoryLabel.setText(WINNER_NAME + " a gagné !");
+                playAgainButton.setOnAction(e -> rejouerLegend());
             } else {
                 victoryLabel.setText("VICTOIRE !");
+                playAgainButton.setOnAction(e -> rejouer());
             }
         }
 
@@ -43,13 +45,17 @@ public class VictoryController {
             scoreLabel.setText("SCORE FINAL : " + LAST_SCORE);
 
         // Boutons
-        playAgainButton.setOnAction(e -> rejouer());
         mainMenuButton.setOnAction(e -> retourMenu());
     }
 
     private void rejouer() {
         music.arreterMusiqueDeVictoire();
         SceneManager.switchScene("Game");
+    }
+
+    private void rejouerLegend() {
+        music.arreterMusiqueDeVictoire();
+        SceneManager.switchScene("LegendGame");
     }
 
     private void retourMenu() {
