@@ -263,6 +263,10 @@ public class GameRenderer {
     // ================================================================
     //                      MODE LEGEND 1V1
     // ================================================================
+
+    /**
+     * MÉTHODE PRINCIPALE pour le rendu du mode Legend 1v1
+     */
     public void renderLegend1v1(Legend1v1Board board) {
         gc.setFill(Color.web("#1882f7")); // fond bleu global
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -276,7 +280,6 @@ public class GameRenderer {
         renderLegendPowerUps(board); // BONUS neige (assets spécifiques)
     }
 
-    /** HUD haut bleu (legend) */
     /**
      * Affiche la barre de score custom pixel art en haut (mode LEGEND 1v1).
      * Affiche vie et score de chaque joueur avec avatar correspondant.
@@ -371,8 +374,6 @@ public class GameRenderer {
         if (avatar2 != null) gc.drawImage(avatar2, x2, y, avatarSize, avatarSize);
     }
 
-
-
     /** Damier bleu + murs fixes (bleu) + murs cassables (glace) */
     private void renderLegendBoard(Legend1v1Board board) {
         double yOffset = Constants.HUD_HEIGHT;
@@ -465,23 +466,27 @@ public class GameRenderer {
     private void renderLegendEnemies(Legend1v1Board board) {
         double yOffset = Constants.HUD_HEIGHT;
         for (LegendEnemyBomber b : board.getBomberEnemies()) {
-            double px = b.getX() * Constants.CELL_SIZE;
-            double py = b.getY() * Constants.CELL_SIZE + yOffset;
-            if (bomberEnemyIcon != null)
-                gc.drawImage(bomberEnemyIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
-            else {
-                gc.setFill(Color.DARKRED);
-                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            if (b.isAlive()) {
+                double px = b.getX() * Constants.CELL_SIZE;
+                double py = b.getY() * Constants.CELL_SIZE + yOffset;
+                if (bomberEnemyIcon != null)
+                    gc.drawImage(bomberEnemyIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                else {
+                    gc.setFill(Color.DARKRED);
+                    gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                }
             }
         }
         for (LegendEnemyYellow y : board.getYellowEnemies()) {
-            double px = y.getX() * Constants.CELL_SIZE;
-            double py = y.getY() * Constants.CELL_SIZE + yOffset;
-            if (yellowEnemyIcon != null)
-                gc.drawImage(yellowEnemyIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
-            else {
-                gc.setFill(Color.GOLD);
-                gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+            if (y.isAlive()) {
+                double px = y.getX() * Constants.CELL_SIZE;
+                double py = y.getY() * Constants.CELL_SIZE + yOffset;
+                if (yellowEnemyIcon != null)
+                    gc.drawImage(yellowEnemyIcon, px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                else {
+                    gc.setFill(Color.GOLD);
+                    gc.fillOval(px, py, Constants.CELL_SIZE, Constants.CELL_SIZE);
+                }
             }
         }
     }

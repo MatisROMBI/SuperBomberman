@@ -21,11 +21,54 @@ public class SceneManager {
             );
             Scene scene = new Scene(loader.load());
             scene.getStylesheets().add("/css/style.css");
+
+            // Adapter la taille de la fenêtre selon la scène
+            adjustWindowSize(fxmlName);
+
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {
+            System.err.println("Erreur lors du chargement de la scène " + fxmlName + " : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Ajuste la taille de la fenêtre selon la scène chargée
+     */
+    private static void adjustWindowSize(String fxmlName) {
+        switch (fxmlName) {
+            case "Game":
+                primaryStage.setWidth(Constants.WINDOW_WIDTH + 16);
+                primaryStage.setHeight(Constants.WINDOW_HEIGHT + 39);
+                break;
+            case "LegendGame":
+                primaryStage.setWidth(900);
+                primaryStage.setHeight(700);
+                break;
+            case "LevelEditor":
+                primaryStage.setWidth(820);
+                primaryStage.setHeight(720);
+                break;
+            case "MapSelection":
+                primaryStage.setWidth(920);
+                primaryStage.setHeight(720);
+                break;
+            case "ThemeSelection":
+                primaryStage.setWidth(920);
+                primaryStage.setHeight(720);
+                break;
+            case "MainMenu":
+            case "GameOver":
+            case "Victory":
+            default:
+                primaryStage.setWidth(816);
+                primaryStage.setHeight(639);
+                break;
+        }
+
+        // Centrer la fenêtre après redimensionnement
+        primaryStage.centerOnScreen();
     }
 
     public static Stage getPrimaryStage() {

@@ -20,6 +20,7 @@ public class MainMenuController {
     @FXML private ImageView robotSurvivorButtonImg;
     @FXML private ImageView legend1v1ButtonImg;
     @FXML private ImageView levelEditorButtonImg;
+    @FXML private ImageView themesButtonImg;
     @FXML private ImageView quitButtonImg;
 
     private MediaPlayer menuMusicPlayer;
@@ -34,12 +35,18 @@ public class MainMenuController {
             robotSurvivorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/ROBOT-SURVIVOR.png")));
             legend1v1ButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/1V1_LEGEND.png")));
 
-            // Nouveau bouton pour l'éditeur de niveau
+            // Bouton éditeur de niveau
             try {
                 levelEditorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/LEVEL_EDITOR.png")));
             } catch (Exception e) {
-                // Si l'image n'existe pas, on peut créer un bouton texte simple
-                System.out.println("Image LEVEL_EDITOR.png non trouvée, utilisation du fallback");
+                System.out.println("Image LEVEL_EDITOR.png non trouvée");
+            }
+
+            // **NOUVEAU** : Bouton thèmes
+            try {
+                themesButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/THEMES.png")));
+            } catch (Exception e) {
+                System.out.println("Image THEMES.png non trouvée");
             }
 
             quitButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/QUIT_text.png")));
@@ -53,22 +60,28 @@ public class MainMenuController {
     }
 
     private void setupButtonActions() {
-        // Mode classique - maintenant avec sélection de map
+        // Mode classique - avec sélection de map
         robotSurvivorButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("MapSelection"); // **=> Nouveau : sélection de map avant de jouer**
+            SceneManager.switchScene("MapSelection");
         });
 
-        // Mode 1v1 Legend - aussi avec sélection de map
+        // Mode 1v1 Legend - avec sélection de map
         legend1v1ButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("MapSelection"); // **=> Sélection de map unifiée**
+            SceneManager.switchScene("MapSelection");
         });
 
-        // **NOUVEAU** : Éditeur de niveau
+        // Éditeur de niveau
         levelEditorButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("LevelEditor"); // **=> Vers l'éditeur de map**
+            SceneManager.switchScene("LevelEditor");
+        });
+
+        // **NOUVEAU** : Sélection de thèmes
+        themesButtonImg.setOnMouseClicked(e -> {
+            stopMenuMusic();
+            SceneManager.switchScene("ThemeSelection"); // **=> Vers la sélection de thèmes**
         });
 
         // Quitter

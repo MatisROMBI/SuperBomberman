@@ -19,15 +19,21 @@
         <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="TOP_LEFT" />
         <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="TOP_LEFT" />
 
-        <VBox alignment="CENTER" spacing="18" StackPane.alignment="BOTTOM_CENTER" translateY="120">
+        <VBox alignment="CENTER" spacing="16" StackPane.alignment="BOTTOM_CENTER" translateY="100">
             <children>
+                <!-- Mode Robot Survivor -->
                 <ImageView fx:id="robotSurvivorButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
 
+                <!-- Mode 1v1 Legend -->
                 <ImageView fx:id="legend1v1ButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
 
-                <!-- NOUVEAU: Bouton éditeur de niveau -->
+                <!-- Éditeur de niveau -->
                 <ImageView fx:id="levelEditorButtonImg" fitWidth="250" fitHeight="35" pickOnBounds="true"/>
 
+                <!-- NOUVEAU: Sélection de thèmes -->
+                <ImageView fx:id="themesButtonImg" fitWidth="200" fitHeight="32" pickOnBounds="true"/>
+
+                <!-- Quitter -->
                 <ImageView fx:id="quitButtonImg" fitWidth="100" fitHeight="39" pickOnBounds="true"/>
             </children>
         </VBox>
