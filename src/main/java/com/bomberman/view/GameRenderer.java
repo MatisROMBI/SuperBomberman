@@ -284,27 +284,24 @@ public class GameRenderer {
     private void renderLegendHUD(Legend1v1Board board) {
         double hudHeight = Constants.HUD_HEIGHT;
         double hudPadding = 16;
-
-        // Couleur de fond bleue
-        gc.setFill(Color.web("#38b6ff")); // Bleu pixel art
-        gc.fillRect(0, 0, Constants.WINDOW_WIDTH, hudHeight);
-
-        // --- Paramètres d'affichage ---
-        double avatarSize = 42;    // Taille des têtes joueurs
-        double boxW = 34, boxH = 34; // Box blanche pour le nombre de vies
-        double scOffset = 12;         // Décalage "SC"
+        double avatarSize = 42;
+        double boxW = 34, boxH = 34;
+        double scOffset = 12;
         double scoreW = 140, scoreH = 38;
 
-        // --- Joueur 1 (gauche) ---
+        // Fond HUD bleu
+        gc.setFill(Color.web("#38b6ff"));
+        gc.fillRect(0, 0, Constants.WINDOW_WIDTH, hudHeight);
+
+        // -------- JOUEUR 1 (gauche) --------
         Player p1 = board.getPlayer1();
-        // Avatars personnalisés
         Image avatar1 = tryLoad("/images/head_ninja_white.png");
         double x1 = hudPadding;
         double y = (hudHeight - avatarSize) / 2;
         if (avatar1 != null) gc.drawImage(avatar1, x1, y, avatarSize, avatarSize);
 
-        // Vies dans carré blanc contour noir
-        int vies1 = Math.max(0, Math.min(p1.getLives(), 5)); // clamp 0-5
+        // Affichage vies
+        int vies1 = Math.max(0, Math.min(p1.getLives(), 5));
         double lifeBoxX1 = x1 + avatarSize + 6;
         double lifeBoxY = (hudHeight - boxH) / 2;
         gc.setFill(Color.WHITE);
@@ -314,10 +311,9 @@ public class GameRenderer {
         gc.strokeRect(lifeBoxX1, lifeBoxY, boxW, boxH);
         gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
         gc.setFill(Color.BLACK);
-        // Affiche le nombre de vies
-        gc.fillText("" + vies1, lifeBoxX1 + 10, lifeBoxY + 26);
+        gc.fillText(String.valueOf(vies1), lifeBoxX1 + 10, lifeBoxY + 26);
 
-        // Texte "SC"
+        // "SC"
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
         double scX1 = lifeBoxX1 + boxW + scOffset;
@@ -328,44 +324,44 @@ public class GameRenderer {
         gc.setFill(Color.BLACK);
         gc.fillRect(scoreRectX1, (hudHeight - scoreH) / 2, scoreW, scoreH);
 
-        // Score en blanc centré dans le rectangle
+        // Affichage du score centré
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
         gc.setFill(Color.WHITE);
         String score1 = String.valueOf(p1.getScore());
         Text t1 = new Text(score1);
         t1.setFont(gc.getFont());
         double strW1 = t1.getLayoutBounds().getWidth();
-        gc.fillText(score1, scoreRectX1 + (scoreW-strW1)/2, (hudHeight+16));
+        // Centre verticalement dans la box noire
+        double scoreY = (hudHeight + scoreH) / 2 - 8; // -8 affine la hauteur pour être bien au centre
+        gc.fillText(score1, scoreRectX1 + (scoreW - strW1) / 2, scoreY);
 
-        // --- Joueur 2 (droite) ---
+        // -------- JOUEUR 2 (droite) --------
         Player p2 = board.getPlayer2();
         Image avatar2 = tryLoad("/images/head_ninja_black.png");
-        // Décalage de la barre droite
         double x2 = Constants.WINDOW_WIDTH - hudPadding - avatarSize;
-        // Vies et score à droite
         double lifeBoxX2 = x2 - boxW - 6;
         double scX2 = lifeBoxX2 - 44;
         double scoreRectX2 = scX2 - scoreW - scOffset;
 
-        // Score rectangle
+        // Rectangle noir pour le score
         gc.setFill(Color.BLACK);
         gc.fillRect(scoreRectX2, (hudHeight - scoreH) / 2, scoreW, scoreH);
 
-        // Score en blanc centré dans le rectangle
-        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
-        gc.setFill(Color.WHITE);
+        // Affichage du score centré (corrigé : score2)
         String score2 = String.valueOf(p2.getScore());
         Text t2 = new Text(score2);
         t2.setFont(gc.getFont());
         double strW2 = t2.getLayoutBounds().getWidth();
-        gc.fillText(score2, scoreRectX2 + (scoreW-strW2)/2, (hudHeight+16));
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
+        gc.setFill(Color.WHITE);
+        gc.fillText(score2, scoreRectX2 + (scoreW - strW2) / 2, scoreY);
 
-        // Texte "SC"
+        // "SC"
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
         gc.fillText("SC", scX2, hudHeight - 15);
 
-        // Vies box
+        // Affichage vies
         int vies2 = Math.max(0, Math.min(p2.getLives(), 5));
         gc.setFill(Color.WHITE);
         gc.fillRect(lifeBoxX2, lifeBoxY, boxW, boxH);
@@ -374,9 +370,9 @@ public class GameRenderer {
         gc.strokeRect(lifeBoxX2, lifeBoxY, boxW, boxH);
         gc.setFont(Font.font("Arial Black", FontWeight.BOLD, 24));
         gc.setFill(Color.BLACK);
-        gc.fillText("" + vies2, lifeBoxX2 + 10, lifeBoxY + 26);
+        gc.fillText(String.valueOf(vies2), lifeBoxX2 + 10, lifeBoxY + 26);
 
-        // Avatar
+        // Affichage avatar joueur 2
         if (avatar2 != null) gc.drawImage(avatar2, x2, y, avatarSize, avatarSize);
     }
 
