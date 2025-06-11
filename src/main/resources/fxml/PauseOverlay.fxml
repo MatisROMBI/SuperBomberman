@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.bomberman.controller.PauseOverlayController"
+           fx:id="pauseOverlay"
+           prefWidth="800" prefHeight="600"
+           style="-fx-background-color: rgba(0, 0, 0, 0.7);"
+           visible="false">
+
+    <!-- Conteneur principal du menu de pause -->
+    <VBox alignment="CENTER" spacing="30" maxWidth="500" maxHeight="400"
+          style="-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e); -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #3498db; -fx-border-width: 3;">
+
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+
+        <!-- Effet d'ombre -->
+        <effect>
+            <DropShadow color="#000000" radius="20" offsetX="0" offsetY="10"/>
+        </effect>
+
+        <!-- Titre PAUSE -->
+        <Label text="PAUSE"
+               style="-fx-font-size: 48px; -fx-text-fill: #ecf0f1; -fx-font-weight: bold;">
+            <effect>
+                <DropShadow color="#3498db" radius="5" offsetX="0" offsetY="2"/>
+            </effect>
+        </Label>
+
+        <!-- Séparateur stylisé -->
+        <Region prefHeight="2" maxWidth="300"
+                style="-fx-background-color: linear-gradient(to right, transparent, #3498db, transparent);"/>
+
+        <!-- Boutons du menu de pause -->
+        <VBox spacing="20" alignment="CENTER">
+
+            <!-- Bouton Reprendre -->
+            <Button fx:id="resumeButton" text="REPRENDRE"
+                    prefWidth="300" prefHeight="50"
+                    styleClass="pause-button-primary">
+                <effect>
+                    <DropShadow color="#000000" radius="3" offsetX="0" offsetY="2"/>
+                </effect>
+            </Button>
+
+            <!-- Bouton Relancer -->
+            <Button fx:id="restartButton" text="RELANCER LA PARTIE"
+                    prefWidth="300" prefHeight="50"
+                    styleClass="pause-button-secondary">
+                <effect>
+                    <DropShadow color="#000000" radius="3" offsetX="0" offsetY="2"/>
+                </effect>
+            </Button>
+
+            <!-- Bouton Menu Principal -->
+            <Button fx:id="mainMenuButton" text="MENU PRINCIPAL"
+                    prefWidth="300" prefHeight="50"
+                    styleClass="pause-button-danger">
+                <effect>
+                    <DropShadow color="#000000" radius="3" offsetX="0" offsetY="2"/>
+                </effect>
+            </Button>
+        </VBox>
+
+        <!-- Instruction -->
+        <Label text="Appuyez sur ÉCHAP pour reprendre"
+               style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px; -fx-font-style: italic;"
+               alignment="CENTER"/>
+
+    </VBox>
+
+</StackPane>

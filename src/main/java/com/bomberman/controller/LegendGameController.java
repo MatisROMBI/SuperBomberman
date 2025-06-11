@@ -8,20 +8,20 @@ import com.bomberman.view.GameRenderer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Contrôleur du mode LEGEND 1v1 - CORRIGÉ
- * Mode 2 joueurs humains sur le même PC
- * Joueur 1 : ZQSD + R (haut-gauche, sprite blanc)
- * Joueur 2 : IJKL + P (bas-droite, sprite noir)
+ * Contrôleur du mode LEGEND 1v1 - AVEC MENU DE PAUSE
  */
-public class LegendGameController {
+public class LegendGameController implements PauseOverlayController.PauseActionListener {
     @FXML private VBox gameContainer;
     @FXML private Canvas gameCanvas;
 
@@ -33,28 +33,50 @@ public class LegendGameController {
     private boolean victory = false;
     private final Music music = new Music();
 
+    // NOUVEAUTÉ: Gestion du menu de pause
+    private StackPane pauseOverlay;
+    private PauseOverlayController pauseController;
+    private boolean isPaused = false;
+
+    private long lastRenderTime = 0;
+    private static final long RENDER_INTERVAL = 16_666_666L; // ~60 FPS
+
     @FXML
     private void initialize() {
-        System.out.println("=== INITIALISATION MODE LEGEND 1V1 ===");
-
-        // Créer le plateau Legend avec 2 joueurs humains
         board = new Legend1v1Board();
         renderer = new GameRenderer(gameCanvas);
 
         setupKeyboardHandling();
+        setupPauseOverlay();
         music.demarrerLegendMusic();
         startRenderLoop();
+    }
 
-        // Vérification debug
-        System.out.println("Joueur 1 position: (" + board.getPlayer1().getX() + "," + board.getPlayer1().getY() + ")");
-        System.out.println("Joueur 2 position: (" + board.getPlayer2().getX() + "," + board.getPlayer2().getY() + ")");
-        System.out.println("Nombre d'ennemis Bomber: " + board.getBomberEnemies().size());
-        System.out.println("Nombre d'ennemis Yellow: " + board.getYellowEnemies().size());
+    /**
+     * NOUVEAUTÉ: Configuration du menu de pause
+     */
+    private void setupPauseOverlay() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PauseOverlay.fxml"));
+            pauseOverlay = loader.load();
+            pauseController = loader.getController();
+            pauseController.setActionListener(this);
 
-        System.out.println("CONTRÔLES:");
-        System.out.println("- Joueur 1 (Blanc): ZQSD + R");
-        System.out.println("- Joueur 2 (Noir): IJKL + P");
-        System.out.println("- ÉCHAP: Retour menu");
+            // Ajouter l'overlay au conteneur principal
+            if (gameContainer.getParent() instanceof StackPane) {
+                StackPane parent = (StackPane) gameContainer.getParent();
+                parent.getChildren().add(pauseOverlay);
+            } else {
+                // Créer un nouveau StackPane si nécessaire
+                StackPane stackPane = new StackPane();
+                VBox originalParent = (VBox) gameContainer.getParent();
+                originalParent.getChildren().remove(gameContainer);
+                stackPane.getChildren().addAll(gameContainer, pauseOverlay);
+                originalParent.getChildren().add(stackPane);
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur lors du chargement du menu de pause : " + e.getMessage());
+        }
     }
 
     private void setupKeyboardHandling() {
@@ -73,72 +95,93 @@ public class LegendGameController {
 
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
-        if (pressedKeys.contains(keyCode)) return;
-        pressedKeys.add(keyCode);
 
+        // NOUVEAUTÉ: Gestion spéciale de la touche ESCAPE pour la pause
+        if ("ESCAPE".equals(keyCode)) {
+            togglePause();
+            event.consume();
+            return;
+        }
+
+        // Ne traiter les autres touches que si le jeu n'est pas en pause
+        if (!isPaused && !pressedKeys.contains(keyCode)) {
+            pressedKeys.add(keyCode);
+            processKeyAction(keyCode);
+        }
+        event.consume();
+    }
+
+    /**
+     * NOUVEAUTÉ: Basculer entre pause et jeu
+     */
+    private void togglePause() {
+        if (pauseController != null) {
+            if (isPaused) {
+                resumeGame();
+            } else {
+                pauseGame();
+            }
+        }
+    }
+
+    /**
+     * NOUVEAUTÉ: Mettre le jeu en pause
+     */
+    private void pauseGame() {
+        isPaused = true;
+        music.arreterLegendMusic();
+        pauseController.showPause();
+    }
+
+    /**
+     * NOUVEAUTÉ: Reprendre le jeu
+     */
+    private void resumeGame() {
+        isPaused = false;
+        music.demarrerLegendMusic();
+        pauseController.hidePause();
+        gameContainer.requestFocus();
+    }
+
+    private void processKeyAction(String keyCode) {
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
 
-        // Debug des touches pressées
-        System.out.println("Touche pressée: " + keyCode);
-
         switch (keyCode) {
-            // ===== JOUEUR 1 (ZQSD + R) =====
+            // Joueur 1 (ZQSD + R)
             case "Z":
-                System.out.println("J1 monte");
                 p1.moveUp(board);
                 break;
             case "S":
-                System.out.println("J1 descend");
                 p1.moveDown(board);
                 break;
             case "Q":
-                System.out.println("J1 gauche");
                 p1.moveLeft(board);
                 break;
             case "D":
-                System.out.println("J1 droite");
                 p1.moveRight(board);
                 break;
             case "R":
-                System.out.println("J1 pose bombe");
                 p1.placeBomb(board);
                 break;
 
-            // ===== JOUEUR 2 (IJKL + P) =====
+            // Joueur 2 (IJKL + P)
             case "I":
-                System.out.println("J2 monte");
                 p2.moveUp(board);
                 break;
             case "K":
-                System.out.println("J2 descend");
                 p2.moveDown(board);
                 break;
             case "J":
-                System.out.println("J2 gauche");
                 p2.moveLeft(board);
                 break;
             case "L":
-                System.out.println("J2 droite");
                 p2.moveRight(board);
                 break;
             case "P":
-                System.out.println("J2 pose bombe");
                 p2.placeBomb(board);
                 break;
-
-            // ===== TOUCHES COMMUNES =====
-            case "ESCAPE":
-                System.out.println("Retour au menu");
-                music.arreterLegendMusic();
-                SceneManager.switchScene("MainMenu");
-                break;
-
-            default:
-                System.out.println("Touche non reconnue: " + keyCode);
-                break;
         }
-        event.consume();
     }
 
     private void handleKeyReleased(KeyEvent event) {
@@ -149,9 +192,12 @@ public class LegendGameController {
         renderLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!gameOver && !victory) {
-                    board.update();
-                    renderer.renderLegend1v1(board);
+                if (!gameOver && !victory && !isPaused) {
+                    if (now - lastRenderTime >= RENDER_INTERVAL) {
+                        board.update();
+                        renderer.renderLegend1v1(board);
+                        lastRenderTime = now;
+                    }
                     checkGameState();
                 }
             }
@@ -163,7 +209,6 @@ public class LegendGameController {
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
 
-        // Égalité (les deux morts)
         if (!p1.isAlive() && !p2.isAlive()) {
             gameOver = true;
             music.arreterLegendMusic();
@@ -174,7 +219,6 @@ public class LegendGameController {
             return;
         }
 
-        // Victoire Joueur 1
         if (!p2.isAlive() && p1.isAlive()) {
             victory = true;
             music.arreterLegendMusic();
@@ -186,7 +230,6 @@ public class LegendGameController {
             return;
         }
 
-        // Victoire Joueur 2
         if (!p1.isAlive() && p2.isAlive()) {
             victory = true;
             music.arreterLegendMusic();
@@ -198,7 +241,6 @@ public class LegendGameController {
             return;
         }
 
-        // Victoire coopérative (tous les ennemis éliminés)
         boolean allEnemiesDead = board.getBomberEnemies().stream().noneMatch(b -> b.isAlive()) &&
                 board.getYellowEnemies().stream().noneMatch(y -> y.isAlive());
 
@@ -235,6 +277,36 @@ public class LegendGameController {
     public void cleanup() {
         stopRenderLoop();
         music.arreterLegendMusic();
-        System.out.println("=== MODE LEGEND 1v1 TERMINÉ ===");
+    }
+
+    // ======================================================================
+    // NOUVEAUTÉ: Implémentation des actions du menu de pause
+    // ======================================================================
+
+    @Override
+    public void onResume() {
+        resumeGame();
+    }
+
+    @Override
+    public void onRestart() {
+        // Arrêter le jeu actuel
+        cleanup();
+
+        // Redémarrer une nouvelle partie Legend
+        board = new Legend1v1Board();
+        music.demarrerLegendMusic();
+        startRenderLoop();
+
+        gameOver = false;
+        victory = false;
+        isPaused = false;
+        gameContainer.requestFocus();
+    }
+
+    @Override
+    public void onMainMenu() {
+        cleanup();
+        SceneManager.switchScene("MainMenu");
     }
 }

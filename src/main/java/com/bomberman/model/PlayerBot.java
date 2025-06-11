@@ -2,6 +2,7 @@ package com.bomberman.model;
 
 import com.bomberman.model.enums.Direction;
 import com.bomberman.model.enums.GameState;
+import com.bomberman.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +12,8 @@ import java.util.Random;
 public class PlayerBot extends Player {
     private Random random = new Random();
     private long lastMoveTime = 0;
-    private static final int BOT_MOVE_DELAY = 800;
+    // OPTIMISATION: Réduction du délai de mouvement
+    private static final int BOT_MOVE_DELAY = Constants.BOT_MOVE_DELAY; // Utilise la constante optimisée
     private int maxBombsBot = 2;
     private int bombsAvailableBot = 2;
     private static final int BOT_START_LIVES = 6;
@@ -21,7 +23,7 @@ public class PlayerBot extends Player {
         setLives(BOT_START_LIVES);
     }
 
-    // PAS d’@Override si la méthode n’est pas dans Player !
+    // PAS d'@Override si la méthode n'est pas dans Player !
     public void onBombExploded() {
         bombsAvailableBot = Math.min(bombsAvailableBot + 1, maxBombsBot);
     }
@@ -108,7 +110,7 @@ public class PlayerBot extends Player {
         return null;
     }
 
-    // Ici tu peux garder l’annotation si applyPowerUp est bien "protected" dans Player.
+    // Ici tu peux garder l'annotation si applyPowerUp est bien "protected" dans Player.
     protected void applyPowerUp(PowerUp powerUp) {
         switch (powerUp.getType()) {
             case EXTRA_BOMB:
@@ -127,7 +129,7 @@ public class PlayerBot extends Player {
         }
     }
 
-    // Surcharge propre, pas d’Override (signature différente de Player)
+    // Surcharge propre, pas d'Override (signature différente de Player)
     public void takeDamage(Board board) {
         if (!isAlive()) return;
 
@@ -139,9 +141,6 @@ public class PlayerBot extends Player {
         }
         setDeathTime(System.currentTimeMillis());
     }
-
-
-
 
     public void respawnAtStart(Board board) {
         if (!isAlive()) return;

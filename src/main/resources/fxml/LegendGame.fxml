@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
 <?import javafx.geometry.Insets?>
 
-<VBox fx:id="gameContainer" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.bomberman.controller.LegendGameController"
-      style="-fx-background-color: #006eff;"
-      prefWidth="900" prefHeight="700"
-      alignment="CENTER"
-      spacing="10">
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.bomberman.controller.LegendGameController"
+           style="-fx-background-color: #006eff;"
+           prefWidth="900" prefHeight="700">
 
-    <!-- Instructions de contrôle -->
-    <VBox alignment="CENTER" spacing="5"
-          style="-fx-background-color: rgba(0,0,0,0.7); -fx-background-radius: 10;">
-        <padding><Insets top="8" right="15" bottom="8" left="15"/></padding>
+    <!-- Contenu principal du jeu Legend -->
+    <VBox fx:id="gameContainer"
+          style="-fx-background-color: #006eff;"
+          prefWidth="900" prefHeight="700"
+          alignment="CENTER"
+          spacing="10">
 
-        <Label text="MODE LEGEND 1v1 - CONTRÔLES"
-               style="-fx-text-fill: #FFD700; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+        <!-- Instructions de contrôle -->
+        <VBox alignment="CENTER" spacing="5"
+              style="-fx-background-color: rgba(0,0,0,0.7); -fx-background-radius: 10;">
+            <padding><Insets top="8" right="15" bottom="8" left="15"/></padding>
 
-        <Label text="🎮 Joueur 1 (Blanc): ZQSD + R (bombe) | 🎮 Joueur 2 (Noir): IJKL + P (bombe) | ÉCHAP: Menu"
-               style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+            <Label text="MODE LEGEND 1v1 - CONTRÔLES"
+                   style="-fx-text-fill: #FFD700; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+            <Label text="🎮 Joueur 1 (Blanc): ZQSD + R | 🎮 Joueur 2 (Noir): IJKL + P | ÉCHAP: Pause"
+                   style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+        </VBox>
+
+        <!-- Canvas de jeu -->
+        <Canvas fx:id="gameCanvas" width="800" height="600"/>
+
     </VBox>
 
-    <!-- Canvas de jeu -->
-    <Canvas fx:id="gameCanvas" width="800" height="600"/>
+    <!-- L'overlay de pause sera ajouté dynamiquement par le contrôleur -->
 
-</VBox>
+</StackPane>

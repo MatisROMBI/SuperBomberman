@@ -15,6 +15,8 @@ public class Game {
     private AnimationTimer gameLoop;
     private long lastUpdate;
 
+    // OPTIMISATION: Réduire la fréquence de mise à jour
+    private static final long UPDATE_INTERVAL = Constants.GAME_SPEED * 1_000_000L; // Utilise la constante optimisée
 
     public Game() {
         initialize();
@@ -55,11 +57,12 @@ public class Game {
         startGameLoop();
     }
 
+    // OPTIMISATION: Limitation de la fréquence de mise à jour
     private void startGameLoop() {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (now - lastUpdate >= Constants.GAME_SPEED * 1_000_000) {
+                if (now - lastUpdate >= UPDATE_INTERVAL) {
                     update();
                     lastUpdate = now;
                 }
@@ -72,7 +75,7 @@ public class Game {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (now - lastUpdate >= Constants.GAME_SPEED * 1_000_000) {
+                if (now - lastUpdate >= UPDATE_INTERVAL) {
                     updateMultiplayer();
                     lastUpdate = now;
                 }
@@ -143,5 +146,4 @@ public class Game {
     public Board getBoard() { return board; }
     public Player getPlayer() { return player; }
     public GameState getGameState() { return gameState; }
-
 }

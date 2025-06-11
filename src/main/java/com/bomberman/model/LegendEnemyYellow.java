@@ -1,5 +1,6 @@
 package com.bomberman.model;
 
+import com.bomberman.utils.Constants;
 import java.util.Random;
 
 /**
@@ -12,6 +13,10 @@ public class LegendEnemyYellow {
     private int x, y;               // Position du Yellow sur la grille
     private boolean alive = true;   // Etat de vie de l'ennemi
     private final Random rand = new Random();
+
+    // OPTIMISATION: Ajouter un délai de mouvement pour éviter les calculs constants
+    private long lastMoveTime = 0;
+    private static final int MOVE_DELAY = Constants.ENEMY_MOVE_DELAY; // Utilise la constante optimisée
 
     /**
      * Constructeur pour positionner le Yellow au départ.
@@ -30,6 +35,11 @@ public class LegendEnemyYellow {
      */
     public void playTurn(Legend1v1Board board, Player p1, Player p2) {
         if (!alive) return;
+
+        // OPTIMISATION: Limiter la fréquence de mouvement
+        long now = System.currentTimeMillis();
+        if (now - lastMoveTime < MOVE_DELAY) return;
+        lastMoveTime = now;
 
         // Cible : le joueur le plus proche (en cases)
         Player target = (distance(p1) < distance(p2)) ? p1 : p2;

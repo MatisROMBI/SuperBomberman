@@ -1,5 +1,6 @@
 package com.bomberman.model;
 
+import com.bomberman.utils.Constants;
 import java.util.Random;
 
 /**
@@ -15,6 +16,10 @@ public class LegendEnemyBomber {
     private boolean alive = true;
     private final Random rand = new Random();
 
+    // OPTIMISATION: Ajouter un délai de mouvement
+    private long lastMoveTime = 0;
+    private static final int MOVE_DELAY = Constants.ENEMY_MOVE_DELAY; // Utilise la constante optimisée
+
     public LegendEnemyBomber(int x, int y) {
         this.x = x;
         this.y = y;
@@ -25,7 +30,12 @@ public class LegendEnemyBomber {
      */
     public void playTurn(Legend1v1Board board, Player p1, Player p2) {
         if (!alive) return;
+
         long now = System.currentTimeMillis();
+
+        // OPTIMISATION: Limiter la fréquence de mouvement
+        if (now - lastMoveTime < MOVE_DELAY) return;
+        lastMoveTime = now;
 
         // Cible : le joueur humain le plus proche
         Player target = (distance(p1) < distance(p2)) ? p1 : p2;
@@ -61,10 +71,13 @@ public class LegendEnemyBomber {
      * Explosion géante sur 2 cases dans chaque direction (croix).
      */
     private void explode(Legend1v1Board board) {
-        for (int dx = -2; dx <= 2; dx++)
-            for (int dy = -2; dy <= 2; dy++)
-                if (Math.abs(dx) + Math.abs(dy) <= 2 && board.isValidPosition(x + dx, y + dy))
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                if (Math.abs(dx) + Math.abs(dy) <= 2 && board.isValidPosition(x + dx, y + dy)) {
                     board.createExplosion(x + dx, y + dy);
+                }
+            }
+        }
         // (On peut ajouter un son ici)
     }
 

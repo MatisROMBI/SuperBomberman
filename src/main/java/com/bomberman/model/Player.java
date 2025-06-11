@@ -16,7 +16,11 @@ public class Player {
     // Gestion du bonus SPEED
     private boolean speedBoost = false;
     private long speedEndTime = 0;
+
+    // OPTIMISATION: Réduire les délais de mouvement
     private long lastMoveTime = 0;
+    private static final int NORMAL_MOVE_DELAY = 100; // Réduit de 160 à 100
+    private static final int SPEED_BOOST_DELAY = 60;  // Réduit de 80 à 60
 
     private int respawnDelay = 1000;
     protected long deathTime = -1;
@@ -57,13 +61,13 @@ public class Player {
         isAlive = true;
     }
 
-    // --- Move (Board ou Legend1v1Board)
+    // OPTIMISATION: Move plus fluide
     public void move(Direction direction, Object board, GameState gameState) {
         if (gameState != null && gameState != GameState.PLAYING) return;
         if (!isAlive) return;
 
         long now = System.currentTimeMillis();
-        int delay = speedBoost ? 80 : 160;
+        int delay = speedBoost ? SPEED_BOOST_DELAY : NORMAL_MOVE_DELAY;
         if (now - lastMoveTime < delay) return;
         lastMoveTime = now;
 
@@ -137,7 +141,9 @@ public class Player {
         }
     }
 
-    public void onBombExploded() {bombsAvailable = Math.min(bombsAvailable + 1, maxBombs);}
+    public void onBombExploded() {
+        bombsAvailable = Math.min(bombsAvailable + 1, maxBombs);
+    }
 
     public void takeDamage() {
         if (!isAlive) return;
