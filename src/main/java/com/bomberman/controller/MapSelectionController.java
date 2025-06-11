@@ -183,11 +183,13 @@ public class MapSelectionController {
             CustomMapHolder.setSelectedMap(null); // Utiliser la génération par défaut
         }
 
-        // Lancer le bon mode de jeu
+        // **CORRECTION** : Lancer le bon mode de jeu selon la sélection
         if ("legend".equals(selectedGameMode)) {
-            SceneManager.switchScene("LegendGame");
+            System.out.println("Lancement du mode Legend 1v1 avec map: " + selectedMap);
+            SceneManager.switchScene("LegendGame"); // **=> Mode Legend 1v1 (2 joueurs humains)**
         } else {
-            SceneManager.switchScene("Game");
+            System.out.println("Lancement du mode Robot Survivor avec map: " + selectedMap);
+            SceneManager.switchScene("Game"); // **=> Mode classique (1 joueur vs bots)**
         }
     }
 

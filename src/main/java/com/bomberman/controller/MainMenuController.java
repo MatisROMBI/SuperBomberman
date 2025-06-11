@@ -42,7 +42,7 @@ public class MainMenuController {
                 System.out.println("Image LEVEL_EDITOR.png non trouvée");
             }
 
-            // **NOUVEAU** : Bouton thèmes
+            // Bouton thèmes
             try {
                 themesButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/THEMES.png")));
             } catch (Exception e) {
@@ -60,32 +60,41 @@ public class MainMenuController {
     }
 
     private void setupButtonActions() {
-        // Mode classique - avec sélection de map
+        // ===== MODE ROBOT SURVIVOR =====
+        // Redirige vers la sélection de map pour choisir la map puis jouer en mode classique
         robotSurvivorButtonImg.setOnMouseClicked(e -> {
+            System.out.println("🤖 Mode Robot Survivor sélectionné -> Sélection de map");
             stopMenuMusic();
             SceneManager.switchScene("MapSelection");
         });
 
-        // Mode 1v1 Legend - avec sélection de map
+        // ===== MODE LEGEND 1V1 =====
+        // ⚠️ CORRECTION : Redirige DIRECTEMENT vers LegendGame (2 joueurs humains)
         legend1v1ButtonImg.setOnMouseClicked(e -> {
+            System.out.println("⚔️ Mode Legend 1v1 sélectionné -> LegendGame DIRECT (2 joueurs humains)");
             stopMenuMusic();
-            SceneManager.switchScene("MapSelection");
+            SceneManager.switchScene("LegendGame"); // 🔥 CHANGEMENT ICI
         });
 
-        // Éditeur de niveau
+        // ===== ÉDITEUR DE NIVEAU =====
         levelEditorButtonImg.setOnMouseClicked(e -> {
+            System.out.println("✏️ Éditeur de niveau sélectionné");
             stopMenuMusic();
             SceneManager.switchScene("LevelEditor");
         });
 
-        // **NOUVEAU** : Sélection de thèmes
+        // ===== SÉLECTION DE THÈMES =====
         themesButtonImg.setOnMouseClicked(e -> {
+            System.out.println("🎨 Sélection de thèmes");
             stopMenuMusic();
-            SceneManager.switchScene("ThemeSelection"); // **=> Vers la sélection de thèmes**
+            SceneManager.switchScene("ThemeSelection");
         });
 
-        // Quitter
-        quitButtonImg.setOnMouseClicked(e -> System.exit(0));
+        // ===== QUITTER =====
+        quitButtonImg.setOnMouseClicked(e -> {
+            System.out.println("👋 Fermeture du jeu");
+            System.exit(0);
+        });
     }
 
     private void playMenuMusic() {

@@ -1,23 +1,27 @@
 package com.bomberman.model;
 
+import com.bomberman.controller.MapSelectionController;
 import com.bomberman.model.enums.CellType;
 import com.bomberman.utils.Constants;
+import com.bomberman.utils.MapManager;
 import java.util.*;
 
 /**
- * Plateau du mode LEGEND 1v1 :
- * - Gère la map, les joueurs, les ennemis et les explosions.
- * - Optimisé pour IA intelligente (ennemis évitent de se marcher dessus, meurent dans une explosion, etc.)
+ * Plateau du mode LEGEND 1v1 - Version 2 joueurs humains
+ * Joueur 1 (Blanc) : Position haut-gauche, contrôles ZQSD + R
+ * Joueur 2 (Noir) : Position bas-droite, contrôles IJKL + P
+ * Ennemis IA : 1 Bomber + 2 Yellow pour ajouter du challenge
  */
 public class Legend1v1Board {
     private final Cell[][] grid;
     private final List<Bomb> bombs;
     private final List<Explosion> explosions;
-    private Player player1;
-    private Player player2;
+    private Player player1; // Joueur humain 1 (haut-gauche)
+    private Player player2; // Joueur humain 2 (bas-droite)
     private final List<LegendEnemyBomber> bomberEnemies;
     private final List<LegendEnemyYellow> yellowEnemies;
     private final Music music = new Music();
+    private final MapManager mapManager = new MapManager();
 
     public Legend1v1Board() {
         grid = new Cell[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
@@ -32,6 +36,44 @@ public class Legend1v1Board {
      * Initialise la map, les positions de départ des joueurs et des ennemis.
      */
     private void initializeBoard() {
+        // Vérifier s'il y a une map personnalisée sélectionnée
+        if (MapSelectionController.CustomMapHolder.hasCustomMap()) {
+            loadCustomMap();
+        } else {
+            generateDefaultLegendMap();
+        }
+
+        setupPlayersAndEnemies();
+    }
+
+    /**
+     * Charge une map personnalisée pour le mode Legend
+     */
+    private void loadCustomMap() {
+        try {
+            String selectedMap = MapSelectionController.CustomMapHolder.getSelectedMap();
+            MapData mapData = mapManager.loadMap(selectedMap);
+
+            // Copier la grille de la map personnalisée
+            CellType[][] customGrid = mapData.getGrid();
+            for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
+                for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
+                    grid[x][y] = new Cell(customGrid[x][y]);
+                }
+            }
+
+            System.out.println("Map personnalisée chargée pour le mode Legend : " + selectedMap);
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de la map personnalisée : " + e.getMessage());
+            generateDefaultLegendMap(); // Fallback vers la map par défaut
+        }
+    }
+
+    /**
+     * Génère la map par défaut du mode Legend
+     */
+    private void generateDefaultLegendMap() {
         // Génère la map avec murs fixes, destructibles, et coins ouverts (style Bomberman)
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
@@ -43,32 +85,60 @@ public class Legend1v1Board {
                 }
             }
         }
-        // Coins ouverts pour spawn safe
-        grid[1][1].setType(CellType.EMPTY);
-        grid[1][2].setType(CellType.EMPTY);
-        grid[2][1].setType(CellType.EMPTY);
-        int xMax = Constants.BOARD_WIDTH - 2, yMax = Constants.BOARD_HEIGHT - 2;
-        grid[xMax][yMax].setType(CellType.EMPTY);
-        grid[xMax - 1][yMax].setType(CellType.EMPTY);
-        grid[xMax][yMax - 1].setType(CellType.EMPTY);
 
-        // Placement des joueurs
-        player1 = new Player(1, 1);
-        player2 = new Player(xMax, yMax);
-        grid[1][1].setHasPlayer(true);
-        grid[xMax][yMax].setHasPlayer(true);
-
-        // Ennemis Legend (ex : 1 bomber + 2 yellow)
-        bomberEnemies.add(new LegendEnemyBomber(Constants.BOARD_WIDTH / 2, 1));
-        grid[Constants.BOARD_WIDTH / 2][1].setHasEnemy(true);
-        yellowEnemies.add(new LegendEnemyYellow(1, yMax));
-        grid[1][yMax].setHasEnemy(true);
-        yellowEnemies.add(new LegendEnemyYellow(xMax, 1));
-        grid[xMax][1].setHasEnemy(true);
+        // Assurer les coins ouverts pour spawn safe
+        ensureLegendSpawnAreasAreFree();
     }
 
     /**
-     * Met à jour la logique du plateau à chaque tick : bombes, explosions, IA ennemie.
+     * S'assure que les zones de spawn du mode Legend sont libres
+     */
+    private void ensureLegendSpawnAreasAreFree() {
+        // Coin haut-gauche (Joueur 1)
+        grid[1][1].setType(CellType.EMPTY);
+        grid[1][2].setType(CellType.EMPTY);
+        grid[2][1].setType(CellType.EMPTY);
+
+        // Coin bas-droite (Joueur 2)
+        int xMax = Constants.BOARD_WIDTH - 2;
+        int yMax = Constants.BOARD_HEIGHT - 2;
+        grid[xMax][yMax].setType(CellType.EMPTY);
+        grid[xMax - 1][yMax].setType(CellType.EMPTY);
+        grid[xMax][yMax - 1].setType(CellType.EMPTY);
+    }
+
+    /**
+     * Place les joueurs et ennemis sur le plateau
+     * MODIFICATION : Seulement 2 joueurs humains + ennemis IA au centre
+     */
+    private void setupPlayersAndEnemies() {
+        int xMax = Constants.BOARD_WIDTH - 2;
+        int yMax = Constants.BOARD_HEIGHT - 2;
+
+        // SEULEMENT 2 JOUEURS HUMAINS (pas 4)
+        player1 = new Player(1, 1);          // Joueur 1 : haut-gauche
+        player2 = new Player(xMax, yMax);    // Joueur 2 : bas-droite
+
+        grid[1][1].setHasPlayer(true);
+        grid[xMax][yMax].setHasPlayer(true);
+
+        // Ennemis IA Legend positionnés au centre/autres zones
+        // 1 Bomber au centre-haut
+        bomberEnemies.add(new LegendEnemyBomber(Constants.BOARD_WIDTH / 2, 2));
+        grid[Constants.BOARD_WIDTH / 2][2].setHasEnemy(true);
+
+        // 2 Yellow ennemis dans les coins non-occupés
+        yellowEnemies.add(new LegendEnemyYellow(xMax, 1));     // haut-droite
+        grid[xMax][1].setHasEnemy(true);
+
+        yellowEnemies.add(new LegendEnemyYellow(1, yMax));     // bas-gauche
+        grid[1][yMax].setHasEnemy(true);
+
+        System.out.println("Mode Legend 1v1 : 2 joueurs humains + 3 ennemis IA");
+    }
+
+    /**
+     * Met à jour la logique du plateau à chaque tick : bombes, explosions, IA ennemie.
      */
     public void update() {
         updateBombs();
@@ -116,7 +186,7 @@ public class Legend1v1Board {
     }
 
     /**
-     * Déclenche une explosion de bombe : propagation et gestion des collisions.
+     * Déclenche une explosion de bombe : propagation et gestion des collisions.
      */
     private void explodeBomb(Bomb bomb) {
         bomb.explode();
@@ -156,7 +226,7 @@ public class Legend1v1Board {
         explosions.add(new Explosion(x, y));
         Cell cell = grid[x][y];
 
-        // Dommages aux joueurs
+        // Dommages aux joueurs HUMAINS
         if (player1.isAlive() && player1.getX() == x && player1.getY() == y) {
             player1.takeDamage();
             if (player1.isAlive()) player1.respawnAtStart(this);
@@ -166,7 +236,7 @@ public class Legend1v1Board {
             if (player2.isAlive()) player2.respawnAtStart(this);
         }
 
-        // Dommages aux ennemis
+        // Dommages aux ennemis IA
         for (LegendEnemyBomber b : bomberEnemies)
             if (b.getX() == x && b.getY() == y && b.isAlive()) b.kill();
         for (LegendEnemyYellow yel : yellowEnemies)
@@ -184,9 +254,6 @@ public class Legend1v1Board {
     }
 
     /**
-     * Utilitaire : true s'il y a déjà un ennemi vivant sur la case (x,y).
-     */
-    /**
      * Retourne vrai s'il y a déjà un ennemi vivant (bomber ou yellow) à la case (x, y).
      */
     public boolean hasEnemyAt(int x, int y) {
@@ -194,7 +261,7 @@ public class Legend1v1Board {
         for (LegendEnemyBomber b : bomberEnemies)
             if (b.getX() == x && b.getY() == y && b.isAlive())
                 return true;
-        // Vérifie tous les yellow ennemis (utilise un autre nom que y)
+        // Vérifie tous les yellow ennemis
         for (LegendEnemyYellow yel : yellowEnemies)
             if (yel.getX() == x && yel.getY() == y && yel.isAlive())
                 return true;

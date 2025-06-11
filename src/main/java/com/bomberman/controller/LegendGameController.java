@@ -16,8 +16,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Contrôleur du mode LEGEND 1v1 (2 joueurs sur le même PC)
- * Gère la logique du plateau, les entrées, le rendu et la musique.
+ * Contrôleur du mode LEGEND 1v1 - CORRIGÉ
+ * Mode 2 joueurs humains sur le même PC
+ * Joueur 1 : ZQSD + R (haut-gauche, sprite blanc)
+ * Joueur 2 : IJKL + P (bas-droite, sprite noir)
  */
 public class LegendGameController {
     @FXML private VBox gameContainer;
@@ -29,19 +31,32 @@ public class LegendGameController {
     private AnimationTimer renderLoop;
     private boolean gameOver = false;
     private boolean victory = false;
-    private final Music music = new Music(); // Musique et sons
+    private final Music music = new Music();
 
     @FXML
     private void initialize() {
+        System.out.println("=== INITIALISATION MODE LEGEND 1V1 ===");
+
+        // Créer le plateau Legend avec 2 joueurs humains
         board = new Legend1v1Board();
         renderer = new GameRenderer(gameCanvas);
 
         setupKeyboardHandling();
-        music.demarrerLegendMusic(); // Démarre la musique LEGEND
+        music.demarrerLegendMusic();
         startRenderLoop();
+
+        // Vérification debug
+        System.out.println("Joueur 1 position: (" + board.getPlayer1().getX() + "," + board.getPlayer1().getY() + ")");
+        System.out.println("Joueur 2 position: (" + board.getPlayer2().getX() + "," + board.getPlayer2().getY() + ")");
+        System.out.println("Nombre d'ennemis Bomber: " + board.getBomberEnemies().size());
+        System.out.println("Nombre d'ennemis Yellow: " + board.getYellowEnemies().size());
+
+        System.out.println("CONTRÔLES:");
+        System.out.println("- Joueur 1 (Blanc): ZQSD + R");
+        System.out.println("- Joueur 2 (Noir): IJKL + P");
+        System.out.println("- ÉCHAP: Retour menu");
     }
 
-    // Prend le focus et configure les touches pour deux joueurs
     private void setupKeyboardHandling() {
         gameContainer.setFocusTraversable(true);
         Platform.runLater(() -> {
@@ -56,28 +71,72 @@ public class LegendGameController {
         gameCanvas.setOnMouseClicked(e -> gameContainer.requestFocus());
     }
 
-    // Contrôle clavier : J1 = ZQSD+R, J2 = IJKL+P
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
-        if (pressedKeys.contains(keyCode)) return; // Ignore répétition
+        if (pressedKeys.contains(keyCode)) return;
         pressedKeys.add(keyCode);
 
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
 
+        // Debug des touches pressées
+        System.out.println("Touche pressée: " + keyCode);
+
         switch (keyCode) {
-            // Joueur 1
-            case "Z": p1.moveUp(board);    break;
-            case "S": p1.moveDown(board);  break;
-            case "Q": p1.moveLeft(board);  break;
-            case "D": p1.moveRight(board); break;
-            case "R": p1.placeBomb(board); break;
-            // Joueur 2
-            case "I": p2.moveUp(board);    break;
-            case "K": p2.moveDown(board);  break;
-            case "J": p2.moveLeft(board);  break;
-            case "L": p2.moveRight(board); break;
-            case "P": p2.placeBomb(board); break;
+            // ===== JOUEUR 1 (ZQSD + R) =====
+            case "Z":
+                System.out.println("J1 monte");
+                p1.moveUp(board);
+                break;
+            case "S":
+                System.out.println("J1 descend");
+                p1.moveDown(board);
+                break;
+            case "Q":
+                System.out.println("J1 gauche");
+                p1.moveLeft(board);
+                break;
+            case "D":
+                System.out.println("J1 droite");
+                p1.moveRight(board);
+                break;
+            case "R":
+                System.out.println("J1 pose bombe");
+                p1.placeBomb(board);
+                break;
+
+            // ===== JOUEUR 2 (IJKL + P) =====
+            case "I":
+                System.out.println("J2 monte");
+                p2.moveUp(board);
+                break;
+            case "K":
+                System.out.println("J2 descend");
+                p2.moveDown(board);
+                break;
+            case "J":
+                System.out.println("J2 gauche");
+                p2.moveLeft(board);
+                break;
+            case "L":
+                System.out.println("J2 droite");
+                p2.moveRight(board);
+                break;
+            case "P":
+                System.out.println("J2 pose bombe");
+                p2.placeBomb(board);
+                break;
+
+            // ===== TOUCHES COMMUNES =====
+            case "ESCAPE":
+                System.out.println("Retour au menu");
+                music.arreterLegendMusic();
+                SceneManager.switchScene("MainMenu");
+                break;
+
+            default:
+                System.out.println("Touche non reconnue: " + keyCode);
+                break;
         }
         event.consume();
     }
@@ -86,7 +145,6 @@ public class LegendGameController {
         pressedKeys.remove(event.getCode().toString());
     }
 
-    // Boucle principale du jeu (update et rendu)
     private void startRenderLoop() {
         renderLoop = new AnimationTimer() {
             @Override
@@ -101,12 +159,11 @@ public class LegendGameController {
         renderLoop.start();
     }
 
-    // Détecte fin de partie et affiche le vainqueur
     private void checkGameState() {
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
 
-        // Cas : les deux joueurs sont morts en même temps (égalité)
+        // Égalité (les deux morts)
         if (!p1.isAlive() && !p2.isAlive()) {
             gameOver = true;
             music.arreterLegendMusic();
@@ -121,8 +178,9 @@ public class LegendGameController {
         if (!p2.isAlive() && p1.isAlive()) {
             victory = true;
             music.arreterLegendMusic();
+            p1.addScore(1000);
             com.bomberman.controller.VictoryController.LAST_SCORE = p1.getScore();
-            com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 1";
+            com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 1 (Blanc)";
             SceneManager.switchScene("Victory");
             stopRenderLoop();
             return;
@@ -132,18 +190,51 @@ public class LegendGameController {
         if (!p1.isAlive() && p2.isAlive()) {
             victory = true;
             music.arreterLegendMusic();
+            p2.addScore(1000);
             com.bomberman.controller.VictoryController.LAST_SCORE = p2.getScore();
-            com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 2";
+            com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 2 (Noir)";
             SceneManager.switchScene("Victory");
             stopRenderLoop();
             return;
         }
 
-        // Tu peux rajouter la détection de victoire “tous les ennemis tués” ici si besoin.
+        // Victoire coopérative (tous les ennemis éliminés)
+        boolean allEnemiesDead = board.getBomberEnemies().stream().noneMatch(b -> b.isAlive()) &&
+                board.getYellowEnemies().stream().noneMatch(y -> y.isAlive());
+
+        if (allEnemiesDead && (p1.isAlive() || p2.isAlive())) {
+            victory = true;
+            music.arreterLegendMusic();
+
+            if (p1.getScore() > p2.getScore()) {
+                p1.addScore(500);
+                com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 1 (Blanc) - Coopération";
+                com.bomberman.controller.VictoryController.LAST_SCORE = p1.getScore();
+            } else if (p2.getScore() > p1.getScore()) {
+                p2.addScore(500);
+                com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 2 (Noir) - Coopération";
+                com.bomberman.controller.VictoryController.LAST_SCORE = p2.getScore();
+            } else {
+                int sharedScore = Math.max(p1.getScore(), p2.getScore()) + 250;
+                com.bomberman.controller.VictoryController.WINNER_NAME = "Égalité - Coopération parfaite";
+                com.bomberman.controller.VictoryController.LAST_SCORE = sharedScore;
+            }
+
+            SceneManager.switchScene("Victory");
+            stopRenderLoop();
+        }
     }
 
-    // Stoppe le rendu
     private void stopRenderLoop() {
-        if (renderLoop != null) renderLoop.stop();
+        if (renderLoop != null) {
+            renderLoop.stop();
+            renderLoop = null;
+        }
+    }
+
+    public void cleanup() {
+        stopRenderLoop();
+        music.arreterLegendMusic();
+        System.out.println("=== MODE LEGEND 1v1 TERMINÉ ===");
     }
 }
