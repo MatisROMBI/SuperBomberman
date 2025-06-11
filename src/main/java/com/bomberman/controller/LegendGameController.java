@@ -1,6 +1,7 @@
 package com.bomberman.controller;
 
 import com.bomberman.model.Legend1v1Board;
+import com.bomberman.model.Music;
 import com.bomberman.model.Player;
 import com.bomberman.utils.SceneManager;
 import com.bomberman.view.GameRenderer;
@@ -15,7 +16,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Contrôleur du mode LEGEND 1v1 (2 humains sur le même PC)
+ * Contrôleur du mode LEGEND 1v1 (2 joueurs sur le même PC)
+ * Gère le plateau, le rendu, la musique et les entrées clavier.
  */
 public class LegendGameController {
     @FXML private VBox gameContainer;
@@ -25,29 +27,26 @@ public class LegendGameController {
     private GameRenderer renderer;
     private final Set<String> pressedKeys = new HashSet<>();
     private AnimationTimer renderLoop;
-
     private boolean gameOver = false;
     private boolean victory = false;
 
+    private final Music music = new Music(); // Gestion de la musique et des sons
+
     @FXML
     private void initialize() {
-        // Initialisation du plateau et du renderer
         board = new Legend1v1Board();
         renderer = new GameRenderer(gameCanvas);
 
         setupKeyboardHandling();
+        music.demarrerLegendMusic(); // Lance la musique LEGEND au démarrage
         startRenderLoop();
     }
 
-    /**
-     * Gère le focus et les handlers clavier pour jouer à deux sur le même PC
-     */
+    // Gère le focus et la récupération du clavier pour les deux joueurs
     private void setupKeyboardHandling() {
         gameContainer.setFocusTraversable(true);
-
         Platform.runLater(() -> {
             gameContainer.requestFocus();
-
             if (gameContainer.getScene() != null) {
                 gameContainer.getScene().setOnKeyPressed(this::handleKeyPressed);
                 gameContainer.getScene().setOnKeyReleased(this::handleKeyReleased);
@@ -55,37 +54,29 @@ public class LegendGameController {
             gameContainer.setOnKeyPressed(this::handleKeyPressed);
             gameContainer.setOnKeyReleased(this::handleKeyReleased);
         });
-
-        // Clique sur le canvas = focus pour la partie
         gameCanvas.setOnMouseClicked(e -> gameContainer.requestFocus());
     }
 
-    /**
-     * Mapping des touches :
-     *  - J1 : ZQSD pour bouger, M pour bombe
-     *  - J2 : IJKL pour bouger, P pour bombe
-     */
+    // Mapping des touches : J1 = ZQSD+R, J2 = IJKL+P
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
-
-        // Ignore la répétition de touche
-        if (pressedKeys.contains(keyCode)) return;
+        if (pressedKeys.contains(keyCode)) return; // Ignore la répétition de touche
         pressedKeys.add(keyCode);
 
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
 
         switch (keyCode) {
-            // JOUEUR 1 (AZERTY & QWERTY friendly)
-            case "Z": p1.moveUp(board); break;
-            case "S": p1.moveDown(board); break;
-            case "Q": p1.moveLeft(board); break;
+            // Joueur 1 (ZQSDR)
+            case "Z": p1.moveUp(board);    break;
+            case "S": p1.moveDown(board);  break;
+            case "Q": p1.moveLeft(board);  break;
             case "D": p1.moveRight(board); break;
             case "R": p1.placeBomb(board); break;
-            // JOUEUR 2
-            case "I": p2.moveUp(board); break;
-            case "K": p2.moveDown(board); break;
-            case "J": p2.moveLeft(board); break;
+            // Joueur 2 (IJKLP)
+            case "I": p2.moveUp(board);    break;
+            case "K": p2.moveDown(board);  break;
+            case "J": p2.moveLeft(board);  break;
             case "L": p2.moveRight(board); break;
             case "P": p2.placeBomb(board); break;
         }
@@ -96,9 +87,7 @@ public class LegendGameController {
         pressedKeys.remove(event.getCode().toString());
     }
 
-    /**
-     * Boucle d'affichage/jeu : update ennemis, joueurs, explosions, etc
-     */
+    // Boucle principale : met à jour le jeu et rend la scène
     private void startRenderLoop() {
         renderLoop = new AnimationTimer() {
             @Override
@@ -113,23 +102,23 @@ public class LegendGameController {
         renderLoop.start();
     }
 
-    /**
-     * Vérifie si la partie est terminée (game over ou victoire)
-     */
+    // Vérifie si la partie est terminée (game over ou victoire)
     private void checkGameState() {
-        // GAME OVER : les deux joueurs sont morts
+        // Game Over : les deux joueurs sont morts
         if (!board.getPlayer1().isAlive() && !board.getPlayer2().isAlive()) {
             gameOver = true;
+            music.arreterLegendMusic(); // Arrête la musique LEGEND
             com.bomberman.controller.GameOverController.setLastScore(
                     Math.max(board.getPlayer1().getScore(), board.getPlayer2().getScore()));
             SceneManager.switchScene("GameOver");
             stopRenderLoop();
         }
 
-        // VIC-TOIRE (à activer si tu veux : par exemple si tous les ennemis morts)
+        // Victoire (décommente si tu veux activer la victoire quand tous les ennemis sont morts)
         /*
         if (board.getBomberEnemies().isEmpty() && board.getYellowEnemies().isEmpty()) {
             victory = true;
+            music.arreterLegendMusic();
             com.bomberman.controller.VictoryController.LAST_SCORE =
                 Math.max(board.getPlayer1().getScore(), board.getPlayer2().getScore());
             SceneManager.switchScene("Victory");
@@ -138,9 +127,7 @@ public class LegendGameController {
         */
     }
 
-    /**
-     * Arrête la boucle de rendu quand la partie est finie
-     */
+    // Arrête la boucle de rendu
     private void stopRenderLoop() {
         if (renderLoop != null) renderLoop.stop();
     }
