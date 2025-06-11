@@ -289,18 +289,18 @@ public class GameRenderer {
         double scOffset = 12;
         double scoreW = 140, scoreH = 38;
 
-        // Fond HUD bleu
+        // Fond bleu HUD
         gc.setFill(Color.web("#38b6ff"));
         gc.fillRect(0, 0, Constants.WINDOW_WIDTH, hudHeight);
 
-        // -------- JOUEUR 1 (gauche) --------
+        // ----- JOUEUR 1 (gauche) -----
         Player p1 = board.getPlayer1();
         Image avatar1 = tryLoad("/images/head_ninja_white.png");
         double x1 = hudPadding;
         double y = (hudHeight - avatarSize) / 2;
         if (avatar1 != null) gc.drawImage(avatar1, x1, y, avatarSize, avatarSize);
 
-        // Affichage vies
+        // Affichage vies J1 (0 à 5)
         int vies1 = Math.max(0, Math.min(p1.getLives(), 5));
         double lifeBoxX1 = x1 + avatarSize + 6;
         double lifeBoxY = (hudHeight - boxH) / 2;
@@ -313,29 +313,26 @@ public class GameRenderer {
         gc.setFill(Color.BLACK);
         gc.fillText(String.valueOf(vies1), lifeBoxX1 + 10, lifeBoxY + 26);
 
-        // "SC"
+        // SC J1
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
         double scX1 = lifeBoxX1 + boxW + scOffset;
         gc.fillText("SC", scX1, hudHeight - 15);
 
-        // Rectangle noir pour le score
+        // Score J1 (rectangle noir + valeur centrée)
         double scoreRectX1 = scX1 + 44;
         gc.setFill(Color.BLACK);
         gc.fillRect(scoreRectX1, (hudHeight - scoreH) / 2, scoreW, scoreH);
-
-        // Affichage du score centré
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
         gc.setFill(Color.WHITE);
         String score1 = String.valueOf(p1.getScore());
         Text t1 = new Text(score1);
         t1.setFont(gc.getFont());
         double strW1 = t1.getLayoutBounds().getWidth();
-        // Centre verticalement dans la box noire
-        double scoreY = (hudHeight + scoreH) / 2 - 8; // -8 affine la hauteur pour être bien au centre
+        double scoreY = (hudHeight + scoreH) / 2 - 8;
         gc.fillText(score1, scoreRectX1 + (scoreW - strW1) / 2, scoreY);
 
-        // -------- JOUEUR 2 (droite) --------
+        // ----- JOUEUR 2 (droite) -----
         Player p2 = board.getPlayer2();
         Image avatar2 = tryLoad("/images/head_ninja_black.png");
         double x2 = Constants.WINDOW_WIDTH - hudPadding - avatarSize;
@@ -343,25 +340,23 @@ public class GameRenderer {
         double scX2 = lifeBoxX2 - 44;
         double scoreRectX2 = scX2 - scoreW - scOffset;
 
-        // Rectangle noir pour le score
+        // Score J2 (rectangle noir + valeur centrée)
         gc.setFill(Color.BLACK);
         gc.fillRect(scoreRectX2, (hudHeight - scoreH) / 2, scoreW, scoreH);
-
-        // Affichage du score centré (corrigé : score2)
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
+        gc.setFill(Color.WHITE);
         String score2 = String.valueOf(p2.getScore());
         Text t2 = new Text(score2);
         t2.setFont(gc.getFont());
         double strW2 = t2.getLayoutBounds().getWidth();
-        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
-        gc.setFill(Color.WHITE);
         gc.fillText(score2, scoreRectX2 + (scoreW - strW2) / 2, scoreY);
 
-        // "SC"
+        // SC J2
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
         gc.fillText("SC", scX2, hudHeight - 15);
 
-        // Affichage vies
+        // Affichage vies J2 (0 à 5)
         int vies2 = Math.max(0, Math.min(p2.getLives(), 5));
         gc.setFill(Color.WHITE);
         gc.fillRect(lifeBoxX2, lifeBoxY, boxW, boxH);
@@ -372,9 +367,10 @@ public class GameRenderer {
         gc.setFill(Color.BLACK);
         gc.fillText(String.valueOf(vies2), lifeBoxX2 + 10, lifeBoxY + 26);
 
-        // Affichage avatar joueur 2
+        // Avatar J2
         if (avatar2 != null) gc.drawImage(avatar2, x2, y, avatarSize, avatarSize);
     }
+
 
 
     /** Damier bleu + murs fixes (bleu) + murs cassables (glace) */
