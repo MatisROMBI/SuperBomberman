@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  Fichier FXML de l’écran de victoire.
+  Affiche le score final et le gagnant, et propose de rejouer ou retourner au menu principal.
+  Utilisé avec le contrôleur VictoryController.
+-->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>

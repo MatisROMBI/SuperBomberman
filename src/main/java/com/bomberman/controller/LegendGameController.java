@@ -1,5 +1,10 @@
 package com.bomberman.controller;
 
+/**
+ * Contrôleur du mode Legend 1v1 avec menu de pause.
+ * Gère le jeu à deux joueurs, les entrées clavier, la pause, et les transitions de fin de partie.
+ */
+
 import com.bomberman.model.Legend1v1Board;
 import com.bomberman.model.Music;
 import com.bomberman.model.Player;
@@ -18,9 +23,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Contrôleur du mode LEGEND 1v1 - AVEC MENU DE PAUSE
- */
 public class LegendGameController implements PauseOverlayController.PauseActionListener {
     @FXML private VBox gameContainer;
     @FXML private Canvas gameCanvas;
@@ -33,7 +35,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     private boolean victory = false;
     private final Music music = new Music();
 
-    // NOUVEAUTÉ: Gestion du menu de pause
+    // Overlay de pause
     private StackPane pauseOverlay;
     private PauseOverlayController pauseController;
     private boolean isPaused = false;
@@ -45,16 +47,13 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     private void initialize() {
         board = new Legend1v1Board();
         renderer = new GameRenderer(gameCanvas);
-
         setupKeyboardHandling();
         setupPauseOverlay();
         music.demarrerLegendMusic();
         startRenderLoop();
     }
 
-    /**
-     * NOUVEAUTÉ: Configuration du menu de pause
-     */
+    // Charge l'overlay du menu de pause
     private void setupPauseOverlay() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PauseOverlay.fxml"));
@@ -62,30 +61,24 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
             pauseController = loader.getController();
             pauseController.setActionListener(this);
 
-            // Ajouter l'overlay au conteneur principal
-            if (gameContainer.getParent() instanceof StackPane) {
-                StackPane parent = (StackPane) gameContainer.getParent();
+            // Ajoute l'overlay au parent
+            if (gameContainer.getParent() instanceof StackPane parent) {
                 parent.getChildren().add(pauseOverlay);
-            } else {
-                // Créer un nouveau StackPane si nécessaire
-                StackPane stackPane = new StackPane();
-                VBox originalParent = (VBox) gameContainer.getParent();
-                originalParent.getChildren().remove(gameContainer);
-                stackPane.getChildren().addAll(gameContainer, pauseOverlay);
-                originalParent.getChildren().add(stackPane);
             }
         } catch (IOException e) {
-            System.err.println("Erreur lors du chargement du menu de pause : " + e.getMessage());
+            System.err.println("Erreur chargement menu pause : " + e.getMessage());
         }
     }
 
+    // Gère le clavier et le focus
     private void setupKeyboardHandling() {
         gameContainer.setFocusTraversable(true);
         Platform.runLater(() -> {
             gameContainer.requestFocus();
-            if (gameContainer.getScene() != null) {
-                gameContainer.getScene().setOnKeyPressed(this::handleKeyPressed);
-                gameContainer.getScene().setOnKeyReleased(this::handleKeyReleased);
+            var scene = gameContainer.getScene();
+            if (scene != null) {
+                scene.setOnKeyPressed(this::handleKeyPressed);
+                scene.setOnKeyReleased(this::handleKeyReleased);
             }
             gameContainer.setOnKeyPressed(this::handleKeyPressed);
             gameContainer.setOnKeyReleased(this::handleKeyReleased);
@@ -93,49 +86,59 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
         gameCanvas.setOnMouseClicked(e -> gameContainer.requestFocus());
     }
 
+    // Appui sur une touche
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
-
-        // NOUVEAUTÉ: Gestion spéciale de la touche ESCAPE pour la pause
         if ("ESCAPE".equals(keyCode)) {
             togglePause();
             event.consume();
             return;
         }
-
-        // Ne traiter les autres touches que si le jeu n'est pas en pause
-        if (!isPaused && !pressedKeys.contains(keyCode)) {
-            pressedKeys.add(keyCode);
+        if (!isPaused && pressedKeys.add(keyCode)) {
             processKeyAction(keyCode);
         }
         event.consume();
     }
 
-    /**
-     * NOUVEAUTÉ: Basculer entre pause et jeu
-     */
-    private void togglePause() {
-        if (pauseController != null) {
-            if (isPaused) {
-                resumeGame();
-            } else {
-                pauseGame();
-            }
+    // Relâchement d'une touche
+    private void handleKeyReleased(KeyEvent event) {
+        pressedKeys.remove(event.getCode().toString());
+    }
+
+    // Traite les déplacements et actions des deux joueurs
+    private void processKeyAction(String keyCode) {
+        Player p1 = board.getPlayer1();
+        Player p2 = board.getPlayer2();
+        switch (keyCode) {
+            // Joueur 1 (ZQSD + R)
+            case "Z" -> p1.moveUp(board);
+            case "S" -> p1.moveDown(board);
+            case "Q" -> p1.moveLeft(board);
+            case "D" -> p1.moveRight(board);
+            case "R" -> p1.placeBomb(board);
+            // Joueur 2 (IJKL + P)
+            case "I" -> p2.moveUp(board);
+            case "K" -> p2.moveDown(board);
+            case "J" -> p2.moveLeft(board);
+            case "L" -> p2.moveRight(board);
+            case "P" -> p2.placeBomb(board);
         }
     }
 
-    /**
-     * NOUVEAUTÉ: Mettre le jeu en pause
-     */
+    // Bascule le mode pause
+    private void togglePause() {
+        if (pauseController != null) {
+            if (isPaused) resumeGame();
+            else pauseGame();
+        }
+    }
+
     private void pauseGame() {
         isPaused = true;
         music.arreterLegendMusic();
         pauseController.showPause();
     }
 
-    /**
-     * NOUVEAUTÉ: Reprendre le jeu
-     */
     private void resumeGame() {
         isPaused = false;
         music.demarrerLegendMusic();
@@ -143,51 +146,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
         gameContainer.requestFocus();
     }
 
-    private void processKeyAction(String keyCode) {
-        Player p1 = board.getPlayer1();
-        Player p2 = board.getPlayer2();
-
-        switch (keyCode) {
-            // Joueur 1 (ZQSD + R)
-            case "Z":
-                p1.moveUp(board);
-                break;
-            case "S":
-                p1.moveDown(board);
-                break;
-            case "Q":
-                p1.moveLeft(board);
-                break;
-            case "D":
-                p1.moveRight(board);
-                break;
-            case "R":
-                p1.placeBomb(board);
-                break;
-
-            // Joueur 2 (IJKL + P)
-            case "I":
-                p2.moveUp(board);
-                break;
-            case "K":
-                p2.moveDown(board);
-                break;
-            case "J":
-                p2.moveLeft(board);
-                break;
-            case "L":
-                p2.moveRight(board);
-                break;
-            case "P":
-                p2.placeBomb(board);
-                break;
-        }
-    }
-
-    private void handleKeyReleased(KeyEvent event) {
-        pressedKeys.remove(event.getCode().toString());
-    }
-
+    // Boucle de rendu du jeu
     private void startRenderLoop() {
         renderLoop = new AnimationTimer() {
             @Override
@@ -205,6 +164,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
         renderLoop.start();
     }
 
+    // Vérifie la fin de partie et gère les transitions
     private void checkGameState() {
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
@@ -267,6 +227,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
         }
     }
 
+    // Arrête la boucle de rendu
     private void stopRenderLoop() {
         if (renderLoop != null) {
             renderLoop.stop();
@@ -274,30 +235,22 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
         }
     }
 
+    // Nettoyage à la fermeture
     public void cleanup() {
         stopRenderLoop();
         music.arreterLegendMusic();
     }
 
-    // ======================================================================
-    // NOUVEAUTÉ: Implémentation des actions du menu de pause
-    // ======================================================================
-
+    // Actions du menu pause
     @Override
-    public void onResume() {
-        resumeGame();
-    }
+    public void onResume() { resumeGame(); }
 
     @Override
     public void onRestart() {
-        // Arrêter le jeu actuel
         cleanup();
-
-        // Redémarrer une nouvelle partie Legend
         board = new Legend1v1Board();
         music.demarrerLegendMusic();
         startRenderLoop();
-
         gameOver = false;
         victory = false;
         isPaused = false;

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  Fichier FXML de l’écran Game Over.
+  Affiche le score final et propose de rejouer ou de retourner au menu principal.
+  Utilisé avec le contrôleur GameOverController.
+-->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>

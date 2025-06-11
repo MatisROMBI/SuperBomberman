@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  Fichier FXML de la scène de jeu principale.
+  Affiche l’aire de jeu avec le canvas, les contrôles du joueur,
+  et gère dynamiquement l’overlay de pause via le contrôleur GameController.
+-->
+
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>

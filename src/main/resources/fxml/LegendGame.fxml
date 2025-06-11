@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Fichier FXML du mode Legend 1v1.
+  Affiche le canvas de jeu, les instructions pour les deux joueurs, et permet au contrôleur d’ajouter dynamiquement un overlay de pause.
+  Utilisé avec le contrôleur LegendGameController.
+-->
+
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.canvas.Canvas?>
