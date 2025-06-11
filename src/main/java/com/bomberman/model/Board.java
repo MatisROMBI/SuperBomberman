@@ -11,7 +11,7 @@ public class Board {
     private List<Explosion> explosions;
     private Player player;
     private List<PlayerBot> bots; // 3 bots
-    private Music sounds = new Music();
+    private Music music = new Music();
 
     public Board() {
         grid = new Cell[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
@@ -111,7 +111,7 @@ public class Board {
         grid[bombX][bombY].setBomb(null);
         createExplosion(bombX, bombY, bomb.getOwner());
 
-        sounds.jouerExplosion();
+        music.jouerExplosion();
 
         for (Direction direction : Direction.values()) {
             for (int i = 1; i <= bomb.getExplosionRange(); i++) {
