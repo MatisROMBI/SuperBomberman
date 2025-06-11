@@ -4,6 +4,7 @@ import com.bomberman.utils.SceneManager;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
@@ -17,39 +18,23 @@ public class MainMenuController {
     @FXML private ImageView balloon2;
     @FXML private ImageView balloon3;
 
-    @FXML private ImageView robotSurvivorButtonImg;
-    @FXML private ImageView legend1v1ButtonImg;
-    @FXML private ImageView levelEditorButtonImg;
-    @FXML private ImageView themesButtonImg;
-    @FXML private ImageView quitButtonImg;
+    // Nouveaux boutons FXML
+    @FXML private Button robotSurvivorButton;
+    @FXML private Button legend1v1Button;
+    @FXML private Button levelEditorButton;
+    @FXML private Button themesButton;
+    @FXML private Button quitButton;
 
     private MediaPlayer menuMusicPlayer;
 
     @FXML
     private void initialize() {
         try {
+            // Chargement des images de fond et ballons
             backgroundImage.setImage(new Image(getClass().getResourceAsStream("/images/menu_bg.png")));
             balloon1.setImage(new Image(getClass().getResourceAsStream("/images/dirigeable_bleu.png")));
             balloon2.setImage(new Image(getClass().getResourceAsStream("/images/ballon_rouge.png")));
             balloon3.setImage(new Image(getClass().getResourceAsStream("/images/fire_dirigeable.png")));
-            robotSurvivorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/ROBOT-SURVIVOR.png")));
-            legend1v1ButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/1V1_LEGEND.png")));
-
-            // Bouton éditeur de niveau
-            try {
-                levelEditorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/LEVEL_EDITOR.png")));
-            } catch (Exception e) {
-                System.out.println("Image LEVEL_EDITOR.png non trouvée");
-            }
-
-            // Bouton thèmes
-            try {
-                themesButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/THEMES.png")));
-            } catch (Exception e) {
-                System.out.println("Image THEMES.png non trouvée");
-            }
-
-            quitButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/QUIT_text.png")));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,39 +47,65 @@ public class MainMenuController {
     private void setupButtonActions() {
         // ===== MODE ROBOT SURVIVOR =====
         // Redirige vers la sélection de map pour choisir la map puis jouer en mode classique
-        robotSurvivorButtonImg.setOnMouseClicked(e -> {
+        robotSurvivorButton.setOnAction(e -> {
             System.out.println("🤖 Mode Robot Survivor sélectionné -> Sélection de map");
             stopMenuMusic();
             SceneManager.switchScene("MapSelection");
         });
 
         // ===== MODE LEGEND 1V1 =====
-        // ⚠️ CORRECTION : Redirige DIRECTEMENT vers LegendGame (2 joueurs humains)
-        legend1v1ButtonImg.setOnMouseClicked(e -> {
+        // Redirige DIRECTEMENT vers LegendGame (2 joueurs humains)
+        legend1v1Button.setOnAction(e -> {
             System.out.println("⚔️ Mode Legend 1v1 sélectionné -> LegendGame DIRECT (2 joueurs humains)");
             stopMenuMusic();
-            SceneManager.switchScene("LegendGame"); // 🔥 CHANGEMENT ICI
+            SceneManager.switchScene("LegendGame");
         });
 
         // ===== ÉDITEUR DE NIVEAU =====
-        levelEditorButtonImg.setOnMouseClicked(e -> {
+        levelEditorButton.setOnAction(e -> {
             System.out.println("✏️ Éditeur de niveau sélectionné");
             stopMenuMusic();
             SceneManager.switchScene("LevelEditor");
         });
 
         // ===== SÉLECTION DE THÈMES =====
-        themesButtonImg.setOnMouseClicked(e -> {
+        themesButton.setOnAction(e -> {
             System.out.println("🎨 Sélection de thèmes");
             stopMenuMusic();
             SceneManager.switchScene("ThemeSelection");
         });
 
         // ===== QUITTER =====
-        quitButtonImg.setOnMouseClicked(e -> {
+        quitButton.setOnAction(e -> {
             System.out.println("👋 Fermeture du jeu");
             System.exit(0);
         });
+
+        // Ajout d'effets visuels supplémentaires sur les boutons
+        addButtonEffects();
+    }
+
+    /**
+     * Ajoute des effets visuels supplémentaires aux boutons
+     */
+    private void addButtonEffects() {
+        Button[] buttons = {robotSurvivorButton, legend1v1Button, levelEditorButton, themesButton, quitButton};
+
+        for (Button button : buttons) {
+            // Effet de focus au survol
+            button.setOnMouseEntered(e -> button.requestFocus());
+
+            // Animation légère au clic
+            button.setOnMousePressed(e -> {
+                button.setScaleX(0.95);
+                button.setScaleY(0.95);
+            });
+
+            button.setOnMouseReleased(e -> {
+                button.setScaleX(1.0);
+                button.setScaleY(1.0);
+            });
+        }
     }
 
     private void playMenuMusic() {
