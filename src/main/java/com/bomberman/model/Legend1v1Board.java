@@ -17,7 +17,7 @@ public class Legend1v1Board {
     private Player player2;
     private final List<LegendEnemyBomber> bomberEnemies;
     private final List<LegendEnemyYellow> yellowEnemies;
-    private final Music sounds = new Music();
+    private final Music music = new Music();
 
     public Legend1v1Board() {
         grid = new Cell[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
@@ -123,7 +123,7 @@ public class Legend1v1Board {
         int bombX = bomb.getX(), bombY = bomb.getY();
         grid[bombX][bombY].setBomb(null);
         createExplosion(bombX, bombY);
-        sounds.jouerExplosion();
+        music.jouerExplosion();
 
         for (var direction : com.bomberman.model.enums.Direction.values()) {
             for (int i = 1; i <= bomb.getExplosionRange(); i++) {
