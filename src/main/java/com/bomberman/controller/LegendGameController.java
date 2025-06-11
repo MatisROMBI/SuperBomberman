@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * Contrôleur du mode LEGEND 1v1 (2 joueurs sur le même PC)
- * Gère le plateau, le rendu, la musique et les entrées clavier.
+ * Gère la logique du plateau, les entrées, le rendu et la musique.
  */
 public class LegendGameController {
     @FXML private VBox gameContainer;
@@ -29,8 +29,7 @@ public class LegendGameController {
     private AnimationTimer renderLoop;
     private boolean gameOver = false;
     private boolean victory = false;
-
-    private final Music music = new Music(); // Gestion de la musique et des sons
+    private final Music music = new Music(); // Musique et sons
 
     @FXML
     private void initialize() {
@@ -38,11 +37,11 @@ public class LegendGameController {
         renderer = new GameRenderer(gameCanvas);
 
         setupKeyboardHandling();
-        music.demarrerLegendMusic(); // Lance la musique LEGEND au démarrage
+        music.demarrerLegendMusic(); // Démarre la musique LEGEND
         startRenderLoop();
     }
 
-    // Gère le focus et la récupération du clavier pour les deux joueurs
+    // Prend le focus et configure les touches pour deux joueurs
     private void setupKeyboardHandling() {
         gameContainer.setFocusTraversable(true);
         Platform.runLater(() -> {
@@ -57,23 +56,23 @@ public class LegendGameController {
         gameCanvas.setOnMouseClicked(e -> gameContainer.requestFocus());
     }
 
-    // Mapping des touches : J1 = ZQSD+R, J2 = IJKL+P
+    // Contrôle clavier : J1 = ZQSD+R, J2 = IJKL+P
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
-        if (pressedKeys.contains(keyCode)) return; // Ignore la répétition de touche
+        if (pressedKeys.contains(keyCode)) return; // Ignore répétition
         pressedKeys.add(keyCode);
 
         Player p1 = board.getPlayer1();
         Player p2 = board.getPlayer2();
 
         switch (keyCode) {
-            // Joueur 1 (ZQSDR)
+            // Joueur 1
             case "Z": p1.moveUp(board);    break;
             case "S": p1.moveDown(board);  break;
             case "Q": p1.moveLeft(board);  break;
             case "D": p1.moveRight(board); break;
             case "R": p1.placeBomb(board); break;
-            // Joueur 2 (IJKLP)
+            // Joueur 2
             case "I": p2.moveUp(board);    break;
             case "K": p2.moveDown(board);  break;
             case "J": p2.moveLeft(board);  break;
@@ -87,7 +86,7 @@ public class LegendGameController {
         pressedKeys.remove(event.getCode().toString());
     }
 
-    // Boucle principale : met à jour le jeu et rend la scène
+    // Boucle principale du jeu (update et rendu)
     private void startRenderLoop() {
         renderLoop = new AnimationTimer() {
             @Override
@@ -102,32 +101,48 @@ public class LegendGameController {
         renderLoop.start();
     }
 
-    // Vérifie si la partie est terminée (game over ou victoire)
+    // Détecte fin de partie et affiche le vainqueur
     private void checkGameState() {
-        // Game Over : les deux joueurs sont morts
-        if (!board.getPlayer1().isAlive() && !board.getPlayer2().isAlive()) {
+        Player p1 = board.getPlayer1();
+        Player p2 = board.getPlayer2();
+
+        // Cas : les deux joueurs sont morts en même temps (égalité)
+        if (!p1.isAlive() && !p2.isAlive()) {
             gameOver = true;
-            music.arreterLegendMusic(); // Arrête la musique LEGEND
+            music.arreterLegendMusic();
             com.bomberman.controller.GameOverController.setLastScore(
-                    Math.max(board.getPlayer1().getScore(), board.getPlayer2().getScore()));
+                    Math.max(p1.getScore(), p2.getScore()));
             SceneManager.switchScene("GameOver");
             stopRenderLoop();
+            return;
         }
 
-        // Victoire (décommente si tu veux activer la victoire quand tous les ennemis sont morts)
-        /*
-        if (board.getBomberEnemies().isEmpty() && board.getYellowEnemies().isEmpty()) {
+        // Victoire Joueur 1
+        if (!p2.isAlive() && p1.isAlive()) {
             victory = true;
             music.arreterLegendMusic();
-            com.bomberman.controller.VictoryController.LAST_SCORE =
-                Math.max(board.getPlayer1().getScore(), board.getPlayer2().getScore());
+            com.bomberman.controller.VictoryController.LAST_SCORE = p1.getScore();
+            com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 1";
             SceneManager.switchScene("Victory");
             stopRenderLoop();
+            return;
         }
-        */
+
+        // Victoire Joueur 2
+        if (!p1.isAlive() && p2.isAlive()) {
+            victory = true;
+            music.arreterLegendMusic();
+            com.bomberman.controller.VictoryController.LAST_SCORE = p2.getScore();
+            com.bomberman.controller.VictoryController.WINNER_NAME = "Joueur 2";
+            SceneManager.switchScene("Victory");
+            stopRenderLoop();
+            return;
+        }
+
+        // Tu peux rajouter la détection de victoire “tous les ennemis tués” ici si besoin.
     }
 
-    // Arrête la boucle de rendu
+    // Stoppe le rendu
     private void stopRenderLoop() {
         if (renderLoop != null) renderLoop.stop();
     }

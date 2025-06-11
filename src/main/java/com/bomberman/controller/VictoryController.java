@@ -6,8 +6,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+/**
+ * Contrôleur de l'écran de victoire
+ * Affiche le score final et, en 1v1, le joueur gagnant.
+ */
 public class VictoryController {
     public static int LAST_SCORE = 0;
+    public static String WINNER_NAME = ""; // <--- Ajoute cette variable pour le gagnant (Joueur 1 / Joueur 2 / pseudo...)
 
     @FXML
     private Label victoryLabel;
@@ -18,28 +23,36 @@ public class VictoryController {
     @FXML
     private Button mainMenuButton;
 
-    Music music = new Music();
+    private final Music music = new Music();
 
     @FXML
     private void initialize() {
         music.demarrerMusiqueDeVictoire();
 
-        if (victoryLabel != null)
-            victoryLabel.setText("VICTOIRE !");
+        // Si un gagnant est renseigné, on l’affiche, sinon "VICTOIRE !"
+        if (victoryLabel != null) {
+            if (WINNER_NAME != null && !WINNER_NAME.isBlank()) {
+                victoryLabel.setText(WINNER_NAME + " a gagné !");
+            } else {
+                victoryLabel.setText("VICTOIRE !");
+            }
+        }
 
+        // Affiche le score final
         if (scoreLabel != null)
             scoreLabel.setText("SCORE FINAL : " + LAST_SCORE);
 
-        playAgainButton.setOnAction(e -> playAgain());
-        mainMenuButton.setOnAction(e -> goToMainMenu());
+        // Boutons
+        playAgainButton.setOnAction(e -> rejouer());
+        mainMenuButton.setOnAction(e -> retourMenu());
     }
 
-    private void playAgain() {
+    private void rejouer() {
         music.arreterMusiqueDeVictoire();
         SceneManager.switchScene("Game");
     }
 
-    private void goToMainMenu() {
+    private void retourMenu() {
         music.arreterMusiqueDeVictoire();
         SceneManager.switchScene("MainMenu");
     }
