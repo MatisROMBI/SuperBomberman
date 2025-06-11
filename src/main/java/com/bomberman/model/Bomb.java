@@ -31,9 +31,7 @@ public class Bomb {
         return !hasExploded && (System.currentTimeMillis() - plantTime) >= Constants.BOMB_TIMER;
     }
 
-    public void explode() {
-        hasExploded = true;
-    }
+    public void explode() {hasExploded = true;}
 
     public int getX() { return x; }
     public int getY() { return y; }

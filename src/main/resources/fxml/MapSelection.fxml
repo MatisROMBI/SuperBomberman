@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mapSelectionContainer" xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bomberman.controller.MapSelectionController"
+      prefWidth="900" prefHeight="700"
+      style="-fx-background-color: #2c3e50;"
+      spacing="15">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- Titre -->
+    <Label text="SÉLECTION DE MAP"
+           style="-fx-font-size: 28px; -fx-text-fill: white; -fx-font-weight: bold;"
+           alignment="CENTER"/>
+
+    <!-- Mode de jeu -->
+    <HBox spacing="20" alignment="CENTER"
+          style="-fx-background-color: #34495e; -fx-background-radius: 10;">
+        <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+
+        <Label text="Mode de jeu:" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+        <RadioButton fx:id="classicModeRadio" text="Robot Survivor"
+                     style="-fx-text-fill: white; -fx-font-size: 14px;"
+                     selected="true"/>
+
+        <RadioButton fx:id="legendModeRadio" text="1v1 Legend"
+                     style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+    </HBox>
+
+    <!-- Contenu principal -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+        <!-- Liste des maps -->
+        <VBox spacing="10" prefWidth="300"
+              style="-fx-background-color: #34495e; -fx-background-radius: 10;">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+
+            <Label text="Maps disponibles"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"
+                   alignment="CENTER"/>
+
+            <ListView fx:id="mapListView" prefHeight="400"
+                      style="-fx-background-color: white; -fx-background-radius: 5;"/>
+
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="editButton" text="Éditeur de Map"
+                        style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px;"/>
+            </HBox>
+        </VBox>
+
+        <!-- Aperçu de la map -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: #34495e; -fx-background-radius: 10;">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+
+            <Label text="Aperçu de la map"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"
+                   alignment="CENTER"/>
+
+            <!-- Informations de la map -->
+            <Label fx:id="mapInfoLabel" text="Sélectionnez une map pour voir l'aperçu"
+                   style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;"
+                   wrapText="true"/>
+
+            <Separator style="-fx-background-color: #7f8c8d;"/>
+
+            <!-- Aperçu textuel -->
+            <TextArea fx:id="mapPreviewArea" prefHeight="350"
+                      style="-fx-control-inner-background: #2c3e50; -fx-text-fill: white; -fx-font-family: 'Courier New';"
+                      editable="false" wrapText="false"/>
+
+        </VBox>
+    </HBox>
+
+    <!-- Boutons d'action -->
+    <HBox spacing="20" alignment="CENTER">
+
+        <Button fx:id="backButton" text="Retour au Menu"
+                prefWidth="150"
+                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14px;"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="playButton" text="JOUER"
+                prefWidth="150"
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold;"
+                disable="true"/>
+    </HBox>
+
+    <!-- Instructions -->
+    <Label text="Sélectionnez une map dans la liste, choisissez votre mode de jeu et cliquez sur JOUER"
+           style="-fx-text-fill: #95a5a6; -fx-font-size: 12px;"
+           alignment="CENTER"/>
+
+</VBox>

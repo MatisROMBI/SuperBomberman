@@ -137,9 +137,7 @@ public class Player {
         }
     }
 
-    public void onBombExploded() {
-        bombsAvailable = Math.min(bombsAvailable + 1, maxBombs);
-    }
+    public void onBombExploded() {bombsAvailable = Math.min(bombsAvailable + 1, maxBombs);}
 
     public void takeDamage() {
         if (!isAlive) return;

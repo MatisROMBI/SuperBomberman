@@ -1,8 +1,10 @@
 package com.bomberman.model;
 
+import com.bomberman.controller.MapSelectionController;
 import com.bomberman.model.enums.CellType;
 import com.bomberman.model.enums.Direction;
 import com.bomberman.utils.Constants;
+import com.bomberman.utils.MapManager;
 import java.util.*;
 
 public class Board {
@@ -12,6 +14,7 @@ public class Board {
     private Player player;
     private List<PlayerBot> bots; // 3 bots
     private Music music = new Music();
+    private MapManager mapManager = new MapManager();
 
     public Board() {
         grid = new Cell[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
@@ -22,6 +25,44 @@ public class Board {
     }
 
     private void initializeBoard() {
+        // Vérifier s'il y a une map personnalisée sélectionnée
+        if (MapSelectionController.CustomMapHolder.hasCustomMap()) {
+            loadCustomMap();
+        } else {
+            generateDefaultMap();
+        }
+
+        setupPlayers();
+    }
+
+    /**
+     * Charge une map personnalisée
+     */
+    private void loadCustomMap() {
+        try {
+            String selectedMap = MapSelectionController.CustomMapHolder.getSelectedMap();
+            MapData mapData = mapManager.loadMap(selectedMap);
+
+            // Copier la grille de la map personnalisée
+            CellType[][] customGrid = mapData.getGrid();
+            for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
+                for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
+                    grid[x][y] = new Cell(customGrid[x][y]);
+                }
+            }
+
+            System.out.println("Map personnalisée chargée : " + selectedMap);
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de la map personnalisée : " + e.getMessage());
+            generateDefaultMap(); // Fallback vers la map par défaut
+        }
+    }
+
+    /**
+     * Génère la map par défaut (logique originale)
+     */
+    private void generateDefaultMap() {
         for (int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for (int y = 0; y < Constants.BOARD_HEIGHT; y++) {
                 if (x == 0 || y == 0 || x == Constants.BOARD_WIDTH - 1 ||
@@ -32,7 +73,15 @@ public class Board {
                 }
             }
         }
+
         // Débloquer les 4 coins pour les joueurs
+        ensureSpawnAreasAreFree();
+    }
+
+    /**
+     * S'assure que les zones de spawn sont libres
+     */
+    private void ensureSpawnAreasAreFree() {
         grid[1][1] = new Cell(CellType.EMPTY);
         grid[1][2] = new Cell(CellType.EMPTY);
         grid[2][1] = new Cell(CellType.EMPTY);
@@ -49,16 +98,25 @@ public class Board {
         grid[1][yMax] = new Cell(CellType.EMPTY);
         grid[2][yMax] = new Cell(CellType.EMPTY);
         grid[1][yMax - 1] = new Cell(CellType.EMPTY);
+    }
 
-        // Placement des joueurs
+    /**
+     * Place les joueurs sur le plateau
+     */
+    private void setupPlayers() {
+        // Placement du joueur principal
         player = new Player(1, 1);
         grid[1][1].setHasPlayer(true);
 
         // 3 bots dans les autres coins
+        int xMax = Constants.BOARD_WIDTH - 2, yMax = Constants.BOARD_HEIGHT - 2;
+
         bots.add(new PlayerBot(xMax, yMax));       // bas droite
         grid[xMax][yMax].setHasPlayer(true);
+
         bots.add(new PlayerBot(xMax, 1));          // haut droite
         grid[xMax][1].setHasPlayer(true);
+
         bots.add(new PlayerBot(1, yMax));          // bas gauche
         grid[1][yMax].setHasPlayer(true);
     }
@@ -202,5 +260,4 @@ public class Board {
     public int getHeight() {
         return Constants.BOARD_HEIGHT;
     }
-
 }

@@ -1,45 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Region prefHeight="80.0" prefWidth="200.0" />
-      <GridPane gridLinesVisible="true" prefHeight="520.0" prefWidth="600.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-      </GridPane>
-   </children>
+<VBox fx:id="editorContainer" xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bomberman.controller.LevelEditorController"
+      prefWidth="800" prefHeight="700"
+      style="-fx-background-color: #2c3e50;"
+      spacing="10">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- Titre -->
+    <Label text="ÉDITEUR DE MAP"
+           style="-fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;"
+           alignment="CENTER"/>
+
+    <!-- Zone de contrôles principaux -->
+    <HBox spacing="15" alignment="CENTER">
+
+        <!-- Outils de dessin -->
+        <VBox spacing="8" style="-fx-background-color: #34495e; -fx-background-radius: 8;" alignment="CENTER">
+            <padding><Insets top="10" right="15" bottom="10" left="15"/></padding>
+
+            <Label text="Outils" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+
+            <RadioButton fx:id="emptyRadio" text="Vide" style="-fx-text-fill: white;"
+                         selected="true"/>
+
+            <RadioButton fx:id="wallRadio" text="Mur fixe" style="-fx-text-fill: white;"/>
+
+            <RadioButton fx:id="destructibleRadio" text="Mur destructible" style="-fx-text-fill: white;"/>
+        </VBox>
+
+        <!-- Gestion des maps -->
+        <VBox spacing="8" style="-fx-background-color: #34495e; -fx-background-radius: 8;" alignment="CENTER">
+            <padding><Insets top="10" right="15" bottom="10" left="15"/></padding>
+
+            <Label text="Gestion des Maps" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+
+            <TextField fx:id="mapNameField" promptText="Nom de la map" prefWidth="200"
+                       style="-fx-background-color: white; -fx-text-fill: black;"/>
+
+            <ComboBox fx:id="existingMapsCombo" promptText="Maps existantes" prefWidth="200"
+                      style="-fx-background-color: white;"/>
+
+            <HBox spacing="5" alignment="CENTER">
+                <Button fx:id="saveButton" text="Sauvegarder"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;"/>
+
+                <Button fx:id="loadButton" text="Charger"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;"/>
+
+                <Button fx:id="deleteButton" text="Supprimer"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;"/>
+            </HBox>
+        </VBox>
+
+        <!-- Actions -->
+        <VBox spacing="8" style="-fx-background-color: #34495e; -fx-background-radius: 8;" alignment="CENTER">
+            <padding><Insets top="10" right="15" bottom="10" left="15"/></padding>
+
+            <Label text="Actions" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+
+            <Button fx:id="clearButton" text="Effacer tout"
+                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 5;"/>
+
+            <Button fx:id="backButton" text="Retour Menu"
+                    style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Instructions -->
+    <Label fx:id="instructionsLabel" text="Instructions"
+           style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;"
+           alignment="CENTER"/>
+
+    <!-- Canvas de l'éditeur -->
+    <ScrollPane fitToWidth="true" fitToHeight="true"
+                style="-fx-background: #2c3e50; -fx-background-color: #2c3e50;">
+        <VBox alignment="CENTER">
+            <Canvas fx:id="editorCanvas" width="600" height="520"
+                    style="-fx-background-color: white;"/>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Légende -->
+    <HBox spacing="15" alignment="CENTER"
+          style="-fx-background-color: #34495e; -fx-background-radius: 5;">
+        <padding><Insets top="5" right="10" bottom="5" left="10"/></padding>
+
+        <Label text="Légende:" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+
+        <HBox spacing="5" alignment="CENTER">
+            <Region style="-fx-background-color: lightgreen;" prefWidth="15" prefHeight="15"/>
+            <Label text="Vide" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+        </HBox>
+
+        <HBox spacing="5" alignment="CENTER">
+            <Region style="-fx-background-color: darkgray;" prefWidth="15" prefHeight="15"/>
+            <Label text="Mur fixe" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+        </HBox>
+
+        <HBox spacing="5" alignment="CENTER">
+            <Region style="-fx-background-color: saddlebrown;" prefWidth="15" prefHeight="15"/>
+            <Label text="Destructible" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+        </HBox>
+
+        <HBox spacing="5" alignment="CENTER">
+            <Region style="-fx-background-color: blue;" prefWidth="10" prefHeight="10"
+                    styleClass="circle"/>
+            <Label text="Spawn protégé" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+        </HBox>
+    </HBox>
 </VBox>

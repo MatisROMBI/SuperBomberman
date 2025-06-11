@@ -19,6 +19,7 @@ public class MainMenuController {
 
     @FXML private ImageView robotSurvivorButtonImg;
     @FXML private ImageView legend1v1ButtonImg;
+    @FXML private ImageView levelEditorButtonImg;
     @FXML private ImageView quitButtonImg;
 
     private MediaPlayer menuMusicPlayer;
@@ -32,25 +33,46 @@ public class MainMenuController {
             balloon3.setImage(new Image(getClass().getResourceAsStream("/images/fire_dirigeable.png")));
             robotSurvivorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/ROBOT-SURVIVOR.png")));
             legend1v1ButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/1V1_LEGEND.png")));
+
+            // Nouveau bouton pour l'éditeur de niveau
+            try {
+                levelEditorButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/LEVEL_EDITOR.png")));
+            } catch (Exception e) {
+                // Si l'image n'existe pas, on peut créer un bouton texte simple
+                System.out.println("Image LEVEL_EDITOR.png non trouvée, utilisation du fallback");
+            }
+
             quitButtonImg.setImage(new Image(getClass().getResourceAsStream("/images/QUIT_text.png")));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         playMenuMusic();
+        setupButtonActions();
+        animateBalloons();
+    }
 
+    private void setupButtonActions() {
+        // Mode classique - maintenant avec sélection de map
         robotSurvivorButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("Game"); // Mode solo classique
+            SceneManager.switchScene("MapSelection"); // **=> Nouveau : sélection de map avant de jouer**
         });
 
+        // Mode 1v1 Legend - aussi avec sélection de map
         legend1v1ButtonImg.setOnMouseClicked(e -> {
             stopMenuMusic();
-            SceneManager.switchScene("LegendGame"); // **=> Redirige vers le FXML LegendGame.fxml**
+            SceneManager.switchScene("MapSelection"); // **=> Sélection de map unifiée**
         });
 
+        // **NOUVEAU** : Éditeur de niveau
+        levelEditorButtonImg.setOnMouseClicked(e -> {
+            stopMenuMusic();
+            SceneManager.switchScene("LevelEditor"); // **=> Vers l'éditeur de map**
+        });
+
+        // Quitter
         quitButtonImg.setOnMouseClicked(e -> System.exit(0));
-        animateBalloons();
     }
 
     private void playMenuMusic() {
