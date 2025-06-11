@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
@@ -19,22 +21,42 @@
         <ImageView fx:id="balloon3" fitWidth="180" fitHeight="90" StackPane.alignment="TOP_LEFT" />
         <ImageView fx:id="balloon2" fitWidth="110" fitHeight="180" StackPane.alignment="TOP_LEFT" />
 
-        <VBox alignment="CENTER" spacing="16" StackPane.alignment="BOTTOM_CENTER" translateY="100">
+        <!-- Bandeau noir transparent derrière les boutons -->
+        <Rectangle width="800" height="250"
+                   fill="rgba(0, 0, 0, 0.75)"
+                   StackPane.alignment="BOTTOM_CENTER"/>
+
+        <VBox alignment="CENTER" spacing="8" StackPane.alignment="BOTTOM_CENTER" translateY="170">
             <children>
                 <!-- Mode Robot Survivor -->
-                <ImageView fx:id="robotSurvivorButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
+                <Button fx:id="robotSurvivorButton"
+                        text="ROBOT SURVIVOR"
+                        styleClass="bomberman-button"
+                        prefWidth="200" prefHeight="28"/>
 
                 <!-- Mode 1v1 Legend -->
-                <ImageView fx:id="legend1v1ButtonImg" fitWidth="300" fitHeight="40" pickOnBounds="true"/>
+                <Button fx:id="legend1v1Button"
+                        text="1V1 LEGEND"
+                        styleClass="bomberman-button"
+                        prefWidth="180" prefHeight="28"/>
 
                 <!-- Éditeur de niveau -->
-                <ImageView fx:id="levelEditorButtonImg" fitWidth="250" fitHeight="35" pickOnBounds="true"/>
+                <Button fx:id="levelEditorButton"
+                        text="LEVEL EDITOR"
+                        styleClass="bomberman-button"
+                        prefWidth="180" prefHeight="26"/>
 
-                <!-- NOUVEAU: Sélection de thèmes -->
-                <ImageView fx:id="themesButtonImg" fitWidth="200" fitHeight="32" pickOnBounds="true"/>
+                <!-- Sélection de thèmes -->
+                <Button fx:id="themesButton"
+                        text="THEMES"
+                        styleClass="bomberman-button"
+                        prefWidth="130" prefHeight="26"/>
 
                 <!-- Quitter -->
-                <ImageView fx:id="quitButtonImg" fitWidth="100" fitHeight="39" pickOnBounds="true"/>
+                <Button fx:id="quitButton"
+                        text="QUIT"
+                        styleClass="bomberman-button"
+                        prefWidth="80" prefHeight="26"/>
             </children>
         </VBox>
     </children>
