@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.net.URL;
 
 public class SceneManager {
     private static Stage primaryStage;
@@ -20,7 +21,9 @@ public class SceneManager {
                     SceneManager.class.getResource("/fxml/" + fxmlName + ".fxml")
             );
             Scene scene = new Scene(loader.load());
-            scene.getStylesheets().add("/css/style.css");
+
+            // CORRECTION: Chargement CSS avec vérification
+            loadStylesheet(scene);
 
             // Adapter la taille de la fenêtre selon la scène
             adjustWindowSize(fxmlName);
@@ -31,6 +34,63 @@ public class SceneManager {
             System.err.println("Erreur lors du chargement de la scène " + fxmlName + " : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * NOUVEAUTÉ: Charge la feuille de style avec plusieurs tentatives
+     */
+    private static void loadStylesheet(Scene scene) {
+        // Liste des chemins possibles pour le CSS
+        String[] cssPaths = {
+                "/css/style.css",
+                "/style.css",
+                "css/style.css",
+                "style.css"
+        };
+
+        boolean cssLoaded = false;
+
+        for (String cssPath : cssPaths) {
+            try {
+                URL cssUrl = SceneManager.class.getResource(cssPath);
+                if (cssUrl != null) {
+                    scene.getStylesheets().add(cssUrl.toExternalForm());
+                    System.out.println("CSS chargé depuis : " + cssPath);
+                    cssLoaded = true;
+                    break;
+                } else {
+                    System.out.println("CSS non trouvé à : " + cssPath);
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur lors du chargement CSS " + cssPath + " : " + e.getMessage());
+            }
+        }
+
+        if (!cssLoaded) {
+            System.err.println("ATTENTION: Aucun fichier CSS trouvé. Le jeu fonctionnera avec les styles par défaut.");
+            // Appliquer des styles inline de base
+            applyFallbackStyles(scene);
+        }
+    }
+
+    /**
+     * NOUVEAUTÉ: Applique des styles de base si le CSS n'est pas trouvé
+     */
+    private static void applyFallbackStyles(Scene scene) {
+        String fallbackCSS =
+                ".root { -fx-font-family: 'Arial'; -fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e); }" +
+                        ".menu-button { -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b); -fx-text-fill: white; -fx-background-radius: 10; -fx-cursor: hand; }" +
+                        ".menu-button:hover { -fx-background-color: linear-gradient(to bottom, #ec7063, #e74c3c); }" +
+                        ".pause-button-primary { -fx-background-color: linear-gradient(to bottom, #3498db, #2980b9); -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; }" +
+                        ".pause-button-primary:hover { -fx-background-color: linear-gradient(to bottom, #5dade2, #3498db); }" +
+                        ".pause-button-secondary { -fx-background-color: linear-gradient(to bottom, #f39c12, #e67e22); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; }" +
+                        ".pause-button-secondary:hover { -fx-background-color: linear-gradient(to bottom, #f7dc6f, #f39c12); }" +
+                        ".pause-button-danger { -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; }" +
+                        ".pause-button-danger:hover { -fx-background-color: linear-gradient(to bottom, #ec7063, #e74c3c); }";
+
+        // Créer une feuille de style inline
+        scene.getRoot().setStyle(fallbackCSS);
+        System.out.println("Styles de fallback appliqués.");
     }
 
     /**
