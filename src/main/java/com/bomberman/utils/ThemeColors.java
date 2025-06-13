@@ -1,35 +1,42 @@
+/**
+ * Palette de couleurs pour un thème
+ * Gère les couleurs du plateau, HUD et mode Legend
+ */
 package com.bomberman.utils;
 
 import javafx.scene.paint.Color;
 import java.io.Serializable;
 
-/**
- * Classe contenant les couleurs d'un thème
- */
 public class ThemeColors implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // Couleurs du plateau
-    private String emptyCell1 = "#90EE90"; // Vert clair
-    private String emptyCell2 = "#7CFC00"; // Vert vif
-    private String wallColor = "#696969";  // Gris foncé
+    // Couleurs du plateau classique
+    private String emptyCell1 = "#90EE90";     // Vert clair
+    private String emptyCell2 = "#7CFC00";     // Vert vif
+    private String wallColor = "#696969";      // Gris foncé
     private String explosionColor = "#FFA500"; // Orange
 
     // Couleurs du HUD
-    private String hudBackgroundColor = "#FF8800"; // Orange
-    private String hudBorderColor = "#CC6A00";     // Orange foncé
-    private String hudTextColor = "#FFFFFF";       // Blanc
+    private String hudBackgroundColor = "#FF8800";  // Orange
+    private String hudBorderColor = "#CC6A00";      // Orange foncé
+    private String hudTextColor = "#FFFFFF";        // Blanc
     private String scoreBackgroundColor = "#000000"; // Noir
 
-    // Couleurs spéciales Legend
-    private String legendBackground = "#1882f7";   // Bleu
-    private String legendHud = "#38b6ff";          // Bleu clair
-    private String legendEmpty1 = "#7ed5fa";       // Bleu très clair
-    private String legendEmpty2 = "#0e51b8";       // Bleu foncé
-    private String legendWall = "#3657a6";         // Bleu marine
+    // Couleurs spéciales mode Legend
+    private String legendBackground = "#1882f7";    // Bleu
+    private String legendHud = "#38b6ff";           // Bleu clair
+    private String legendEmpty1 = "#7ed5fa";        // Bleu très clair
+    private String legendEmpty2 = "#0e51b8";        // Bleu foncé
+    private String legendWall = "#3657a6";          // Bleu marine
 
+    /**
+     * Constructeur par défaut
+     */
     public ThemeColors() {}
 
+    /**
+     * Constructeur de copie
+     */
     public ThemeColors(ThemeColors other) {
         if (other != null) {
             this.emptyCell1 = other.emptyCell1;
@@ -48,7 +55,7 @@ public class ThemeColors implements Serializable {
         }
     }
 
-    // Getters qui retournent des objets Color avec gestion d'erreur
+    // Accesseurs avec gestion d'erreur et fallback
     public Color getEmptyCell1() {
         try { return Color.web(emptyCell1); }
         catch (Exception e) { return Color.LIGHTGREEN; }
@@ -97,6 +104,7 @@ public class ThemeColors implements Serializable {
     }
     public void setScoreBackgroundColor(String color) { this.scoreBackgroundColor = color; }
 
+    // Couleurs mode Legend
     public Color getLegendBackground() {
         try { return Color.web(legendBackground); }
         catch (Exception e) { return Color.BLUE; }

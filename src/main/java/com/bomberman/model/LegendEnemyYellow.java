@@ -1,33 +1,29 @@
+/**
+ * Ennemi Yellow IA avancé pour le mode Legend 1v1
+ * Comportement : poursuite rapide et agressive des joueurs
+ * Attaque au contact direct (fait perdre une vie)
+ */
 package com.bomberman.model;
 
 import java.util.Random;
 
-/**
- * Ennemi Yellow IA AMÉLIORÉ :
- * - Poursuit le joueur humain le plus proche avec intelligence tactique
- * - Déplacements plus fluides et cohérents
- * - Évite les pièges et les explosions
- * - S'il touche un joueur, il lui enlève une vie et le fait respawn
- * - Système anti-blocage avancé
- * - Meurt s'il est touché par une explosion
- */
 public class LegendEnemyYellow {
-    private int x, y;               // Position du Yellow sur la grille
-    private boolean alive = true;   // État de vie de l'ennemi
+    private int x, y;                    // Position sur la grille
+    private boolean alive = true;        // État de vie
     private final Random rand = new Random();
 
     // NOUVELLES VARIABLES pour IA améliorée
     private long lastMoveTime = 0;
     private static final int MOVE_DELAY = 300; // Plus rapide que Bomber
-    private int stuckCounter = 0; // Compteur anti-blocage
-    private int lastX = -1, lastY = -1; // Position précédente
-    private com.bomberman.model.enums.Direction lastDirection = null; // Dernière direction
-    private Player currentTarget = null; // Cible actuelle pour persistance
-    private long targetSwitchTime = 0; // Dernière fois qu'on a changé de cible
-    private static final int TARGET_SWITCH_DELAY = 2000; // ms avant de pouvoir changer de cible
+    private int stuckCounter = 0;        // Compteur anti-blocage
+    private int lastX = -1, lastY = -1;  // Position précédente
+    private com.bomberman.model.enums.Direction lastDirection = null;
+    private Player currentTarget = null; // Cible persistante
+    private long targetSwitchTime = 0;   // Derniert changement de cible
+    private static final int TARGET_SWITCH_DELAY = 2000; // Délai avant changement de cible
 
     /**
-     * Constructeur pour positionner le Yellow au départ.
+     * Constructeur avec position initiale
      */
     public LegendEnemyYellow(int x, int y) {
         this.x = x;
@@ -37,34 +33,31 @@ public class LegendEnemyYellow {
     }
 
     /**
-     * Action AMÉLIORÉE réalisée à chaque tour de jeu :
-     * - IA plus intelligente et cohérente
-     * - Cible persistante pour éviter les zigzags
-     * - Attaque intelligente des joueurs
-     * - Anti-blocage avancé
+     * IA principale - Tour de jeu AMÉLIORÉ
+     * Stratégie : poursuite intelligente avec cible persistante
      */
     public void playTurn(Legend1v1Board board, Player p1, Player p2) {
         if (!alive) return;
 
         long now = System.currentTimeMillis();
 
-        // Système de cooldown pour les mouvements (plus rapide que Bomber)
+        // Contrôle de fréquence (plus rapide que Bomber)
         if (now - lastMoveTime < MOVE_DELAY) return;
 
-        // SÉLECTION INTELLIGENTE DE LA CIBLE
+        // SÉLECTION INTELLIGENTE de la cible
         Player target = selectOptimalTarget(p1, p2, now);
 
-        // ATTAQUE si adjacent au joueur cible
+        // ATTAQUE si adjacent au joueur
         if (isNextTo(target)) {
             performAttack(target, board);
             lastMoveTime = now;
             return; // Ne pas bouger après attaque
         }
 
-        // MOUVEMENT INTELLIGENT avec pathfinding et tactiques
+        // MOUVEMENT INTELLIGENT avec pathfinding
         performIntelligentMovement(board, target);
 
-        // Détection anti-blocage
+        // Système anti-blocage
         if (x == lastX && y == lastY) {
             stuckCounter++;
         } else {
@@ -75,27 +68,26 @@ public class LegendEnemyYellow {
 
         lastMoveTime = now;
 
-        // Meurt s'il se trouve sur une explosion
+        // Mort si touché par explosion
         if (board.isExplosionAt(x, y)) {
             alive = false;
-            System.out.println("💀 Yellow eliminated by explosion at (" + x + "," + y + ")");
+            System.out.println("💀 Yellow éliminé par explosion à (" + x + "," + y + ")");
         }
     }
 
     /**
-     * NOUVEAU : Sélection intelligente de la cible avec persistance
+     * NOUVEAU : Sélection intelligente de cible avec persistance
+     * Évite les changements de cible trop fréquents (zigzag)
      */
     private Player selectOptimalTarget(Player p1, Player p2, long now) {
-        // Si on a déjà une cible et qu'elle est encore valide, continuer avec elle
+        // Maintient la cible actuelle si encore valide
         if (currentTarget != null && currentTarget.isAlive() &&
                 now - targetSwitchTime < TARGET_SWITCH_DELAY) {
             return currentTarget;
         }
 
-        // Choisir la nouvelle cible optimale
+        // Sélection d'une nouvelle cible optimale
         Player newTarget;
-
-        // Prioriser le joueur le plus proche
         int dist1 = distance(p1);
         int dist2 = distance(p2);
 
@@ -108,17 +100,17 @@ public class LegendEnemyYellow {
         } else if (dist2 < dist1) {
             newTarget = p2;
         } else {
-            // À distance égale, garder la cible actuelle ou choisir aléatoirement
+            // À distance égale, garde la cible actuelle ou choisit aléatoirement
             newTarget = (currentTarget != null && currentTarget.isAlive()) ?
                     currentTarget : (rand.nextBoolean() ? p1 : p2);
         }
 
-        // Mettre à jour la cible si nécessaire
+        // Mise à jour de la cible si changement
         if (newTarget != currentTarget) {
             currentTarget = newTarget;
             targetSwitchTime = now;
-            System.out.println("🎯 Yellow changed target to Player " +
-                    (newTarget == p1 ? "1" : "2") + " at distance " + distance(newTarget));
+            System.out.println("🎯 Yellow change de cible vers Joueur " +
+                    (newTarget == p1 ? "1" : "2") + " à distance " + distance(newTarget));
         }
 
         return newTarget;
@@ -128,42 +120,42 @@ public class LegendEnemyYellow {
      * NOUVEAU : Attaque optimisée avec feedback
      */
     private void performAttack(Player target, Legend1v1Board board) {
-        System.out.println("⚔️ Yellow attacks Player " +
-                (target == board.getPlayer1() ? "1" : "2") + " at (" + x + "," + y + ")");
+        System.out.println("⚔️ Yellow attaque le Joueur " +
+                (target == board.getPlayer1() ? "1" : "2") + " à (" + x + "," + y + ")");
 
-        target.takeDamage();
+        target.takeDamage(); // Fait perdre une vie
         if (target.isAlive()) {
-            target.respawnAtStart(board);
+            target.respawnAtStart(board); // Respawn si encore vivant
         }
     }
 
     /**
-     * NOUVEAU : Mouvement intelligent avec pathfinding et tactiques avancées
+     * NOUVEAU : Mouvement intelligent avec pathfinding avancé
      */
     private void performIntelligentMovement(Legend1v1Board board, Player target) {
         com.bomberman.model.enums.Direction bestDirection = null;
 
-        // Si bloqué depuis trop longtemps, mouvement aléatoire pour débloquer
+        // Déblocage forcé si bloqué trop longtemps
         if (stuckCounter >= 4) {
             bestDirection = getRandomValidDirection(board);
-            stuckCounter = 0; // Reset
-            System.out.println("🔄 Yellow using anti-stuck movement");
+            stuckCounter = 0;
+            System.out.println("🔄 Yellow utilisne mouvement anti-blocage");
         } else {
-            // Pathfinding intelligent : utiliser la méthode du board
+            // Pathfinding intelligent
             bestDirection = board.getBestDirection(x, y, target.getX(), target.getY());
 
-            // Si pas de chemin optimal, essayer un mouvement tactique
+            // Mouvement tactique si pas de chemin direct
             if (bestDirection == null) {
                 bestDirection = getTacticalMovement(board, target);
             }
 
-            // En dernier recours, mouvement aléatoire
+            // Mouvement aléatoire en dernier recours
             if (bestDirection == null) {
                 bestDirection = getRandomValidDirection(board);
             }
         }
 
-        // Exécuter le mouvement choisi
+        // Exécution du mouvement
         if (bestDirection != null) {
             tryMove(board, bestDirection.getDx(), bestDirection.getDy());
             lastDirection = bestDirection;
@@ -174,14 +166,14 @@ public class LegendEnemyYellow {
      * NOUVEAU : Mouvement tactique avec évitement des dangers
      */
     private com.bomberman.model.enums.Direction getTacticalMovement(Legend1v1Board board, Player target) {
-        // Éviter de revenir en arrière immédiatement
+        // Évite de revenir en arrière immédiatement
         com.bomberman.model.enums.Direction oppositeDir = getOppositeDirection(lastDirection);
 
-        // Calculer les priorités de mouvement
+        // Calcule les priorités de mouvement
         java.util.List<DirectionPriority> priorities = new java.util.ArrayList<>();
 
         for (com.bomberman.model.enums.Direction dir : com.bomberman.model.enums.Direction.values()) {
-            if (dir == oppositeDir) continue; // Éviter de revenir en arrière
+            if (dir == oppositeDir) continue; // Évite le retour en arrière
 
             int nx = x + dir.getDx();
             int ny = y + dir.getDy();
@@ -197,7 +189,7 @@ public class LegendEnemyYellow {
             }
         }
 
-        // Trier par priorité et prendre la meilleure
+        // Trie par priorité et prend la meilleure
         if (!priorities.isEmpty()) {
             priorities.sort((a, b) -> Integer.compare(b.priority, a.priority));
             return priorities.get(0).direction;
@@ -207,17 +199,17 @@ public class LegendEnemyYellow {
     }
 
     /**
-     * NOUVEAU : Calcule la priorité d'un mouvement selon les dangers et la cible
+     * NOUVEAU : Calcule la priorité d'un mouvement
      */
     private int calculateMovePriority(Legend1v1Board board, int nx, int ny, Player target) {
-        int priority = 100; // Base priority
+        int priority = 100; // Priorité de base
 
-        // Éviter les explosions (priorité critique)
+        // Évite les explosions (priorité critique)
         if (board.isExplosionAt(nx, ny)) {
             return 0; // Mouvement interdit
         }
 
-        // Vérifier les bombes à proximité (danger élevé)
+        // Évite les bombes proches (danger élevé)
         for (Bomb bomb : board.getBombs()) {
             int bombDist = Math.abs(nx - bomb.getX()) + Math.abs(ny - bomb.getY());
             if (bombDist <= bomb.getExplosionRange()) {
@@ -225,16 +217,16 @@ public class LegendEnemyYellow {
             }
         }
 
-        // Se rapprocher de la cible (bonus)
+        // Bonus pour se rapprocher de la cible
         int currentDistToTarget = Math.abs(x - target.getX()) + Math.abs(y - target.getY());
         int newDistToTarget = Math.abs(nx - target.getX()) + Math.abs(ny - target.getY());
         if (newDistToTarget < currentDistToTarget) {
-            priority += 30; // Bonus pour se rapprocher
+            priority += 30; // Bonus pour rapprochement
         } else if (newDistToTarget > currentDistToTarget) {
-            priority -= 20; // Malus pour s'éloigner
+            priority -= 20; // Malus pour éloignement
         }
 
-        // Éviter les coins (malus léger) - utilise des constantes fixes pour éviter les imports
+        // Évite les coins (malus léger)
         if ((nx == 1 || nx == 13) && (ny == 1 || ny == 11)) {
             priority -= 10;
         }
@@ -256,7 +248,7 @@ public class LegendEnemyYellow {
     }
 
     /**
-     * NOUVEAU : Obtenir une direction aléatoire valide pour déblocage
+     * NOUVEAU : Direction aléatoire valide pour déblocage
      */
     private com.bomberman.model.enums.Direction getRandomValidDirection(Legend1v1Board board) {
         com.bomberman.model.enums.Direction[] directions = com.bomberman.model.enums.Direction.values();
@@ -269,7 +261,7 @@ public class LegendEnemyYellow {
             if (board.isValidPosition(nx, ny) &&
                     board.getCell(nx, ny).isWalkable() &&
                     !board.hasEnemyAt(nx, ny) &&
-                    !board.isExplosionAt(nx, ny)) { // Éviter les explosions
+                    !board.isExplosionAt(nx, ny)) { // Évite les explosions
                 validDirections.add(dir);
             }
         }
@@ -279,11 +271,10 @@ public class LegendEnemyYellow {
     }
 
     /**
-     * NOUVEAU : Obtenir la direction opposée pour éviter les aller-retours
+     * NOUVEAU : Direction opposée pour éviter les aller-retours
      */
     private com.bomberman.model.enums.Direction getOppositeDirection(com.bomberman.model.enums.Direction dir) {
         if (dir == null) return null;
-
         switch (dir) {
             case UP: return com.bomberman.model.enums.Direction.DOWN;
             case DOWN: return com.bomberman.model.enums.Direction.UP;
@@ -294,54 +285,42 @@ public class LegendEnemyYellow {
     }
 
     /**
-     * Essaie de déplacer le Yellow avec vérifications renforcées.
+     * Tentative de mouvement avec vérifications
      */
     private void tryMove(Legend1v1Board board, int dx, int dy) {
         int nx = x + dx;
         int ny = y + dy;
-        if (board.isValidPosition(nx, ny)
-                && board.getCell(nx, ny).isWalkable()
-                && !board.hasEnemyAt(nx, ny)
-                && !board.isExplosionAt(nx, ny)) { // Éviter les explosions
+        if (board.isValidPosition(nx, ny) &&
+                board.getCell(nx, ny).isWalkable() &&
+                !board.hasEnemyAt(nx, ny) &&
+                !board.isExplosionAt(nx, ny)) { // Évite les explosions
             x = nx;
             y = ny;
         }
     }
 
     /**
-     * True si le joueur est sur une case adjacente à Yellow.
+     * Vérifie si le joueur est adjacent
      */
     private boolean isNextTo(Player p) {
         return Math.abs(p.getX() - x) + Math.abs(p.getY() - y) == 1;
     }
 
     /**
-     * Distance de Manhattan entre le Yellow et un joueur.
+     * Distance de Manhattan vers un joueur
      */
     private int distance(Player p) {
         return Math.abs(p.getX() - x) + Math.abs(p.getY() - y);
     }
 
-    // --------- Getters / Setters / Kill ----------
-
-    /** Renvoie true si le Yellow est encore en vie */
+    // --------- Accesseurs et méthodes utilitaires ----------
     public boolean isAlive() { return alive; }
-
-    /** Position X du Yellow */
     public int getX() { return x; }
-
-    /** Position Y du Yellow */
     public int getY() { return y; }
-
-    /** Tue le Yellow (appelé si sur explosion) */
     public void kill() {
         alive = false;
-        System.out.println("💀 Yellow eliminated at (" + x + "," + y + ")");
+        System.out.println("💀 Yellow éliminé à (" + x + "," + y + ")");
     }
-
-    /** NOUVEAU : Cible actuelle pour debug */
     public Player getCurrentTarget() { return currentTarget; }
-
-    /** NOUVEAU : Compteur de blocage pour debug */
     public int getStuckCounter() { return stuckCounter; }
 }

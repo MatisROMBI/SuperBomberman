@@ -1,37 +1,51 @@
+/**
+ * Classe représentant le joueur principal
+ * Gère les statistiques, mouvements, bombes et bonus
+ */
 package com.bomberman.model;
 
 import com.bomberman.model.enums.Direction;
 import com.bomberman.model.enums.GameState;
 
 public class Player {
-    private int x, y;
-    private int startX, startY;
-    private int lives = 6;
-    private int maxBombs = 2;
-    private int bombsAvailable = 2;
-    private int explosionRange = 1;
-    private int score = 0;
-    private boolean isAlive = true;
+    // Position et spawn
+    private int x, y;                    // Position actuelle
+    private int startX, startY;          // Position de départ (pour respawn)
 
-    // Gestion du bonus SPEED
-    private boolean speedBoost = false;
-    private long speedEndTime = 0;
+    // Statistiques de base
+    private int lives = 6;               // Vies (6 par défaut)
+    private int maxBombs = 2;            // Nombre maximum de bombes
+    private int bombsAvailable = 2;      // Bombes actuellement disponibles
+    private int explosionRange = 1;      // Portée des explosions
+    private int score = 0;               // Score du joueur
+    private boolean isAlive = true;      // État de vie
 
-    // OPTIMISATION: Réduire les délais de mouvement
+    // Bonus temporaire SPEED
+    private boolean speedBoost = false;  // Boost de vitesse actif
+    private long speedEndTime = 0;       // Fin du boost de vitesse
+
+    // OPTIMISATION: Contrôle de la fluidité des mouvements
     private long lastMoveTime = 0;
-    private static final int NORMAL_MOVE_DELAY = 100; // Réduit de 160 à 100
-    private static final int SPEED_BOOST_DELAY = 60;  // Réduit de 80 à 60
+    private static final int NORMAL_MOVE_DELAY = 100; // Délai normal (réduit pour fluidité)
+    private static final int SPEED_BOOST_DELAY = 60;  // Délai avec boost de vitesse
 
-    private int respawnDelay = 1000;
-    protected long deathTime = -1;
+    // Gestion du respawn
+    private int respawnDelay = 1000;     // Délai de respawn (1 seconde)
+    protected long deathTime = -1;       // Moment de la mort
 
-    // Pour callback fin de partie
+    // Callback pour fin de partie
     private GameOverListener gameOverListener;
 
+    /**
+     * Constructeur par défaut
+     */
     public Player() {
-        this(0, 0); // Position par défaut
+        this(0, 0);
     }
 
+    /**
+     * Constructeur avec position de départ
+     */
     public Player(int startX, int startY) {
         this.x = startX;
         this.y = startY;
@@ -39,18 +53,24 @@ public class Player {
         this.startY = startY;
     }
 
+    /**
+     * Définit le listener pour les fins de partie
+     */
     public void setGameOverListener(GameOverListener listener) {
         this.gameOverListener = listener;
     }
 
-    // --- Supporte Board ET Legend1v1Board
+    /**
+     * Respawn du joueur à sa position de départ
+     * Supporte les deux types de plateau (Board et Legend1v1Board)
+     */
     public void respawnAtStart(Object board) {
         if (board instanceof Legend1v1Board) {
             Legend1v1Board b = (Legend1v1Board) board;
-            b.getCell(x, y).setHasPlayer(false);
+            b.getCell(x, y).setHasPlayer(false);  // Libère l'ancienne position
             x = startX;
             y = startY;
-            b.getCell(x, y).setHasPlayer(true);
+            b.getCell(x, y).setHasPlayer(true);   // Occupe la nouvelle position
         } else if (board instanceof Board) {
             Board b = (Board) board;
             b.getCell(x, y).setHasPlayer(false);
@@ -61,25 +81,32 @@ public class Player {
         isAlive = true;
     }
 
-    // OPTIMISATION: Move plus fluide
+    /**
+     * OPTIMISATION: Mouvement avec contrôle de fluidité
+     * Gère les déplacements dans une direction donnée
+     */
     public void move(Direction direction, Object board, GameState gameState) {
+        // Vérifications préliminaires
         if (gameState != null && gameState != GameState.PLAYING) return;
         if (!isAlive) return;
 
+        // Contrôle de la fluidité des mouvements
         long now = System.currentTimeMillis();
         int delay = speedBoost ? SPEED_BOOST_DELAY : NORMAL_MOVE_DELAY;
         if (now - lastMoveTime < delay) return;
         lastMoveTime = now;
 
-        // Fin du bonus speed ?
+        // Vérification de la fin du bonus speed
         if (speedBoost && speedEndTime > 0 && now > speedEndTime) {
             speedBoost = false;
             speedEndTime = 0;
         }
 
+        // Calcul de la nouvelle position
         int newX = x + direction.getDx();
         int newY = y + direction.getDy();
 
+        // Vérification de validité selon le type de plateau
         Cell cell = null;
         boolean valid = false;
 
@@ -92,9 +119,12 @@ public class Player {
             valid = b.isValidPosition(newX, newY);
             if (valid) cell = b.getCell(newX, newY);
         }
+
         if (!valid || cell == null) return;
 
+        // Vérification que la cellule est accessible
         if (cell.isWalkable() && !cell.hasPlayer()) {
+            // Déplacement effectif
             if (board instanceof Legend1v1Board) {
                 Legend1v1Board b = (Legend1v1Board) board;
                 b.getCell(x, y).setHasPlayer(false);
@@ -108,18 +138,24 @@ public class Player {
                 y = newY;
                 b.getCell(x, y).setHasPlayer(true);
             }
+
+            // Collecte des bonus
             if (cell.hasPowerUp()) {
-                addScore(300);
+                addScore(300); // +300 points pour un bonus
                 applyPowerUp(cell.getPowerUp());
                 cell.setPowerUp(null);
             }
         }
     }
 
+    /**
+     * Pose une bombe à la position actuelle du joueur
+     */
     public void placeBomb(Object board, GameState gameState) {
         if (!isAlive) return;
         if (bombsAvailable <= 0) return;
 
+        // Pose de bombe selon le type de plateau
         if (board instanceof Legend1v1Board) {
             Legend1v1Board b = (Legend1v1Board) board;
             if (b.getCell(x, y).getBomb() == null &&
@@ -141,16 +177,25 @@ public class Player {
         }
     }
 
+    /**
+     * Callback appelé quand une bombe explose
+     * Remet une bombe à disposition
+     */
     public void onBombExploded() {
         bombsAvailable = Math.min(bombsAvailable + 1, maxBombs);
     }
 
+    /**
+     * Gère les dégâts subis par le joueur
+     */
     public void takeDamage() {
         if (!isAlive) return;
+
         lives--;
         if (lives <= 0) {
             lives = 0;
             isAlive = false;
+            // Déclenche le callback de fin de partie
             if (gameOverListener != null) {
                 gameOverListener.onGameOver(score);
             }
@@ -158,8 +203,12 @@ public class Player {
         deathTime = System.currentTimeMillis();
     }
 
+    /**
+     * Tente de faire respawn le joueur après un délai
+     */
     public void tryRespawn() {
-        if (!isAlive && deathTime > 0 && System.currentTimeMillis() - deathTime > respawnDelay) {
+        if (!isAlive && deathTime > 0 &&
+                System.currentTimeMillis() - deathTime > respawnDelay) {
             x = startX;
             y = startY;
             isAlive = (lives > 0);
@@ -167,28 +216,43 @@ public class Player {
         }
     }
 
-    public void addScore(int pts) { score += pts; }
+    /**
+     * Ajoute des points au score
+     */
+    public void addScore(int pts) {
+        score += pts;
+    }
 
+    /**
+     * Applique les effets d'un bonus collecté
+     */
     protected void applyPowerUp(PowerUp powerUp) {
         switch (powerUp.getType()) {
-            case EXTRA_BOMB: maxBombs++; bombsAvailable++; break;
-            case RANGE_UP: explosionRange++; break;
-            case LIFE: lives++; break;
+            case EXTRA_BOMB:
+                maxBombs++;
+                bombsAvailable++;
+                break;
+            case RANGE_UP:
+                explosionRange++;
+                break;
+            case LIFE:
+                lives++;
+                break;
             case SPEED:
                 speedBoost = true;
-                speedEndTime = System.currentTimeMillis() + 5000;
+                speedEndTime = System.currentTimeMillis() + 5000; // 5 secondes
                 break;
         }
     }
 
-    // --- Méthodes utilitaires pour le mode 1v1 Legend ---
+    // --- Méthodes de convenance pour le mode 1v1 Legend ---
     public void moveUp(Object board)    { move(Direction.UP,    board, null); }
     public void moveDown(Object board)  { move(Direction.DOWN,  board, null); }
     public void moveLeft(Object board)  { move(Direction.LEFT,  board, null); }
     public void moveRight(Object board) { move(Direction.RIGHT, board, null); }
     public void placeBomb(Object board) { placeBomb(board, null); }
 
-    // ----------- Getters & Setters complets -----------
+    // ----------- Accesseurs complets -----------
     public int getX() { return x; }
     public void setX(int v) { this.x = v; }
     public int getY() { return y; }

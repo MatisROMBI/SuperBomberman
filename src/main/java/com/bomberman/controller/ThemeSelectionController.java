@@ -1,3 +1,8 @@
+/**
+ * Contrôleur pour la sélection et gestion des thèmes visuels
+ * Permet de prévisualiser, appliquer, créer et supprimer des thèmes
+ * Interface avec aperçus des sprites et informations détaillées
+ */
 package com.bomberman.controller;
 
 import com.bomberman.utils.SceneManager;
@@ -13,30 +18,37 @@ import javafx.scene.layout.VBox;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Contrôleur pour la sélection et gestion des thèmes
- */
 public class ThemeSelectionController {
-    @FXML private VBox themeContainer;
-    @FXML private ListView<String> themeListView;
-    @FXML private Label themeNameLabel;
-    @FXML private Label themeDescriptionLabel;
-    @FXML private GridPane spritePreviewGrid;
-    @FXML private Button applyThemeButton;
-    @FXML private Button createThemeButton;
-    @FXML private Button deleteThemeButton;
-    @FXML private Button backButton;
-    @FXML private ImageView playerPreview1;
-    @FXML private ImageView playerPreview2;
-    @FXML private ImageView enemyPreview1;
-    @FXML private ImageView enemyPreview2;
-    @FXML private ImageView bombPreview;
-    @FXML private ImageView wallPreview;
-    @FXML private ImageView powerUpPreview;
 
+    // ===== ÉLÉMENTS DE L'INTERFACE FXML =====
+    @FXML private VBox themeContainer;           // Conteneur principal
+    @FXML private ListView<String> themeListView; // Liste des thèmes disponibles
+    @FXML private Label themeNameLabel;          // Nom du thème sélectionné
+    @FXML private Label themeDescriptionLabel;   // Description du thème
+    @FXML private GridPane spritePreviewGrid;    // Grille d'aperçu des sprites
+
+    // Boutons d'action
+    @FXML private Button applyThemeButton;       // Appliquer le thème
+    @FXML private Button createThemeButton;      // Créer un nouveau thème
+    @FXML private Button deleteThemeButton;      // Supprimer le thème
+    @FXML private Button backButton;             // Retour menu principal
+
+    // ImageView pour les aperçus de sprites
+    @FXML private ImageView playerPreview1;      // Aperçu joueur 1
+    @FXML private ImageView playerPreview2;      // Aperçu joueur 2
+    @FXML private ImageView enemyPreview1;       // Aperçu ennemi Bomber
+    @FXML private ImageView enemyPreview2;       // Aperçu ennemi Yellow
+    @FXML private ImageView bombPreview;         // Aperçu bombe
+    @FXML private ImageView wallPreview;         // Aperçu mur destructible
+    @FXML private ImageView powerUpPreview;      // Aperçu power-up
+
+    // ===== GESTIONNAIRE ET ÉTAT =====
     private final ThemeManager themeManager = ThemeManager.getInstance();
-    private String selectedTheme;
+    private String selectedTheme;                // Thème actuellement sélectionné
 
+    /**
+     * Initialisation du contrôleur de sélection de thèmes
+     */
     @FXML
     private void initialize() {
         setupControls();
@@ -44,29 +56,37 @@ public class ThemeSelectionController {
         selectCurrentTheme();
     }
 
+    /**
+     * Configuration des contrôles de l'interface
+     */
     private void setupControls() {
-        // Configuration des boutons
+        // Configuration des boutons d'action
         applyThemeButton.setOnAction(e -> applySelectedTheme());
         createThemeButton.setOnAction(e -> createNewTheme());
         deleteThemeButton.setOnAction(e -> deleteSelectedTheme());
         backButton.setOnAction(e -> SceneManager.switchScene("MainMenu"));
 
-        // Désactiver les boutons par défaut
+        // Désactivation par défaut des boutons contextuels
         applyThemeButton.setDisable(true);
         deleteThemeButton.setDisable(true);
 
-        // Configuration de la liste
+        // Configuration de la sélection de thèmes
         setupThemeSelection();
     }
 
+    /**
+     * Configuration du système de sélection de thèmes
+     */
     private void setupThemeSelection() {
         themeListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 selectedTheme = newSelection;
-                showThemePreview(newSelection);
+                showThemePreview(newSelection);  // Affiche l'aperçu
 
-                // Activer/désactiver les boutons selon le thème sélectionné
+                // Active le bouton d'application
                 applyThemeButton.setDisable(false);
+
+                // Désactive la suppression pour les thèmes par défaut
                 boolean isDefaultTheme = "classic".equals(newSelection) || "legend".equals(newSelection);
                 deleteThemeButton.setDisable(isDefaultTheme);
             } else {
@@ -78,11 +98,14 @@ public class ThemeSelectionController {
         });
     }
 
+    /**
+     * Charge la liste de tous les thèmes disponibles
+     */
     private void loadThemeList() {
         Map<String, ThemeData> themes = themeManager.getAvailableThemes();
         themeListView.getItems().clear();
 
-        // Ajouter les thèmes dans un ordre spécifique
+        // Ajoute les thèmes par défaut en premier
         if (themes.containsKey("classic")) {
             themeListView.getItems().add("classic");
         }
@@ -90,32 +113,43 @@ public class ThemeSelectionController {
             themeListView.getItems().add("legend");
         }
 
-        // Ajouter les autres thèmes
+        // Ajoute les autres thèmes triés alphabétiquement
         themes.keySet().stream()
                 .filter(id -> !"classic".equals(id) && !"legend".equals(id))
                 .sorted()
                 .forEach(themeListView.getItems()::add);
     }
 
+    /**
+     * Sélectionne automatiquement le thème actuellement actif
+     */
     private void selectCurrentTheme() {
         String currentTheme = themeManager.getCurrentTheme();
         themeListView.getSelectionModel().select(currentTheme);
     }
 
+    /**
+     * Affiche l'aperçu complet d'un thème sélectionné
+     * @param themeId Identifiant du thème à prévisualiser
+     */
     private void showThemePreview(String themeId) {
         ThemeData theme = themeManager.getAvailableThemes().get(themeId);
         if (theme == null) return;
 
-        // Afficher les informations du thème
+        // Affichage des informations du thème
         themeNameLabel.setText(theme.getName());
         themeDescriptionLabel.setText(theme.getDescription());
 
-        // Afficher les aperçus des sprites
+        // Mise à jour des aperçus de sprites
         updateSpritePreview(theme);
     }
 
+    /**
+     * Met à jour tous les aperçus de sprites pour un thème
+     * @param theme Données du thème à prévisualiser
+     */
     private void updateSpritePreview(ThemeData theme) {
-        // Aperçus des joueurs
+        // ===== APERÇUS DES JOUEURS =====
         if (theme.getPlayerSprites().size() > 0) {
             setImagePreview(playerPreview1, theme.getPlayerSprites().get(0));
         }
@@ -123,7 +157,7 @@ public class ThemeSelectionController {
             setImagePreview(playerPreview2, theme.getPlayerSprites().get(1));
         }
 
-        // Aperçus des ennemis
+        // ===== APERÇUS DES ENNEMIS =====
         Map<String, String> enemies = theme.getEnemySprites();
         if (enemies.containsKey("bomber")) {
             setImagePreview(enemyPreview1, enemies.get("bomber"));
@@ -132,19 +166,24 @@ public class ThemeSelectionController {
             setImagePreview(enemyPreview2, enemies.get("yellow"));
         }
 
-        // Aperçu de la bombe
+        // ===== APERÇU DE LA BOMBE =====
         setImagePreview(bombPreview, theme.getBombSprite());
 
-        // Aperçu du mur destructible
+        // ===== APERÇU DU MUR DESTRUCTIBLE =====
         setImagePreview(wallPreview, theme.getDestructibleWallSprite());
 
-        // Aperçu d'un power-up
+        // ===== APERÇU D'UN POWER-UP =====
         Map<String, String> powerUps = theme.getPowerUpSprites();
         if (powerUps.containsKey("EXTRA_BOMB")) {
             setImagePreview(powerUpPreview, powerUps.get("EXTRA_BOMB"));
         }
     }
 
+    /**
+     * Configure l'aperçu d'une image dans un ImageView
+     * @param imageView L'ImageView à configurer
+     * @param imagePath Chemin vers l'image à afficher
+     */
     private void setImagePreview(ImageView imageView, String imagePath) {
         if (imageView != null && imagePath != null) {
             try {
@@ -154,18 +193,21 @@ public class ThemeSelectionController {
                 imageView.setFitHeight(40);
                 imageView.setPreserveRatio(true);
             } catch (Exception e) {
-                // Si l'image n'existe pas, afficher une image par défaut ou vider
+                // Si l'image n'existe pas, affiche une image par défaut ou vide
                 imageView.setImage(null);
                 System.err.println("Impossible de charger l'aperçu : " + imagePath);
             }
         }
     }
 
+    /**
+     * Efface tous les aperçus de thème
+     */
     private void clearThemePreview() {
         themeNameLabel.setText("Sélectionnez un thème");
         themeDescriptionLabel.setText("");
 
-        // Effacer tous les aperçus
+        // Efface tous les aperçus d'images
         if (playerPreview1 != null) playerPreview1.setImage(null);
         if (playerPreview2 != null) playerPreview2.setImage(null);
         if (enemyPreview1 != null) enemyPreview1.setImage(null);
@@ -175,11 +217,14 @@ public class ThemeSelectionController {
         if (powerUpPreview != null) powerUpPreview.setImage(null);
     }
 
+    /**
+     * Applique le thème sélectionné comme thème actif
+     */
     private void applySelectedTheme() {
         if (selectedTheme != null) {
             themeManager.setCurrentTheme(selectedTheme);
 
-            // Afficher une confirmation
+            // Affichage d'une confirmation
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Thème appliqué");
             alert.setHeaderText(null);
@@ -189,14 +234,17 @@ public class ThemeSelectionController {
         }
     }
 
+    /**
+     * Ouvre le dialogue de création d'un nouveau thème
+     */
     private void createNewTheme() {
-        // Ouvrir un dialogue pour créer un nouveau thème
+        // Ouvre le dialogue de création
         Optional<ThemeData> result = showThemeCreationDialog();
 
         if (result.isPresent()) {
             ThemeData newTheme = result.get();
             themeManager.addCustomTheme(newTheme);
-            loadThemeList();
+            loadThemeList(); // Rafraîchit la liste
             themeListView.getSelectionModel().select(newTheme.getId());
 
             showAlert("Succès", "Nouveau thème '" + newTheme.getName() + "' créé avec succès !");
@@ -204,7 +252,8 @@ public class ThemeSelectionController {
     }
 
     /**
-     * Affiche le dialogue de création de thème
+     * Affiche le dialogue de création de thème personnalisé
+     * @return Optional contenant le nouveau thème ou vide si annulé
      */
     private Optional<ThemeData> showThemeCreationDialog() {
         Dialog<ThemeData> dialog = new Dialog<>();
@@ -220,6 +269,7 @@ public class ThemeSelectionController {
         grid.setHgap(10);
         grid.setVgap(10);
 
+        // Champs du formulaire
         TextField themeId = new TextField();
         themeId.setPromptText("ID du thème (ex: montheme)");
         TextField themeName = new TextField();
@@ -233,6 +283,7 @@ public class ThemeSelectionController {
         baseTheme.setValue("classic");
         baseTheme.setPromptText("Thème de base");
 
+        // Ajout des champs à la grille
         grid.add(new Label("ID:"), 0, 0);
         grid.add(themeId, 1, 0);
         grid.add(new Label("Nom:"), 0, 1);
@@ -244,16 +295,17 @@ public class ThemeSelectionController {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Validation
+        // Validation en temps réel
         Button createButton = (Button) dialog.getDialogPane().lookupButton(createButtonType);
         createButton.setDisable(true);
 
-        // Listeners pour validation
+        // Fonction de validation
         Runnable validation = () -> {
             boolean valid = !themeId.getText().trim().isEmpty() && !themeName.getText().trim().isEmpty();
             createButton.setDisable(!valid);
         };
 
+        // Listeners pour validation automatique
         themeId.textProperty().addListener((obs, oldText, newText) -> validation.run());
         themeName.textProperty().addListener((obs, oldText, newText) -> validation.run());
 
@@ -268,7 +320,7 @@ public class ThemeSelectionController {
                 if (!id.isEmpty() && !name.isEmpty()) {
                     ThemeData newTheme = new ThemeData(id, name, description.isEmpty() ? "Thème personnalisé" : description);
 
-                    // Copier depuis le thème de base
+                    // Copie depuis le thème de base
                     ThemeData baseThemeData = themeManager.getAvailableThemes().get(base);
                     if (baseThemeData != null) {
                         newTheme.copyFrom(baseThemeData);
@@ -283,10 +335,13 @@ public class ThemeSelectionController {
         return dialog.showAndWait();
     }
 
+    /**
+     * Supprime le thème sélectionné après confirmation
+     */
     private void deleteSelectedTheme() {
         if (selectedTheme == null) return;
 
-        // Empêcher la suppression des thèmes par défaut
+        // Empêche la suppression des thèmes par défaut
         if ("classic".equals(selectedTheme) || "legend".equals(selectedTheme)) {
             showAlert("Erreur", "Impossible de supprimer les thèmes par défaut.");
             return;
@@ -310,6 +365,11 @@ public class ThemeSelectionController {
         }
     }
 
+    /**
+     * Affiche une alerte d'information
+     * @param title Titre de l'alerte
+     * @param message Message à afficher
+     */
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);

@@ -1,27 +1,36 @@
+/**
+ * Gestionnaire principal de partie pour le mode classique
+ * Boucle de jeu avec AnimationTimer et gestion des états
+ */
 package com.bomberman.model;
 
 import com.bomberman.model.enums.GameState;
 import com.bomberman.utils.Constants;
 import javafx.animation.AnimationTimer;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
-    private Board board;
-    private Player player;
-    private List<Player> players;
-    private GameState gameState;
-    private AnimationTimer gameLoop;
-    private long lastUpdate;
+    private Board board;                 // Plateau de jeu
+    private Player player;               // Joueur principal
+    private List<Player> players;        // Liste des joueurs (mode multijoueur)
+    private GameState gameState;         // État actuel du jeu
+    private AnimationTimer gameLoop;     // Boucle de jeu principale
+    private long lastUpdate;             // Dernière mise à jour
 
-    // Réduire la fréquence de mise à jour
-    private static final long UPDATE_INTERVAL = Constants.GAME_SPEED * 1_000_000L; // Utilise la constante optimisée
+    // OPTIMISATION: Réduction de la fréquence de mise à jour
+    private static final long UPDATE_INTERVAL = Constants.GAME_SPEED * 1_000_000L;
 
+    /**
+     * Constructeur par défaut (mode solo)
+     */
     public Game() {
         initialize();
     }
 
+    /**
+     * Constructeur avec choix du mode
+     */
     public Game(boolean isMultiplayer) {
         if (isMultiplayer) {
             initializeMultiplayer();
@@ -30,6 +39,9 @@ public class Game {
         }
     }
 
+    /**
+     * Initialisation du mode multijoueur (4 joueurs)
+     */
     private void initializeMultiplayer() {
         board = new Board();
         players = new ArrayList<>();
@@ -41,7 +53,7 @@ public class Game {
         players.add(new Player(1, board.getHeight() - 2));
         players.add(new Player(board.getWidth() - 2, board.getHeight() - 2));
 
-        // Place les joueurs sur le plateau
+        // Placement sur le plateau
         for (Player p : players) {
             board.getCell(p.getX(), p.getY()).setHasPlayer(true);
         }
@@ -49,15 +61,20 @@ public class Game {
         startGameLoopMultiplayer();
     }
 
+    /**
+     * Initialisation du mode solo (1 joueur vs 3 bots)
+     */
     private void initialize() {
         board = new Board();
-        player = board.getPlayer(); // Utilise le joueur du Board
+        player = board.getPlayer(); // Utilise le joueur du plateau
         gameState = GameState.PLAYING;
         board.getCell(player.getX(), player.getY()).setHasPlayer(true);
         startGameLoop();
     }
 
-    // Limitation de la fréquence de mise à jour
+    /**
+     * OPTIMISATION: Boucle de jeu avec limitation de fréquence
+     */
     private void startGameLoop() {
         gameLoop = new AnimationTimer() {
             @Override
@@ -71,6 +88,9 @@ public class Game {
         gameLoop.start();
     }
 
+    /**
+     * Boucle de jeu multijoueur
+     */
     private void startGameLoopMultiplayer() {
         gameLoop = new AnimationTimer() {
             @Override
@@ -84,16 +104,18 @@ public class Game {
         gameLoop.start();
     }
 
-    public List<Player> getPlayers() {
-        return players;
-    }
-
+    /**
+     * Mise à jour du mode solo
+     */
     private void update() {
         if (gameState != GameState.PLAYING) return;
         board.update(player);
         checkGameState();
     }
 
+    /**
+     * Mise à jour du mode multijoueur
+     */
     private void updateMultiplayer() {
         if (gameState != GameState.PLAYING) return;
 
@@ -106,20 +128,26 @@ public class Game {
         checkGameStateMultiplayer();
     }
 
+    /**
+     * Vérification des conditions de fin de partie (mode solo)
+     */
     private void checkGameState() {
         if (!player.isAlive()) {
             gameState = GameState.GAME_OVER;
             gameLoop.stop();
-            // (le reste : passage à l'écran Game Over)
         } else if (board.getBots().stream().noneMatch(PlayerBot::isAlive)) {
+            // Victoire : tous les bots sont morts
             gameState = GameState.VICTORY;
             gameLoop.stop();
-            player.addScore(1000); // +1000 points pour la victoire
+            player.addScore(1000); // Bonus de victoire
             com.bomberman.controller.VictoryController.LAST_SCORE = player.getScore();
             com.bomberman.utils.SceneManager.switchScene("Victory");
         }
     }
 
+    /**
+     * Vérification des conditions de fin de partie (mode multijoueur)
+     */
     private void checkGameStateMultiplayer() {
         boolean anyAlive = players.stream().anyMatch(Player::isAlive);
 
@@ -129,6 +157,9 @@ public class Game {
         }
     }
 
+    /**
+     * Basculement pause/jeu
+     */
     public void pause() {
         if (gameState == GameState.PLAYING) {
             gameState = GameState.PAUSED;
@@ -137,12 +168,17 @@ public class Game {
         }
     }
 
+    /**
+     * Arrêt du jeu
+     */
     public void stop() {
         if (gameLoop != null) {
             gameLoop.stop();
         }
     }
 
+    // Accesseurs
+    public List<Player> getPlayers() { return players; }
     public Board getBoard() { return board; }
     public Player getPlayer() { return player; }
     public GameState getGameState() { return gameState; }

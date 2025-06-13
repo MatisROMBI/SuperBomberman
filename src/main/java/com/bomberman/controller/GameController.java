@@ -1,3 +1,8 @@
+/**
+ * Contrôleur principal du mode de jeu classique (1 joueur vs 3 bots)
+ * Gère les entrées clavier, la boucle de rendu et le menu pause
+ * Implémente les interfaces pour la gestion des fins de partie et du menu pause
+ */
 package com.bomberman.controller;
 
 import com.bomberman.model.Game;
@@ -21,54 +26,67 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class GameController implements GameOverListener, PauseOverlayController.PauseActionListener {
-    @FXML private VBox gameContainer;
-    @FXML private Canvas gameCanvas;
 
-    private Game game;
-    private GameRenderer renderer;
-    private Set<String> pressedKeys;
-    private AnimationTimer renderLoop;
-    private final Music music = new Music();
+    // ===== ÉLÉMENTS DE L'INTERFACE FXML =====
+    @FXML private VBox gameContainer;      // Conteneur principal du jeu
+    @FXML private Canvas gameCanvas;       // Canvas pour le rendu graphique
 
-    // Gestion du menu de pause
-    private StackPane pauseOverlay;
-    private PauseOverlayController pauseController;
-    private boolean isPaused = false;
+    // ===== COMPOSANTS DE JEU =====
+    private Game game;                     // Instance du jeu
+    private GameRenderer renderer;         // Moteur de rendu
+    private Set<String> pressedKeys;       // Ensemble des touches actuellement pressées
+    private AnimationTimer renderLoop;     // Boucle de rendu principal
+    private final Music music = new Music(); // Gestionnaire audio
 
-    // OPTIMISATION: Limiter le taux de rafraichissement
-    private long lastRenderTime = 0;
-    private static final long RENDER_INTERVAL = 16_666_666L; // ~60 FPS en nanosecondes
+    // ===== GESTION DU MENU PAUSE =====
+    private StackPane pauseOverlay;        // Overlay du menu pause
+    private PauseOverlayController pauseController; // Contrôleur du menu pause
+    private boolean isPaused = false;      // État de pause du jeu
 
+    // ===== OPTIMISATION DU RENDU =====
+    private long lastRenderTime = 0;       // Timestamp du dernier rendu
+    private static final long RENDER_INTERVAL = 16_666_666L; // Intervalle pour 60 FPS
+
+    /**
+     * Initialisation du contrôleur appelée automatiquement après chargement FXML
+     */
     @FXML
     private void initialize() {
+        // Création et configuration du jeu
         game = new Game();
-        music.arreterGameOverMusique();
-        music.demarrerMusique();
-        game.getPlayer().setGameOverListener(this);
+        music.arreterGameOverMusique();  // Arrête la musique de game over si elle jouait
+        music.demarrerMusique();         // Démarre la musique de jeu
+        game.getPlayer().setGameOverListener(this); // Configure le callback de fin de partie
+
+        // Initialisation du rendu et des contrôles
         renderer = new GameRenderer(gameCanvas);
         pressedKeys = new HashSet<>();
 
+        // Configuration des systèmes
         setupKeyboardHandling();
         setupPauseOverlay();
         startRenderLoop();
     }
 
     /**
-     * Configuration du menu de pause
+     * Configuration du système de menu pause
+     * Charge l'overlay FXML et l'intègre dans la hiérarchie des composants
      */
     private void setupPauseOverlay() {
         try {
+            // Chargement du FXML du menu pause
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PauseOverlay.fxml"));
             pauseOverlay = loader.load();
             pauseController = loader.getController();
-            pauseController.setActionListener(this);
+            pauseController.setActionListener(this); // Configure les callbacks
 
-            // Ajouter l'overlay au conteneur principal
+            // Intégration dans la hiérarchie des composants
             if (gameContainer.getParent() instanceof StackPane) {
+                // Si déjà dans un StackPane, ajoute directement
                 StackPane parent = (StackPane) gameContainer.getParent();
                 parent.getChildren().add(pauseOverlay);
             } else {
-                // Créer un nouveau StackPane si nécessaire
+                // Crée un nouveau StackPane pour superposer les éléments
                 StackPane stackPane = new StackPane();
                 VBox originalParent = (VBox) gameContainer.getParent();
                 originalParent.getChildren().remove(gameContainer);
@@ -81,42 +99,55 @@ public class GameController implements GameOverListener, PauseOverlayController.
     }
 
     /**
-     * Gestion des événements clavier et focus.
+     * Configuration de la gestion des événements clavier
+     * Met en place les listeners pour les touches pressées et relâchées
      */
     private void setupKeyboardHandling() {
         gameContainer.setFocusTraversable(true);
+
+        // Configuration asynchrone pour s'assurer que la scène est prête
         Platform.runLater(() -> {
             gameContainer.requestFocus();
+
+            // Configuration des listeners au niveau de la scène si disponible
             if (gameContainer.getScene() != null) {
                 gameContainer.getScene().setOnKeyPressed(this::handleKeyPressed);
                 gameContainer.getScene().setOnKeyReleased(this::handleKeyReleased);
             }
+
+            // Configuration des listeners au niveau du conteneur
             gameContainer.setOnKeyPressed(this::handleKeyPressed);
             gameContainer.setOnKeyReleased(this::handleKeyReleased);
         });
+
+        // Clic sur le canvas pour récupérer le focus
         gameCanvas.setOnMouseClicked(e -> gameContainer.requestFocus());
     }
 
-    // Gestion plus efficace des touches
+    /**
+     * Gestion optimisée des touches pressées
+     * Utilise un Set pour éviter les répétitions et traite la pause spécialement
+     * @param event Événement clavier
+     */
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
 
-        // Gestion spéciale de la touche ESCAPE pour la pause
+        // Gestion spéciale de la touche ÉCHAP pour la pause
         if ("ESCAPE".equals(keyCode)) {
             togglePause();
             event.consume();
             return;
         }
 
-        // Ne traiter les autres touches que si le jeu n'est pas en pause
-        if (!isPaused && pressedKeys.add(keyCode)) {
+        // Traitement des autres touches seulement si pas en pause
+        if (!isPaused && pressedKeys.add(keyCode)) {  // add() renvoie true si nouvel élément
             processKeyAction(keyCode);
         }
         event.consume();
     }
 
     /**
-     * Basculer entre pause et jeu
+     * Basculement entre l'état de pause et de jeu
      */
     private void togglePause() {
         if (pauseController != null) {
@@ -129,29 +160,36 @@ public class GameController implements GameOverListener, PauseOverlayController.
     }
 
     /**
-     * NOUVEAUTÉ: Mettre le jeu en pause
+     * Met le jeu en pause
+     * Arrête la musique et affiche le menu pause
      */
     private void pauseGame() {
         isPaused = true;
-        game.pause();
-        music.arreterMusique();
-        pauseController.showPause();
+        game.pause();                    // Met le jeu en pause
+        music.arreterMusique();          // Arrête la musique
+        pauseController.showPause();     // Affiche le menu pause
     }
 
     /**
-     * NOUVEAUTÉ: Reprendre le jeu
+     * Reprend le jeu depuis la pause
+     * Relance la musique et cache le menu pause
      */
     private void resumeGame() {
         isPaused = false;
-        game.pause(); // Bascule l'état de pause
-        music.demarrerMusique();
-        pauseController.hidePause();
-        gameContainer.requestFocus();
+        game.pause();                    // Bascule l'état de pause du jeu
+        music.demarrerMusique();         // Relance la musique
+        pauseController.hidePause();     // Cache le menu pause
+        gameContainer.requestFocus();    // Redonne le focus pour les contrôles
     }
 
-    // NOUVELLE MÉTHODE: Séparer le traitement des touches
+    /**
+     * Traitement des actions correspondant aux touches pressées
+     * Gère les mouvements du joueur et les actions (pose de bombe)
+     * @param keyCode Code de la touche pressée
+     */
     private void processKeyAction(String keyCode) {
         switch (keyCode) {
+            // Mouvements - Support ZQSD et flèches directionnelles
             case "UP": case "Z":
                 game.getPlayer().move(Direction.UP, game.getBoard(), game.getGameState());
                 break;
@@ -164,76 +202,108 @@ public class GameController implements GameOverListener, PauseOverlayController.
             case "RIGHT": case "D":
                 game.getPlayer().move(Direction.RIGHT, game.getBoard(), game.getGameState());
                 break;
+
+            // Action - Pose de bombe
             case "SPACE":
                 game.getPlayer().placeBomb(game.getBoard(), game.getGameState());
                 break;
+
             default:
+                // Touche non gérée, ne fait rien
                 break;
         }
     }
 
+    /**
+     * Gestion du relâchement des touches
+     * Retire la touche de l'ensemble des touches pressées
+     * @param event Événement clavier
+     */
     private void handleKeyReleased(KeyEvent event) {
         pressedKeys.remove(event.getCode().toString());
     }
 
-    // OPTIMISATION: Limiter le taux de rendu
+    /**
+     * Démarre la boucle de rendu optimisée à 60 FPS
+     * Utilise un AnimationTimer pour synchroniser avec le rafraîchissement d'écran
+     */
     private void startRenderLoop() {
         renderLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // Limiter à ~60 FPS
+                // Limitation à 60 FPS pour optimiser les performances
                 if (now - lastRenderTime >= RENDER_INTERVAL) {
-                    renderer.render(game);
+                    renderer.render(game);  // Rendu du jeu
                     lastRenderTime = now;
                 }
 
-                if (game.getGameState() == GameState.GAME_OVER || game.getGameState() == GameState.VICTORY) {
+                // Vérification des conditions d'arrêt
+                if (game.getGameState() == GameState.GAME_OVER ||
+                        game.getGameState() == GameState.VICTORY) {
                     music.arreterMusique();
-                    stop();
+                    stop(); // Arrête l'AnimationTimer
                 }
             }
         };
         renderLoop.start();
     }
 
+    /**
+     * Nettoyage des ressources du contrôleur
+     * Arrête la boucle de rendu et libère les ressources du jeu
+     */
     public void cleanup() {
         if (renderLoop != null) renderLoop.stop();
         if (game != null) game.stop();
     }
 
-    // Callback fin de partie
+    // ===== IMPLÉMENTATION DE GAMEOVERLISTENER =====
+
+    /**
+     * Callback appelé quand le joueur perd toutes ses vies
+     * Déclenche la transition vers l'écran Game Over
+     * @param score Score final du joueur
+     */
     @Override
     public void onGameOver(int score) {
         music.arreterMusique();
         com.bomberman.controller.GameOverController.setLastScore(score);
-        music.demarrerGameOverMusique();
+        music.demarrerGameOverMusique();  // Musique spéciale game over
         SceneManager.switchScene("GameOver");
     }
 
-    // ======================================================================
-    // NOUVEAUTÉ: Implémentation des actions du menu de pause
-    // ======================================================================
+    // ===== IMPLÉMENTATION DE PAUSEACTIONLISTENER =====
 
+    /**
+     * Action de reprise depuis le menu pause
+     */
     @Override
     public void onResume() {
         resumeGame();
     }
 
+    /**
+     * Action de redémarrage depuis le menu pause
+     * Recrée une nouvelle partie complètement
+     */
     @Override
     public void onRestart() {
-        // Arrêter le jeu actuel
-        cleanup();
+        cleanup();  // Nettoie la partie actuelle
 
-        // Redémarrer une nouvelle partie
+        // Création d'une nouvelle partie
         game = new Game();
         game.getPlayer().setGameOverListener(this);
         music.demarrerMusique();
         startRenderLoop();
 
+        // Réinitialisation des états
         isPaused = false;
         gameContainer.requestFocus();
     }
 
+    /**
+     * Action de retour au menu principal depuis le menu pause
+     */
     @Override
     public void onMainMenu() {
         cleanup();
