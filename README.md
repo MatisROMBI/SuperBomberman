@@ -4,15 +4,15 @@ Un jeu Bomberman moderne développé en JavaFX avec plusieurs modes de jeu, un s
 
 ## 📋 Table des matières
 
-- [Aperçu du projet]
-- [Fonctionnalités]
-- [Installation]
-- [Modes de jeu]
-- [Contrôles]
-- [Système de thèmes]
-- [Éditeur de niveaux]
-- [Architecture technique]
-- [Contributions]
+- Aperçu du projet
+- Fonctionnalités
+- Installation
+- Modes de jeu
+- Contrôles
+- Système de thèmes
+- Éditeur de niveaux
+- Architecture technique
+- Contributions
 
 ## 🎯 Aperçu du projet
 
