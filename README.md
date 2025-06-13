@@ -1,56 +1,213 @@
-# Super Bomberman
+# 🎮 Bomberman JavaFX
 
-## Tests Unitaires
+Un jeu Bomberman moderne développé en JavaFX avec plusieurs modes de jeu, un système de thèmes personnalisables et un éditeur de niveaux intégré.
 
-Ce projet utilise JUnit 5 et Mockito pour les tests unitaires. Les tests sont organisés dans le dossier `src/test/java/com/bomberman/model/`.
+## 📋 Table des matières
 
-### Structure des Tests
+- [Aperçu du projet](#aperçu-du-projet)
+- [Fonctionnalités](#fonctionnalités)
+- [Installation](#installation)
+- [Modes de jeu](#modes-de-jeu)
+- [Contrôles](#contrôles)
+- [Système de thèmes](#système-de-thèmes)
+- [Éditeur de niveaux](#éditeur-de-niveaux)
+- [Architecture technique](#architecture-technique)
+- [Captures d'écran](#captures-décran)
+- [Contributions](#contributions)
 
-- `BoardTest.java` : Tests pour la classe Board
-  - Test d'initialisation du plateau
-  - Test des dimensions du plateau
-  - Test d'accès aux cellules
-  - Test de validation des positions
+## 🎯 Aperçu du projet
 
-- `BombTest.java` : Tests pour la classe Bomb
-  - Test d'initialisation de la bombe
-  - Test de l'explosion
-  - Test de la progression
-  - Test du temps restant
+Ce projet est une implémentation moderne du jeu classique Bomberman, développé en JavaFX avec une architecture modulaire et des fonctionnalités avancées. Le jeu propose plusieurs modes de jeu, un système de thèmes personnalisables et un éditeur de niveaux pour créer ses propres maps.
 
-- `GameTest.java` : Tests pour la classe Game
-  - Test d'initialisation du jeu
-  - Test de la pause/reprise
-  - Test de l'arrêt du jeu
-  - Test du mode multijoueur
+## ✨ Fonctionnalités
 
-- `PlayerTest.java` : Tests pour la classe Player
-  - Test d'initialisation du joueur
-  - Test des mouvements
-  - Test du score
-  - Test des bombes
+### 🎮 Modes de jeu
+- **Robot Survivor** : Mode solo contre des bots IA
+- **Legend 1v1** : Mode compétitif pour 2 joueurs humains
+- **Maps personnalisées** : Jouez sur vos propres créations
 
-### Exécution des Tests
+### 🎨 Système de thèmes
+- **4 thèmes intégrés** : Classic, Legend, Retro, Futuristic
+- **Thèmes personnalisables** : Créez vos propres thèmes
+- **Sprites adaptatifs** : Chaque thème modifie l'apparence complète du jeu
 
-Pour exécuter les tests, utilisez la commande Maven suivante :
+### 🛠️ Éditeur de niveaux
+- **Interface intuitive** : Créez facilement vos maps
+- **Système de sauvegarde** : Gardez vos créations
+- **Validation automatique** : Zones de spawn protégées
 
+### 🎵 Système audio
+- **Musiques thématiques** : Différentes pour chaque mode
+- **Effets sonores** : Explosions, victoire, défaite
+- **Contrôle du volume** : Activation/désactivation
+
+### ⚙️ Fonctionnalités techniques
+- **Menu de pause** : Avec reprendre, recommencer, quitter
+- **Système de score** : Points pour destructions et victoires
+- **Power-ups** : Vie, portée, vitesse, bombes supplémentaires
+- **Animations fluides** : 60 FPS optimisé
+
+## 📦 Installation
+
+### Prérequis
+- **Java 11+** (recommandé : Java 17)
+- **JavaFX 11+** (si non inclus dans votre JDK)
+- **Maven** (pour la compilation)
+
+### Étapes d'installation
+
+1. **Cloner le projet**
 ```bash
-./mvnw test
+git clone https://github.com/votre-username/bomberman-javafx.git
+cd bomberman-javafx
 ```
 
-Pour exécuter un test spécifique :
-
+2. **Compiler le projet**
 ```bash
-./mvnw test -Dtest=BoardTest
+mvn clean compile
 ```
 
-### Configuration
+3. **Lancer le jeu**
+```bash
+mvn javafx:run
+```
 
-Les dépendances de test sont configurées dans le fichier `pom.xml` :
+Ou si vous utilisez un IDE comme IntelliJ IDEA ou Eclipse, importez le projet Maven et lancez la classe `Main.java`.
 
-- JUnit Jupiter 5.9.2
-- Mockito 5.3.1
+## 🎮 Modes de jeu
 
-### Rapports de Test
+### 🤖 Robot Survivor
+- **Objectif** : Survivre et éliminer tous les bots
+- **Joueurs** : 1 joueur humain vs 3 bots IA
+- **Scoring** : Points pour chaque bot éliminé, pour chaque bloc détruit et pour chaque bonus récupéré
 
-Les rapports de test sont générés dans le dossier `target/surefire-reports/` après l'exécution des tests. 
+### ⚔️ Legend 1v1
+- **Objectif** : Éliminer l'autre joueur ou coopérer contre les ennemis
+- **Joueurs** : 2 joueurs humains + ennemis IA
+- **Particularités** : 
+  - 6 vies par joueur
+  - Thème visuel glacial
+  - Ennemis IA améliorés (Bomber et Yellow)
+  - Scoring compétitif
+
+## 🎮 Contrôles
+
+### Mode Robot Survivor
+- **Déplacement** : `ZQSD` ou `Flèches directionnelles`
+- **Poser bombe** : `Espace`
+- **Pause** : `Échap`
+
+### Mode Legend 1v1
+- **Joueur 1 (Blanc)** : `ZQSD` + `R` (bombe)
+- **Joueur 2 (Noir)** : `IJKL` + `P` (bombe)
+- **Pause** : `Échap`
+
+### Éditeur de niveaux
+- **Clic gauche** : Placer l'élément sélectionné
+- **Clic droit** : Effacer la case
+- **Glisser** : Dessiner en continu
+
+## 🎨 Système de thèmes
+
+### Thèmes disponibles
+
+| Thème | Description | Particularités |
+|-------|-------------|----------------|
+| **Classic** | Style Bomberman original | Sprites traditionnels, couleurs vives |
+| **Legend** | Thème glacial | Ninjas, blocs de glace, power-ups neige |
+| **Retro** | Style pixel art old-school | Graphismes 8-bit |
+| **Futuristic** | Thème sci-fi | Design moderne et futuriste |
+
+### Création de thèmes personnalisés
+1. Accédez au menu **Thèmes**
+2. Cliquez sur **Créer un thème**
+3. Choisissez un thème de base
+4. Personnalisez les sprites et couleurs
+5. Sauvegardez votre création
+
+## 🛠️ Éditeur de niveaux
+
+### Outils disponibles
+- **Vide** : Cases marchables
+- **Mur fixe** : Murs indestructibles
+- **Mur destructible** : Murs cassables
+
+### Fonctionnalités
+- **Sauvegarde/Chargement** : Gardez vos créations
+- **Aperçu en temps réel** : Visualisez votre map
+- **Validation automatique** : Zones de spawn protégées
+- **Export** : Partagez vos maps
+
+### Contraintes
+- Les positions de spawn (coins) sont protégées
+- Au minimum 10 cases jouables requises
+- Dimensions fixes : 15x13 cases
+
+## 🏗️ Architecture technique
+
+### Structure du projet
+```
+src/main/java/com/bomberman/
+├── controller/          # Contrôleurs JavaFX (MVC)
+├── model/              # Logique métier et entités
+│   ├── enums/         # Énumérations (Direction, CellType, etc.)
+│   └── ...
+├── utils/              # Utilitaires (Constants, Managers)
+├── view/               # Rendu et affichage
+└── Main.java           # Point d'entrée
+
+src/main/resources/
+├── fxml/               # Interfaces utilisateur
+├── images/             # Sprites et graphismes
+├── sons/               # Musiques et effets sonores
+└── css/                # Feuilles de style
+```
+
+### Patterns utilisés
+- **MVC** : Séparation claire des responsabilités
+- **Singleton** : Gestionnaires (ThemeManager, MapManager)
+- **Observer** : Système d'événements de jeu
+- **Strategy** : IA des différents ennemis
+
+### Technologies
+- **JavaFX** : Interface utilisateur et rendu
+- **FXML** : Déclaration des interfaces
+- **CSS** : Styling et thèmes visuels
+- **Sérialisation Java** : Sauvegarde des maps et thèmes
+
+## 🎯 Fonctionnalités avancées
+
+### Intelligence Artificielle
+- **Pathfinding** : Les bots trouvent le chemin optimal
+- **Comportements adaptatifs** : Différentes stratégies par type d'ennemi
+- **Anti-blocage** : Système pour éviter les situations bloquées
+
+### Optimisations
+- **Rendu 60 FPS** : Affichage fluide optimisé
+- **Cache d'images** : Chargement intelligent des sprites
+- **Positions pré-calculées** : Optimisation des calculs de rendu
+
+### Système de scoring
+- **Blocs détruits** : +50 points
+- **Bots éliminés** : +300 points
+- **Victoire** : +1000 points
+- **Bonus coopération** : Points supplémentaires en Legend
+
+## 👥 Crédits
+
+- **Développement** : Tous les membres du groupe 11 de la SAÉ S2.01 de la promotion 2024/2025 à Aix-en-Provence
+- **Sprites** : Assets Bomberman classiques
+- **Musiques** : Compositions originales et remixes
+- **Inspiration** : SuperBomberman original 
+
+---
+
+### 🏆 Fonctionnalités spéciales
+
+- **Menu de pause** complet avec reprise, recommencer et retour au menu
+- **Système de thèmes** entièrement personnalisable
+- **Éditeur de niveaux** intégré avec validation
+- **Modes de jeu** variés pour solo et multijoueur local
+- **Optimisations** pour un gameplay fluide à 60 FPS
+
+*Amusez-vous bien avec ce Bomberman moderne ! 💣*
