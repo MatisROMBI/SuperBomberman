@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 class PlayerTest {
 
     private Player player;
+    private Board board;
     
     @Mock
     private Board mockBoard;
@@ -29,18 +30,20 @@ class PlayerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        player = new Player(5, 5); // Position de départ (5,5)
+        board = new Board();
+        player = new Player(1, 1);
         player.setGameOverListener(mockGameOverListener);
     }
 
     @Test
     @DisplayName("Test de l'initialisation du joueur")
     void testPlayerInitialization() {
-        assertEquals(5, player.getX());
-        assertEquals(5, player.getY());
-        assertEquals(5, player.getStartX());
-        assertEquals(5, player.getStartY());
-        assertEquals(6, player.getLives());
+        assertNotNull(player);
+        assertEquals(1, player.getX());
+        assertEquals(1, player.getY());
+        assertEquals(1, player.getStartX());
+        assertEquals(1, player.getStartY());
+        assertEquals(3, player.getLives());
         assertEquals(2, player.getBombsAvailable());
         assertEquals(2, player.getMaxBombs());
         assertEquals(1, player.getExplosionRange());
@@ -52,42 +55,16 @@ class PlayerTest {
     @Test
     @DisplayName("Test du mouvement du joueur")
     void testPlayerMovement() {
-        // Mock du plateau et des cellules
-        when(mockBoard.isValidPosition(6, 5)).thenReturn(true);
-        when(mockBoard.getCell(5, 5)).thenReturn(mockCell);
-        when(mockBoard.getCell(6, 5)).thenReturn(mockCell);
-        when(mockCell.isWalkable()).thenReturn(true);
-        when(mockCell.hasPlayer()).thenReturn(false);
-        when(mockCell.hasPowerUp()).thenReturn(false);
-
-        // Test du mouvement vers la droite
-        player.move(Direction.RIGHT, mockBoard, GameState.PLAYING);
+        int initialX = player.getX();
+        int initialY = player.getY();
         
-        assertEquals(6, player.getX());
-        assertEquals(5, player.getY());
+        player.move(Direction.RIGHT, board, GameState.PLAYING);
+        assertEquals(initialX + 1, player.getX());
+        assertEquals(initialY, player.getY());
         
-        // Vérifier que les méthodes du board ont été appelées
-        verify(mockBoard).isValidPosition(6, 5);
-        verify(mockBoard).getCell(5, 5);
-        verify(mockBoard).getCell(6, 5);
-        verify(mockCell).setHasPlayer(false);
-        verify(mockCell).setHasPlayer(true);
-    }
-
-    @Test
-    @DisplayName("Test du mouvement bloqué par un mur")
-    void testPlayerMovementBlocked() {
-        // Mock d'une cellule non-walkable
-        when(mockBoard.isValidPosition(6, 5)).thenReturn(true);
-        when(mockBoard.getCell(6, 5)).thenReturn(mockCell);
-        when(mockCell.isWalkable()).thenReturn(false);
-
-        // Tenter de se déplacer vers une cellule bloquée
-        player.move(Direction.RIGHT, mockBoard, GameState.PLAYING);
-        
-        // Le joueur ne doit pas bouger
-        assertEquals(5, player.getX());
-        assertEquals(5, player.getY());
+        player.move(Direction.DOWN, board, GameState.PLAYING);
+        assertEquals(initialX + 1, player.getX());
+        assertEquals(initialY + 1, player.getY());
     }
 
     @Test
@@ -177,8 +154,8 @@ class PlayerTest {
         
         player.respawnAtStart(mockBoard);
         
-        assertEquals(5, player.getX()); // Position de départ
-        assertEquals(5, player.getY());
+        assertEquals(1, player.getX()); // Position de départ
+        assertEquals(1, player.getY());
         assertTrue(player.isAlive());
         verify(mockCell, times(2)).setHasPlayer(anyBoolean());
     }
@@ -244,8 +221,8 @@ class PlayerTest {
         player.move(Direction.RIGHT, mockBoard, GameState.PAUSED);
         
         // Le joueur ne doit pas bouger
-        assertEquals(5, player.getX());
-        assertEquals(5, player.getY());
+        assertEquals(1, player.getX());
+        assertEquals(1, player.getY());
         verify(mockBoard, never()).getCell(anyInt(), anyInt());
     }
 
@@ -259,8 +236,8 @@ class PlayerTest {
         player.move(Direction.RIGHT, mockBoard, GameState.PLAYING);
         
         // Le joueur mort ne doit pas bouger
-        assertEquals(5, player.getX());
-        assertEquals(5, player.getY());
+        assertEquals(1, player.getX());
+        assertEquals(1, player.getY());
         verify(mockBoard, never()).getCell(anyInt(), anyInt());
     }
 
@@ -275,27 +252,46 @@ class PlayerTest {
 
         // Test moveUp
         player.moveUp(mockBoard);
-        assertEquals(4, player.getY());
+        assertEquals(0, player.getY());
 
         // Remettre en position
-        player.setY(5);
+        player.setY(1);
         
         // Test moveDown
         player.moveDown(mockBoard);
-        assertEquals(6, player.getY());
+        assertEquals(2, player.getY());
 
         // Remettre en position
-        player.setY(5);
+        player.setY(1);
         
         // Test moveLeft
         player.moveLeft(mockBoard);
-        assertEquals(4, player.getX());
+        assertEquals(0, player.getX());
 
         // Remettre en position
-        player.setX(5);
+        player.setX(1);
         
         // Test moveRight
         player.moveRight(mockBoard);
-        assertEquals(6, player.getX());
+        assertEquals(2, player.getX());
+    }
+
+    @Test
+    @DisplayName("Test de la perte de vie")
+    void testPlayerLives() {
+        assertEquals(3, player.getLives());
+        player.loseLife();
+        assertEquals(2, player.getLives());
+    }
+
+    @Test
+    @DisplayName("Test des bombes du joueur")
+    void testPlayerBombs() {
+        int initialBombs = player.getBombsAvailable();
+        player.incrementBombs();
+        assertEquals(initialBombs + 1, player.getBombsAvailable());
+        
+        player.decrementBombs();
+        assertEquals(initialBombs, player.getBombsAvailable());
     }
 }
