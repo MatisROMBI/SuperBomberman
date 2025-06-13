@@ -18,6 +18,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -46,6 +47,34 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     // ===== OPTIMISATION DU RENDU =====
     private long lastRenderTime = 0;
     private static final long RENDER_INTERVAL = 16_666_666L; // 60 FPS
+
+    // ===== IMPLÉMENTATION DE LEGENDGAMEACTIONLISTENER =====
+    public interface LegendGameActionListener {
+        void onStart();
+        void onBack();
+    }
+
+    private LegendGameActionListener actionListener;
+    private Button startButton;
+    private Button backButton;
+    private StackPane legendGame;
+
+    public void setActionListener(LegendGameActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void showLegendGame() {
+        legendGame.setVisible(true);
+        startButton.requestFocus();
+    }
+
+    public void hideLegendGame() {
+        legendGame.setVisible(false);
+    }
+
+    public boolean isLegendGameVisible() {
+        return legendGame.isVisible();
+    }
 
     /**
      * Initialisation du contrôleur Legend

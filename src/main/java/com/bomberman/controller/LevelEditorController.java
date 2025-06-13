@@ -13,6 +13,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.layout.StackPane;
 
 import java.util.List;
 
@@ -51,6 +52,9 @@ public class LevelEditorController {
     private CellType selectedCellType = CellType.EMPTY; // Type de cellule actuellement sélectionné
     private ToggleGroup cellTypeGroup;         // Groupe pour les boutons radio (un seul sélectionné)
     private final MapManager mapManager = new MapManager(); // Gestionnaire pour sauvegarder/charger les maps
+
+    private LevelEditorActionListener actionListener;
+    private StackPane levelEditor;
 
     /**
      * Méthode d'initialisation appelée automatiquement après le chargement du FXML
@@ -407,5 +411,29 @@ public class LevelEditorController {
         alert.setHeaderText(null); // Pas de header
         alert.setContentText(message);
         alert.showAndWait(); // Attendre que l'utilisateur ferme la boîte de dialogue
+    }
+
+    public interface LevelEditorActionListener {
+        void onSave();
+        void onLoad();
+        void onClear();
+        void onBack();
+    }
+
+    public void setActionListener(LevelEditorActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void showLevelEditor() {
+        levelEditor.setVisible(true);
+        saveButton.requestFocus();
+    }
+
+    public void hideLevelEditor() {
+        levelEditor.setVisible(false);
+    }
+
+    public boolean isLevelEditorVisible() {
+        return levelEditor.isVisible();
     }
 }

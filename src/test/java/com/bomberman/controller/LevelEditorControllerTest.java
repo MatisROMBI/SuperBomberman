@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -18,8 +19,11 @@ import org.testfx.framework.junit5.ApplicationTest;
 
 import java.util.Arrays;
 import java.util.List;
+import java.lang.reflect.Field;
 
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LevelEditorControllerTest extends ApplicationTest {
 
@@ -55,28 +59,40 @@ class LevelEditorControllerTest extends ApplicationTest {
     private MapManager mapManager;
     @Mock
     private ToggleGroup cellTypeGroup;
+    @Mock
+    private LevelEditorController.LevelEditorActionListener actionListener;
+    @Mock
+    private StackPane levelEditor;
 
     private LevelEditorController controller;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         controller = new LevelEditorController();
-        // Initialisation des mocks
-        controller.editorContainer = editorContainer;
-        controller.editorCanvas = editorCanvas;
-        controller.mapNameField = mapNameField;
-        controller.existingMapsCombo = existingMapsCombo;
-        controller.saveButton = saveButton;
-        controller.loadButton = loadButton;
-        controller.deleteButton = deleteButton;
-        controller.clearButton = clearButton;
-        controller.backButton = backButton;
-        controller.emptyRadio = emptyRadio;
-        controller.wallRadio = wallRadio;
-        controller.destructibleRadio = destructibleRadio;
-        controller.instructionsLabel = instructionsLabel;
-        when(editorCanvas.getGraphicsContext2D()).thenReturn(gc);
+        
+        // Utilisation de la réflexion pour accéder aux champs privés
+        Field saveButtonField = LevelEditorController.class.getDeclaredField("saveButton");
+        saveButtonField.setAccessible(true);
+        saveButtonField.set(controller, saveButton);
+
+        Field loadButtonField = LevelEditorController.class.getDeclaredField("loadButton");
+        loadButtonField.setAccessible(true);
+        loadButtonField.set(controller, loadButton);
+
+        Field clearButtonField = LevelEditorController.class.getDeclaredField("clearButton");
+        clearButtonField.setAccessible(true);
+        clearButtonField.set(controller, clearButton);
+
+        Field backButtonField = LevelEditorController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        backButtonField.set(controller, backButton);
+
+        Field levelEditorField = LevelEditorController.class.getDeclaredField("levelEditor");
+        levelEditorField.setAccessible(true);
+        levelEditorField.set(controller, levelEditor);
+
+        controller.setActionListener(actionListener);
     }
 
     @Test
@@ -204,5 +220,109 @@ class LevelEditorControllerTest extends ApplicationTest {
         
         // Assert
         assertEquals(CellType.EMPTY, controller.selectedCellType);
+    }
+
+    @Test
+    void testShowLevelEditor() {
+        // Act
+        controller.showLevelEditor();
+        
+        // Assert
+        verify(levelEditor).setVisible(true);
+        verify(saveButton).requestFocus();
+    }
+
+    @Test
+    void testHideLevelEditor() {
+        // Act
+        controller.hideLevelEditor();
+        
+        // Assert
+        verify(levelEditor).setVisible(false);
+    }
+
+    @Test
+    void testSaveButtonAction() throws Exception {
+        // Arrange
+        Field saveButtonField = LevelEditorController.class.getDeclaredField("saveButton");
+        saveButtonField.setAccessible(true);
+        Button saveBtn = (Button) saveButtonField.get(controller);
+        
+        // Act
+        saveBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onSave();
+    }
+
+    @Test
+    void testLoadButtonAction() throws Exception {
+        // Arrange
+        Field loadButtonField = LevelEditorController.class.getDeclaredField("loadButton");
+        loadButtonField.setAccessible(true);
+        Button loadBtn = (Button) loadButtonField.get(controller);
+        
+        // Act
+        loadBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onLoad();
+    }
+
+    @Test
+    void testClearButtonAction() throws Exception {
+        // Arrange
+        Field clearButtonField = LevelEditorController.class.getDeclaredField("clearButton");
+        clearButtonField.setAccessible(true);
+        Button clearBtn = (Button) clearButtonField.get(controller);
+        
+        // Act
+        clearBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onClear();
+    }
+
+    @Test
+    void testBackButtonAction() throws Exception {
+        // Arrange
+        Field backButtonField = LevelEditorController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        Button backBtn = (Button) backButtonField.get(controller);
+        
+        // Act
+        backBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onBack();
+    }
+
+    @Test
+    void testIsLevelEditorVisible() {
+        // Arrange
+        when(levelEditor.isVisible()).thenReturn(true);
+        
+        // Act
+        boolean isVisible = controller.isLevelEditorVisible();
+        
+        // Assert
+        assertTrue(isVisible);
+    }
+
+    @Test
+    void testSetActionListener() throws Exception {
+        // Arrange
+        LevelEditorController.LevelEditorActionListener newListener = mock(LevelEditorController.LevelEditorActionListener.class);
+        
+        // Act
+        controller.setActionListener(newListener);
+        
+        // Assert
+        // Vérifie que le listener a été correctement défini en testant une action
+        Field saveButtonField = LevelEditorController.class.getDeclaredField("saveButton");
+        saveButtonField.setAccessible(true);
+        Button saveBtn = (Button) saveButtonField.get(controller);
+        saveBtn.getOnAction().handle(null);
+        verify(newListener).onSave();
     }
 }

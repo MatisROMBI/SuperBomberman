@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapSelectionControllerTest extends ApplicationTest {
 
@@ -40,23 +42,46 @@ class MapSelectionControllerTest extends ApplicationTest {
     private MapManager mapManager;
     @Mock
     private ToggleGroup gameModeGroup;
+    @Mock
+    private MapSelectionController.MapSelectionActionListener actionListener;
+    @Mock
+    private Button map1Button;
+    @Mock
+    private Button map2Button;
+    @Mock
+    private Button map3Button;
+    @Mock
+    private StackPane mapSelection;
 
     private MapSelectionController controller;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         controller = new MapSelectionController();
-        // Initialisation des mocks
-        controller.mapSelectionContainer = mapSelectionContainer;
-        controller.mapListView = mapListView;
-        controller.mapPreviewArea = mapPreviewArea;
-        controller.mapInfoLabel = mapInfoLabel;
-        controller.playButton = playButton;
-        controller.editButton = editButton;
-        controller.backButton = backButton;
-        controller.classicModeRadio = classicModeRadio;
-        controller.legendModeRadio = legendModeRadio;
+        
+        // Utilisation de la réflexion pour accéder aux champs privés
+        Field map1ButtonField = MapSelectionController.class.getDeclaredField("map1Button");
+        map1ButtonField.setAccessible(true);
+        map1ButtonField.set(controller, map1Button);
+
+        Field map2ButtonField = MapSelectionController.class.getDeclaredField("map2Button");
+        map2ButtonField.setAccessible(true);
+        map2ButtonField.set(controller, map2Button);
+
+        Field map3ButtonField = MapSelectionController.class.getDeclaredField("map3Button");
+        map3ButtonField.setAccessible(true);
+        map3ButtonField.set(controller, map3Button);
+
+        Field backButtonField = MapSelectionController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        backButtonField.set(controller, backButton);
+
+        Field mapSelectionField = MapSelectionController.class.getDeclaredField("mapSelection");
+        mapSelectionField.setAccessible(true);
+        mapSelectionField.set(controller, mapSelection);
+
+        controller.setActionListener(actionListener);
     }
 
     @Test
@@ -172,5 +197,109 @@ class MapSelectionControllerTest extends ApplicationTest {
         
         // Assert
         verify(playButton).setDisable(false);
+    }
+
+    @Test
+    void testShowMapSelection() {
+        // Act
+        controller.showMapSelection();
+        
+        // Assert
+        verify(mapSelection).setVisible(true);
+        verify(map1Button).requestFocus();
+    }
+
+    @Test
+    void testHideMapSelection() {
+        // Act
+        controller.hideMapSelection();
+        
+        // Assert
+        verify(mapSelection).setVisible(false);
+    }
+
+    @Test
+    void testMap1ButtonAction() throws Exception {
+        // Arrange
+        Field map1ButtonField = MapSelectionController.class.getDeclaredField("map1Button");
+        map1ButtonField.setAccessible(true);
+        Button map1Btn = (Button) map1ButtonField.get(controller);
+        
+        // Act
+        map1Btn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onMapSelected(1);
+    }
+
+    @Test
+    void testMap2ButtonAction() throws Exception {
+        // Arrange
+        Field map2ButtonField = MapSelectionController.class.getDeclaredField("map2Button");
+        map2ButtonField.setAccessible(true);
+        Button map2Btn = (Button) map2ButtonField.get(controller);
+        
+        // Act
+        map2Btn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onMapSelected(2);
+    }
+
+    @Test
+    void testMap3ButtonAction() throws Exception {
+        // Arrange
+        Field map3ButtonField = MapSelectionController.class.getDeclaredField("map3Button");
+        map3ButtonField.setAccessible(true);
+        Button map3Btn = (Button) map3ButtonField.get(controller);
+        
+        // Act
+        map3Btn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onMapSelected(3);
+    }
+
+    @Test
+    void testBackButtonAction() throws Exception {
+        // Arrange
+        Field backButtonField = MapSelectionController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        Button backBtn = (Button) backButtonField.get(controller);
+        
+        // Act
+        backBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onBack();
+    }
+
+    @Test
+    void testIsMapSelectionVisible() {
+        // Arrange
+        when(mapSelection.isVisible()).thenReturn(true);
+        
+        // Act
+        boolean isVisible = controller.isMapSelectionVisible();
+        
+        // Assert
+        assertTrue(isVisible);
+    }
+
+    @Test
+    void testSetActionListener() throws Exception {
+        // Arrange
+        MapSelectionController.MapSelectionActionListener newListener = mock(MapSelectionController.MapSelectionActionListener.class);
+        
+        // Act
+        controller.setActionListener(newListener);
+        
+        // Assert
+        // Vérifie que le listener a été correctement défini en testant une action
+        Field map1ButtonField = MapSelectionController.class.getDeclaredField("map1Button");
+        map1ButtonField.setAccessible(true);
+        Button map1Btn = (Button) map1ButtonField.get(controller);
+        map1Btn.getOnAction().handle(null);
+        verify(newListener).onMapSelected(1);
     }
 }

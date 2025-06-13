@@ -11,6 +11,7 @@ import com.bomberman.utils.SceneManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 
 import java.util.List;
 
@@ -26,11 +27,17 @@ public class MapSelectionController {
     @FXML private Button backButton;             // Bouton retour menu principal
     @FXML private RadioButton classicModeRadio; // Mode Robot Survivor
     @FXML private RadioButton legendModeRadio;   // Mode Legend 1v1
+    @FXML private StackPane mapSelection;
 
     // ===== GESTIONNAIRES ET ÉTAT =====
     private final MapManager mapManager = new MapManager(); // Gestionnaire de cartes
     private ToggleGroup gameModeGroup;                      // Groupe des boutons radio
     private String selectedGameMode = "classic";           // Mode sélectionné par défaut
+
+    private MapSelectionActionListener actionListener;
+    private Button map1Button;
+    private Button map2Button;
+    private Button map3Button;
 
     /**
      * Initialisation du contrôleur de sélection de cartes
@@ -276,5 +283,22 @@ public class MapSelectionController {
         public static boolean hasCustomMap() {
             return selectedCustomMap != null;
         }
+    }
+
+    public void setActionListener(MapSelectionActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void showMapSelection() {
+        mapSelection.setVisible(true);
+        map1Button.requestFocus();
+    }
+
+    public void hideMapSelection() {
+        mapSelection.setVisible(false);
+    }
+
+    public boolean isMapSelectionVisible() {
+        return mapSelection.isVisible();
     }
 }

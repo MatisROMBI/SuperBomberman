@@ -1,17 +1,19 @@
 package com.bomberman.controller;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.testfx.framework.junit5.ApplicationTest;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-class PauseOverlayControllerTest extends ApplicationTest {
+class PauseOverlayControllerTest {
 
     @Mock
     private PauseOverlayController.PauseActionListener actionListener;
@@ -27,14 +29,27 @@ class PauseOverlayControllerTest extends ApplicationTest {
     private PauseOverlayController controller;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         controller = new PauseOverlayController();
-        // Initialisation des mocks
-        controller.resumeButton = resumeButton;
-        controller.restartButton = restartButton;
-        controller.mainMenuButton = mainMenuButton;
-        controller.pauseOverlay = pauseOverlay;
+        
+        // Utilisation de la réflexion pour accéder aux champs privés
+        Field resumeButtonField = PauseOverlayController.class.getDeclaredField("resumeButton");
+        resumeButtonField.setAccessible(true);
+        resumeButtonField.set(controller, resumeButton);
+
+        Field restartButtonField = PauseOverlayController.class.getDeclaredField("restartButton");
+        restartButtonField.setAccessible(true);
+        restartButtonField.set(controller, restartButton);
+
+        Field mainMenuButtonField = PauseOverlayController.class.getDeclaredField("mainMenuButton");
+        mainMenuButtonField.setAccessible(true);
+        mainMenuButtonField.set(controller, mainMenuButton);
+
+        Field pauseOverlayField = PauseOverlayController.class.getDeclaredField("pauseOverlay");
+        pauseOverlayField.setAccessible(true);
+        pauseOverlayField.set(controller, pauseOverlay);
+
         controller.setActionListener(actionListener);
     }
 
@@ -58,27 +73,42 @@ class PauseOverlayControllerTest extends ApplicationTest {
     }
 
     @Test
-    void testResumeButtonAction() {
+    void testResumeButtonAction() throws Exception {
+        // Arrange
+        Field resumeButtonField = PauseOverlayController.class.getDeclaredField("resumeButton");
+        resumeButtonField.setAccessible(true);
+        Button resumeBtn = (Button) resumeButtonField.get(controller);
+        
         // Act
-        controller.resumeButton.getOnAction().handle(null);
+        resumeBtn.getOnAction().handle(null);
         
         // Assert
         verify(actionListener).onResume();
     }
 
     @Test
-    void testRestartButtonAction() {
+    void testRestartButtonAction() throws Exception {
+        // Arrange
+        Field restartButtonField = PauseOverlayController.class.getDeclaredField("restartButton");
+        restartButtonField.setAccessible(true);
+        Button restartBtn = (Button) restartButtonField.get(controller);
+        
         // Act
-        controller.restartButton.getOnAction().handle(null);
+        restartBtn.getOnAction().handle(null);
         
         // Assert
         verify(actionListener).onRestart();
     }
 
     @Test
-    void testMainMenuButtonAction() {
+    void testMainMenuButtonAction() throws Exception {
+        // Arrange
+        Field mainMenuButtonField = PauseOverlayController.class.getDeclaredField("mainMenuButton");
+        mainMenuButtonField.setAccessible(true);
+        Button mainMenuBtn = (Button) mainMenuButtonField.get(controller);
+        
         // Act
-        controller.mainMenuButton.getOnAction().handle(null);
+        mainMenuBtn.getOnAction().handle(null);
         
         // Assert
         verify(actionListener).onMainMenu();
@@ -97,7 +127,7 @@ class PauseOverlayControllerTest extends ApplicationTest {
     }
 
     @Test
-    void testSetActionListener() {
+    void testSetActionListener() throws Exception {
         // Arrange
         PauseOverlayController.PauseActionListener newListener = mock(PauseOverlayController.PauseActionListener.class);
         
@@ -106,7 +136,10 @@ class PauseOverlayControllerTest extends ApplicationTest {
         
         // Assert
         // Vérifie que le listener a été correctement défini en testant une action
-        controller.resumeButton.getOnAction().handle(null);
+        Field resumeButtonField = PauseOverlayController.class.getDeclaredField("resumeButton");
+        resumeButtonField.setAccessible(true);
+        Button resumeBtn = (Button) resumeButtonField.get(controller);
+        resumeBtn.getOnAction().handle(null);
         verify(newListener).onResume();
     }
 }

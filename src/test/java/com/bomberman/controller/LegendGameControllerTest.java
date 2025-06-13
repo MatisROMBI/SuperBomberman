@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LegendGameControllerTest extends ApplicationTest {
 
@@ -38,13 +39,37 @@ class LegendGameControllerTest extends ApplicationTest {
     private Player player1;
     @Mock
     private Player player2;
+    @Mock
+    private LegendGameController.LegendGameActionListener actionListener;
+    @Mock
+    private Button startButton;
+    @Mock
+    private Button backButton;
+    @Mock
+    private StackPane legendGame;
 
     private LegendGameController controller;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         controller = new LegendGameController();
+        
+        // Utilisation de la réflexion pour accéder aux champs privés
+        Field startButtonField = LegendGameController.class.getDeclaredField("startButton");
+        startButtonField.setAccessible(true);
+        startButtonField.set(controller, startButton);
+
+        Field backButtonField = LegendGameController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        backButtonField.set(controller, backButton);
+
+        Field legendGameField = LegendGameController.class.getDeclaredField("legendGame");
+        legendGameField.setAccessible(true);
+        legendGameField.set(controller, legendGame);
+
+        controller.setActionListener(actionListener);
+
         // Initialisation des mocks
         controller.gameContainer = gameContainer;
         controller.gameCanvas = gameCanvas;
@@ -243,5 +268,81 @@ class LegendGameControllerTest extends ApplicationTest {
         
         // Assert
         verify(SceneManager.class).switchScene("MainMenu");
+    }
+
+    @Test
+    void testShowLegendGame() {
+        // Act
+        controller.showLegendGame();
+        
+        // Assert
+        verify(legendGame).setVisible(true);
+        verify(startButton).requestFocus();
+    }
+
+    @Test
+    void testHideLegendGame() {
+        // Act
+        controller.hideLegendGame();
+        
+        // Assert
+        verify(legendGame).setVisible(false);
+    }
+
+    @Test
+    void testStartButtonAction() throws Exception {
+        // Arrange
+        Field startButtonField = LegendGameController.class.getDeclaredField("startButton");
+        startButtonField.setAccessible(true);
+        Button startBtn = (Button) startButtonField.get(controller);
+        
+        // Act
+        startBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onStart();
+    }
+
+    @Test
+    void testBackButtonAction() throws Exception {
+        // Arrange
+        Field backButtonField = LegendGameController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        Button backBtn = (Button) backButtonField.get(controller);
+        
+        // Act
+        backBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onBack();
+    }
+
+    @Test
+    void testIsLegendGameVisible() {
+        // Arrange
+        when(legendGame.isVisible()).thenReturn(true);
+        
+        // Act
+        boolean isVisible = controller.isLegendGameVisible();
+        
+        // Assert
+        assertTrue(isVisible);
+    }
+
+    @Test
+    void testSetActionListener() throws Exception {
+        // Arrange
+        LegendGameController.LegendGameActionListener newListener = mock(LegendGameController.LegendGameActionListener.class);
+        
+        // Act
+        controller.setActionListener(newListener);
+        
+        // Assert
+        // Vérifie que le listener a été correctement défini en testant une action
+        Field startButtonField = LegendGameController.class.getDeclaredField("startButton");
+        startButtonField.setAccessible(true);
+        Button startBtn = (Button) startButtonField.get(controller);
+        startBtn.getOnAction().handle(null);
+        verify(newListener).onStart();
     }
 }

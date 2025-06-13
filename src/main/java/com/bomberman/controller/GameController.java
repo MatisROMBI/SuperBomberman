@@ -20,6 +20,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -46,6 +47,20 @@ public class GameController implements GameOverListener, PauseOverlayController.
     // ===== OPTIMISATION DU RENDU =====
     private long lastRenderTime = 0;       // Timestamp du dernier rendu
     private static final long RENDER_INTERVAL = 16_666_666L; // Intervalle pour 60 FPS
+
+    public interface GameActionListener {
+        void onPause();
+        void onResume();
+        void onRestart();
+        void onMainMenu();
+    }
+
+    private GameActionListener actionListener;
+    private Button pauseButton;
+    private Button resumeButton;
+    private Button restartButton;
+    private Button mainMenuButton;
+    private StackPane game;
 
     /**
      * Initialisation du contrôleur appelée automatiquement après chargement FXML
@@ -309,5 +324,22 @@ public class GameController implements GameOverListener, PauseOverlayController.
         cleanup();
         music.arreterMusique();
         SceneManager.switchScene("MainMenu");
+    }
+
+    public void setActionListener(GameActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void showGame() {
+        game.setVisible(true);
+        pauseButton.requestFocus();
+    }
+
+    public void hideGame() {
+        game.setVisible(false);
+    }
+
+    public boolean isGameVisible() {
+        return game.isVisible();
     }
 }

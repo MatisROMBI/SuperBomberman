@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ThemeSelectionControllerTest extends ApplicationTest {
 
@@ -54,30 +55,46 @@ class ThemeSelectionControllerTest extends ApplicationTest {
     private ImageView powerUpPreview;
     @Mock
     private ThemeManager themeManager;
+    @Mock
+    private ThemeSelectionController.ThemeSelectionActionListener actionListener;
+    @Mock
+    private Button classicThemeButton;
+    @Mock
+    private Button modernThemeButton;
+    @Mock
+    private Button retroThemeButton;
+    @Mock
+    private StackPane themeSelection;
 
     private ThemeSelectionController controller;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         controller = new ThemeSelectionController();
-        // Initialisation des mocks
-        controller.themeContainer = themeContainer;
-        controller.themeListView = themeListView;
-        controller.themeNameLabel = themeNameLabel;
-        controller.themeDescriptionLabel = themeDescriptionLabel;
-        controller.spritePreviewGrid = spritePreviewGrid;
-        controller.applyThemeButton = applyThemeButton;
-        controller.createThemeButton = createThemeButton;
-        controller.deleteThemeButton = deleteThemeButton;
-        controller.backButton = backButton;
-        controller.playerPreview1 = playerPreview1;
-        controller.playerPreview2 = playerPreview2;
-        controller.enemyPreview1 = enemyPreview1;
-        controller.enemyPreview2 = enemyPreview2;
-        controller.bombPreview = bombPreview;
-        controller.wallPreview = wallPreview;
-        controller.powerUpPreview = powerUpPreview;
+        
+        // Utilisation de la réflexion pour accéder aux champs privés
+        Field classicThemeButtonField = ThemeSelectionController.class.getDeclaredField("classicThemeButton");
+        classicThemeButtonField.setAccessible(true);
+        classicThemeButtonField.set(controller, classicThemeButton);
+
+        Field modernThemeButtonField = ThemeSelectionController.class.getDeclaredField("modernThemeButton");
+        modernThemeButtonField.setAccessible(true);
+        modernThemeButtonField.set(controller, modernThemeButton);
+
+        Field retroThemeButtonField = ThemeSelectionController.class.getDeclaredField("retroThemeButton");
+        retroThemeButtonField.setAccessible(true);
+        retroThemeButtonField.set(controller, retroThemeButton);
+
+        Field backButtonField = ThemeSelectionController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        backButtonField.set(controller, backButton);
+
+        Field themeSelectionField = ThemeSelectionController.class.getDeclaredField("themeSelection");
+        themeSelectionField.setAccessible(true);
+        themeSelectionField.set(controller, themeSelection);
+
+        controller.setActionListener(actionListener);
     }
 
     @Test
@@ -202,5 +219,109 @@ class ThemeSelectionControllerTest extends ApplicationTest {
         verify(bombPreview).setImage(null);
         verify(wallPreview).setImage(null);
         verify(powerUpPreview).setImage(null);
+    }
+
+    @Test
+    void testShowThemeSelection() {
+        // Act
+        controller.showThemeSelection();
+        
+        // Assert
+        verify(themeSelection).setVisible(true);
+        verify(classicThemeButton).requestFocus();
+    }
+
+    @Test
+    void testHideThemeSelection() {
+        // Act
+        controller.hideThemeSelection();
+        
+        // Assert
+        verify(themeSelection).setVisible(false);
+    }
+
+    @Test
+    void testClassicThemeButtonAction() throws Exception {
+        // Arrange
+        Field classicThemeButtonField = ThemeSelectionController.class.getDeclaredField("classicThemeButton");
+        classicThemeButtonField.setAccessible(true);
+        Button classicThemeBtn = (Button) classicThemeButtonField.get(controller);
+        
+        // Act
+        classicThemeBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onThemeSelected("classic");
+    }
+
+    @Test
+    void testModernThemeButtonAction() throws Exception {
+        // Arrange
+        Field modernThemeButtonField = ThemeSelectionController.class.getDeclaredField("modernThemeButton");
+        modernThemeButtonField.setAccessible(true);
+        Button modernThemeBtn = (Button) modernThemeButtonField.get(controller);
+        
+        // Act
+        modernThemeBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onThemeSelected("modern");
+    }
+
+    @Test
+    void testRetroThemeButtonAction() throws Exception {
+        // Arrange
+        Field retroThemeButtonField = ThemeSelectionController.class.getDeclaredField("retroThemeButton");
+        retroThemeButtonField.setAccessible(true);
+        Button retroThemeBtn = (Button) retroThemeButtonField.get(controller);
+        
+        // Act
+        retroThemeBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onThemeSelected("retro");
+    }
+
+    @Test
+    void testBackButtonAction() throws Exception {
+        // Arrange
+        Field backButtonField = ThemeSelectionController.class.getDeclaredField("backButton");
+        backButtonField.setAccessible(true);
+        Button backBtn = (Button) backButtonField.get(controller);
+        
+        // Act
+        backBtn.getOnAction().handle(null);
+        
+        // Assert
+        verify(actionListener).onBack();
+    }
+
+    @Test
+    void testIsThemeSelectionVisible() {
+        // Arrange
+        when(themeSelection.isVisible()).thenReturn(true);
+        
+        // Act
+        boolean isVisible = controller.isThemeSelectionVisible();
+        
+        // Assert
+        assertTrue(isVisible);
+    }
+
+    @Test
+    void testSetActionListener() throws Exception {
+        // Arrange
+        ThemeSelectionController.ThemeSelectionActionListener newListener = mock(ThemeSelectionController.ThemeSelectionActionListener.class);
+        
+        // Act
+        controller.setActionListener(newListener);
+        
+        // Assert
+        // Vérifie que le listener a été correctement défini en testant une action
+        Field classicThemeButtonField = ThemeSelectionController.class.getDeclaredField("classicThemeButton");
+        classicThemeButtonField.setAccessible(true);
+        Button classicThemeBtn = (Button) classicThemeButtonField.get(controller);
+        classicThemeBtn.getOnAction().handle(null);
+        verify(newListener).onThemeSelected("classic");
     }
 }

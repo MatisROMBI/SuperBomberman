@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.util.Map;
@@ -45,6 +46,18 @@ public class ThemeSelectionController {
     // ===== GESTIONNAIRE ET ÉTAT =====
     private final ThemeManager themeManager = ThemeManager.getInstance();
     private String selectedTheme;                // Thème actuellement sélectionné
+
+    // New fields for the ThemeSelectionActionListener
+    public interface ThemeSelectionActionListener {
+        void onThemeSelected(String themeName);
+        void onBack();
+    }
+
+    private ThemeSelectionActionListener actionListener;
+    private Button classicThemeButton;
+    private Button modernThemeButton;
+    private Button retroThemeButton;
+    private StackPane themeSelection;
 
     /**
      * Initialisation du contrôleur de sélection de thèmes
@@ -376,5 +389,22 @@ public class ThemeSelectionController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void setActionListener(ThemeSelectionActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void showThemeSelection() {
+        themeSelection.setVisible(true);
+        classicThemeButton.requestFocus();
+    }
+
+    public void hideThemeSelection() {
+        themeSelection.setVisible(false);
+    }
+
+    public boolean isThemeSelectionVisible() {
+        return themeSelection.isVisible();
     }
 }

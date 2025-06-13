@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -17,6 +18,16 @@ import java.net.URL;
  * Gère l'affichage du menu, les animations et la navigation vers les différents modes de jeu
  */
 public class MainMenuController {
+    public interface MainMenuActionListener {
+        void onPlay();
+        void onEditor();
+        void onLegend();
+        void onThemes();
+        void onQuit();
+    }
+
+    private MainMenuActionListener actionListener;
+
     // ==================== ÉLÉMENTS DE L'INTERFACE ====================
 
     @FXML private ImageView backgroundImage;  // Image de fond du menu
@@ -30,6 +41,8 @@ public class MainMenuController {
     @FXML private Button levelEditorButton;   // Éditeur de niveau
     @FXML private Button themesButton;        // Sélection de thèmes
     @FXML private Button quitButton;          // Quitter le jeu
+
+    @FXML private StackPane mainMenu;
 
     // Lecteur de musique pour le menu
     private MediaPlayer menuMusicPlayer;
@@ -219,5 +232,22 @@ public class MainMenuController {
         PauseTransition pauseRouge = new PauseTransition(Duration.seconds(4));
         pauseRouge.setOnFinished(e -> ttRouge.play());
         pauseRouge.play();
+    }
+
+    public void setActionListener(MainMenuActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void showMainMenu() {
+        mainMenu.setVisible(true);
+        robotSurvivorButton.requestFocus();
+    }
+
+    public void hideMainMenu() {
+        mainMenu.setVisible(false);
+    }
+
+    public boolean isMainMenuVisible() {
+        return mainMenu.isVisible();
     }
 }
