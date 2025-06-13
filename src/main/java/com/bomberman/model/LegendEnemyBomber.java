@@ -3,7 +3,7 @@ package com.bomberman.model;
 import java.util.Random;
 
 /**
- * Ennemi Bomber IA AMÉLIORÉ :
+ * Ennemi Bomber IA :
  * - Déplacements plus intelligents et cohérents
  * - Pathfinding amélioré vers le joueur le plus proche
  * - Pose une explosion géante au contact (cooldown optimisé)
@@ -18,7 +18,7 @@ public class LegendEnemyBomber {
     private boolean alive = true;
     private final Random rand = new Random();
 
-    // NOUVELLES VARIABLES pour IA améliorée
+
     private long lastMoveTime = 0;
     private static final int MOVE_DELAY = 400; // Déplacement plus fluide
     private int stuckCounter = 0; // Compteur anti-blocage
@@ -33,7 +33,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * Tour de jeu AMÉLIORÉ : IA plus cohérente et intelligente
+     *  IA plus cohérente et intelligente
      */
     public void playTurn(Legend1v1Board board, Player p1, Player p2) {
         if (!alive) return;
@@ -78,7 +78,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * NOUVEAU : Mouvement intelligent avec pathfinding et anti-blocage
+     * Mouvement intelligent avec pathfinding et anti-blocage
      */
     private void performIntelligentMovement(Legend1v1Board board, Player target) {
         com.bomberman.model.enums.Direction bestDirection = null;
@@ -110,7 +110,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * NOUVEAU : Mouvement tactique quand le pathfinding direct échoue
+     * Mouvement tactique quand le pathfinding direct échoue
      */
     private com.bomberman.model.enums.Direction getTacticalMovement(Legend1v1Board board, Player target) {
         // Éviter de revenir en arrière immédiatement
@@ -136,7 +136,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * NOUVEAU : Obtenir une direction aléatoire valide pour déblocage
+     * Obtenir une direction aléatoire valide pour déblocage
      */
     private com.bomberman.model.enums.Direction getRandomValidDirection(Legend1v1Board board) {
         com.bomberman.model.enums.Direction[] directions = com.bomberman.model.enums.Direction.values();
@@ -158,7 +158,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * NOUVEAU : Obtenir la direction opposée pour éviter les aller-retours
+     * Obtenir la direction opposée pour éviter les aller-retours
      */
     private com.bomberman.model.enums.Direction getOppositeDirection(com.bomberman.model.enums.Direction dir) {
         if (dir == null) return null;
@@ -173,7 +173,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * Explosion géante sur 2 cases dans chaque direction (croix) - OPTIMISÉ
+     * Explosion géante sur 2 cases dans chaque direction (croix)
      */
     private void explode(Legend1v1Board board) {
         // Explosion en croix plus large et plus dangereuse
@@ -195,7 +195,7 @@ public class LegendEnemyBomber {
     }
 
     /**
-     * Déplacement OPTIMISÉ avec vérifications renforcées
+     * Déplacement avec vérifications renforcées
      */
     private void tryMove(Legend1v1Board board, int dx, int dy) {
         int nx = x + dx;
@@ -224,7 +224,7 @@ public class LegendEnemyBomber {
         return Math.abs(p.getX() - x) + Math.abs(p.getY() - y);
     }
 
-    // --------- Getters / Setters / Kill ----------
+
 
     /** Renvoie true si le Bomber est encore en vie */
     public boolean isAlive() { return alive; }
@@ -241,9 +241,9 @@ public class LegendEnemyBomber {
         System.out.println("💀 Bomber eliminated at (" + x + "," + y + ")");
     }
 
-    /** NOUVEAU : True si le Bomber peut exploser actuellement */
+    /**  True si le Bomber peut exploser actuellement */
     public boolean canExplode() { return canExplode; }
 
-    /** NOUVEAU : Compteur de blocage pour debug */
+    /**  Compteur de blocage pour debug */
     public int getStuckCounter() { return stuckCounter; }
 }

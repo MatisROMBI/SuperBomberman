@@ -183,7 +183,7 @@ public class MapSelectionController {
             CustomMapHolder.setSelectedMap(null); // Utiliser la génération par défaut
         }
 
-        // **CORRECTION** : Lancer le bon mode de jeu selon la sélection
+        //  Lancer le bon mode de jeu selon la sélection
         if ("legend".equals(selectedGameMode)) {
             System.out.println("Lancement du mode Legend 1v1 avec map: " + selectedMap);
             SceneManager.switchScene("LegendGame"); // **=> Mode Legend 1v1 (2 joueurs humains)**

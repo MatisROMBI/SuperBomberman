@@ -30,7 +30,7 @@ public class GameController implements GameOverListener, PauseOverlayController.
     private AnimationTimer renderLoop;
     private final Music music = new Music();
 
-    // NOUVEAUTÉ: Gestion du menu de pause
+    // Gestion du menu de pause
     private StackPane pauseOverlay;
     private PauseOverlayController pauseController;
     private boolean isPaused = false;
@@ -54,7 +54,7 @@ public class GameController implements GameOverListener, PauseOverlayController.
     }
 
     /**
-     * NOUVEAUTÉ: Configuration du menu de pause
+     * Configuration du menu de pause
      */
     private void setupPauseOverlay() {
         try {
@@ -97,11 +97,11 @@ public class GameController implements GameOverListener, PauseOverlayController.
         gameCanvas.setOnMouseClicked(e -> gameContainer.requestFocus());
     }
 
-    // OPTIMISATION: Gestion plus efficace des touches
+    // Gestion plus efficace des touches
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
 
-        // NOUVEAUTÉ: Gestion spéciale de la touche ESCAPE pour la pause
+        // Gestion spéciale de la touche ESCAPE pour la pause
         if ("ESCAPE".equals(keyCode)) {
             togglePause();
             event.consume();
@@ -116,7 +116,7 @@ public class GameController implements GameOverListener, PauseOverlayController.
     }
 
     /**
-     * NOUVEAUTÉ: Basculer entre pause et jeu
+     * Basculer entre pause et jeu
      */
     private void togglePause() {
         if (pauseController != null) {

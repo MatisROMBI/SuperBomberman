@@ -33,7 +33,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     private boolean victory = false;
     private final Music music = new Music();
 
-    // NOUVEAUTÉ: Gestion du menu de pause
+    // Gestion du menu de pause
     private StackPane pauseOverlay;
     private PauseOverlayController pauseController;
     private boolean isPaused = false;
@@ -53,7 +53,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     }
 
     /**
-     * NOUVEAUTÉ: Configuration du menu de pause
+     * Configuration du menu de pause
      */
     private void setupPauseOverlay() {
         try {
@@ -96,7 +96,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     private void handleKeyPressed(KeyEvent event) {
         String keyCode = event.getCode().toString();
 
-        // NOUVEAUTÉ: Gestion spéciale de la touche ESCAPE pour la pause
+        // Gestion spéciale de la touche ESCAPE pour la pause
         if ("ESCAPE".equals(keyCode)) {
             togglePause();
             event.consume();
@@ -112,7 +112,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     }
 
     /**
-     * NOUVEAUTÉ: Basculer entre pause et jeu
+     * Basculer entre pause et jeu
      */
     private void togglePause() {
         if (pauseController != null) {
@@ -125,7 +125,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     }
 
     /**
-     * NOUVEAUTÉ: Mettre le jeu en pause
+     * Mettre le jeu en pause
      */
     private void pauseGame() {
         isPaused = true;
@@ -134,7 +134,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     }
 
     /**
-     * NOUVEAUTÉ: Reprendre le jeu
+     * Reprendre le jeu
      */
     private void resumeGame() {
         isPaused = false;
@@ -280,7 +280,7 @@ public class LegendGameController implements PauseOverlayController.PauseActionL
     }
 
     // ======================================================================
-    // NOUVEAUTÉ: Implémentation des actions du menu de pause
+    // Implémentation des actions du menu de pause
     // ======================================================================
 
     @Override

@@ -9,7 +9,7 @@ public class Bomb {
     private boolean hasExploded;
     private final int owner;
 
-    // OPTIMISATION: Cache pour éviter les calculs répétés
+    // Cache pour éviter les calculs répétés
     private final long explosionTime;
 
     public Bomb(int x, int y, int explosionRange, int owner) {
@@ -26,7 +26,7 @@ public class Bomb {
         this(x, y, explosionRange, 0);
     }
 
-    // OPTIMISATION: Méthode d'update pour éviter les calculs constants
+    // Méthode d'update pour éviter les calculs constants
     public void update() {
         if (!hasExploded && System.currentTimeMillis() >= explosionTime) {
             hasExploded = true;
@@ -49,14 +49,14 @@ public class Bomb {
     public int getOwner() { return owner; }
     public long getPlantTime() { return plantTime; }
 
-    // OPTIMISATION: Méthode pour obtenir le temps restant
+    // Méthode pour obtenir le temps restant
     public long getTimeRemaining() {
         if (hasExploded) return 0;
         long remaining = explosionTime - System.currentTimeMillis();
         return Math.max(0, remaining);
     }
 
-    // OPTIMISATION: Méthode pour obtenir le pourcentage d'avancement
+    // Méthode pour obtenir le pourcentage d'avancement
     public float getProgress() {
         if (hasExploded) return 1.0f;
         long elapsed = System.currentTimeMillis() - plantTime;

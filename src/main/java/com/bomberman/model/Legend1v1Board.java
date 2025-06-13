@@ -7,7 +7,7 @@ import com.bomberman.utils.MapManager;
 import java.util.*;
 
 /**
- * Plateau du mode LEGEND 1v1 - Version améliorée
+ * Plateau du mode LEGEND 1v1
  * Joueur 1 (Blanc) : Position haut-gauche, contrôles ZQSD + R, 6 vies
  * Joueur 2 (Noir) : Position bas-droite, contrôles IJKL + P, 6 vies
  * Ennemis IA améliorés : 1 Bomber + 2 Yellow avec déplacements plus cohérents
@@ -109,7 +109,7 @@ public class Legend1v1Board {
 
     /**
      * Place les joueurs et ennemis sur le plateau
-     * AMÉLIORATION : Joueurs avec 6 vies garanties + ennemis IA optimisés
+     * Joueurs avec 6 vies garanties + ennemis IA optimisés
      */
     private void setupPlayersAndEnemies() {
         int xMax = Constants.BOARD_WIDTH - 2;
@@ -271,7 +271,7 @@ public class Legend1v1Board {
     }
 
     /**
-     * Utilitaire : true s'il y a une explosion à la case (x,y).
+     * true s'il y a une explosion à la case (x,y).
      */
     public boolean isExplosionAt(int x, int y) {
         for (Explosion e : explosions)
@@ -296,7 +296,7 @@ public class Legend1v1Board {
     }
 
     /**
-     * NOUVELLE MÉTHODE : Pathfinding simple pour les ennemis
+     * Pathfinding simple pour les ennemis
      * Retourne la direction optimale pour aller de (fromX, fromY) vers (toX, toY)
      */
     public com.bomberman.model.enums.Direction getBestDirection(int fromX, int fromY, int toX, int toY) {
@@ -333,10 +333,6 @@ public class Legend1v1Board {
 
         return bestDir;
     }
-
-    // ===========================
-    // GETTERS ET METHODES UTILITAIRES
-    // ===========================
 
     public boolean isValidPosition(int x, int y) {
         return x >= 0 && x < Constants.BOARD_WIDTH && y >= 0 && y < Constants.BOARD_HEIGHT;

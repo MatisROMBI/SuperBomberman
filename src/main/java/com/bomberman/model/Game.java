@@ -15,7 +15,7 @@ public class Game {
     private AnimationTimer gameLoop;
     private long lastUpdate;
 
-    // OPTIMISATION: Réduire la fréquence de mise à jour
+    // Réduire la fréquence de mise à jour
     private static final long UPDATE_INTERVAL = Constants.GAME_SPEED * 1_000_000L; // Utilise la constante optimisée
 
     public Game() {
@@ -57,7 +57,7 @@ public class Game {
         startGameLoop();
     }
 
-    // OPTIMISATION: Limitation de la fréquence de mise à jour
+    // Limitation de la fréquence de mise à jour
     private void startGameLoop() {
         gameLoop = new AnimationTimer() {
             @Override
