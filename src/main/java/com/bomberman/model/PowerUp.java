@@ -1,3 +1,7 @@
+/**
+ * Représente un bonus collectable
+ * Génération aléatoire et application des effets
+ */
 package com.bomberman.model;
 
 import com.bomberman.model.enums.PowerUpType;
@@ -5,6 +9,9 @@ import com.bomberman.model.enums.PowerUpType;
 public class PowerUp {
     private PowerUpType type;
 
+    /**
+     * Constructeur avec type spécifique
+     */
     public PowerUp(PowerUpType type) {
         this.type = type;
     }
@@ -13,7 +20,10 @@ public class PowerUp {
         return type;
     }
 
-    // Méthode utilitaire pour générer un power-up aléatoire
+    /**
+     * Génère un power-up aléatoire avec probabilités équilibrées
+     * 33% EXTRA_BOMB, 33% RANGE_UP, 17% LIFE, 17% SPEED
+     */
     public static PowerUp random() {
         double r = Math.random();
         if (r < 0.33) return new PowerUp(PowerUpType.EXTRA_BOMB);

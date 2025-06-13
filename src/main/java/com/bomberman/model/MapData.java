@@ -1,28 +1,34 @@
+/**
+ * Structure de données pour les cartes personnalisées
+ * Sérialisation pour sauvegarde fichier
+ */
 package com.bomberman.model;
 
 import com.bomberman.model.enums.CellType;
 import com.bomberman.utils.Constants;
-
 import java.io.Serializable;
 
-/**
- * Classe représentant les données d'une map personnalisée
- */
 public class MapData implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String name;
-    private CellType[][] grid;
-    private long creationTime;
-    private String description;
+    private String name;                 // Nom de la carte
+    private CellType[][] grid;           // Grille de la carte
+    private long creationTime;           // Timestamp de création
+    private String description;          // Description de la carte
 
+    /**
+     * Constructeur avec grille
+     */
     public MapData(String name, CellType[][] grid) {
         this.name = name;
         this.grid = copyGrid(grid);
         this.creationTime = System.currentTimeMillis();
-        this.description = "Map personnalisée";
+        this.description = "Carte personnalisée";
     }
 
+    /**
+     * Constructeur avec description
+     */
     public MapData(String name, CellType[][] grid, String description) {
         this.name = name;
         this.grid = copyGrid(grid);
@@ -31,7 +37,7 @@ public class MapData implements Serializable {
     }
 
     /**
-     * Crée une copie profonde de la grille pour éviter les références partagées
+     * Copie profonde de la grille pour éviter les références partagées
      */
     private CellType[][] copyGrid(CellType[][] original) {
         CellType[][] copy = new CellType[Constants.BOARD_WIDTH][Constants.BOARD_HEIGHT];
@@ -44,10 +50,10 @@ public class MapData implements Serializable {
     }
 
     /**
-     * Valide que la map est jouable (zones de spawn libres, etc.)
+     * Validation de la jouabilité de la carte
      */
     public boolean isValid() {
-        // Vérifier que les positions de spawn sont libres
+        // Vérification des zones de spawn libres
         if (grid[1][1] != CellType.EMPTY) return false;
 
         int maxX = Constants.BOARD_WIDTH - 2;
@@ -56,7 +62,7 @@ public class MapData implements Serializable {
         if (grid[maxX][1] != CellType.EMPTY) return false;
         if (grid[1][maxY] != CellType.EMPTY) return false;
 
-        // Vérifier qu'il y a au moins quelques cases vides accessibles
+        // Vérification du nombre de cases jouables
         int emptyCells = 0;
         for (int x = 1; x < Constants.BOARD_WIDTH - 1; x++) {
             for (int y = 1; y < Constants.BOARD_HEIGHT - 1; y++) {
@@ -66,11 +72,11 @@ public class MapData implements Serializable {
             }
         }
 
-        return emptyCells >= 10; // Au minimum 10 cases jouables
+        return emptyCells >= 10; // Minimum 10 cases jouables
     }
 
     /**
-     * Génère des statistiques sur la map
+     * Génère des statistiques sur la carte
      */
     public String getStats() {
         int walls = 0, destructible = 0, empty = 0;
@@ -88,16 +94,13 @@ public class MapData implements Serializable {
         return String.format("Murs: %d | Destructibles: %d | Vides: %d", walls, destructible, empty);
     }
 
-    // Getters et Setters
+    // Accesseurs
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
     public CellType[][] getGrid() { return grid; }
     public void setGrid(CellType[][] grid) { this.grid = copyGrid(grid); }
-
     public long getCreationTime() { return creationTime; }
     public void setCreationTime(long creationTime) { this.creationTime = creationTime; }
-
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 

@@ -1,3 +1,7 @@
+/**
+ * Gestionnaire de scènes JavaFX
+ * Navigation entre les écrans avec redimensionnement automatique
+ */
 package com.bomberman.utils;
 
 import javafx.fxml.FXMLLoader;
@@ -9,12 +13,18 @@ import java.net.URL;
 public class SceneManager {
     private static Stage primaryStage;
 
+    /**
+     * Initialise le gestionnaire avec la fenêtre principale
+     */
     public static void initialize(Stage stage) {
         primaryStage = stage;
         primaryStage.setTitle("Bomberman");
         primaryStage.setResizable(false);
     }
 
+    /**
+     * Change de scène avec chargement FXML
+     */
     public static void switchScene(String fxmlName) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -22,25 +32,24 @@ public class SceneManager {
             );
             Scene scene = new Scene(loader.load());
 
-            // CORRECTION: Chargement CSS avec vérification
+            // Chargement CSS avec vérification
             loadStylesheet(scene);
 
-            // Adapter la taille de la fenêtre selon la scène
+            // Ajustement de la taille de fenêtre
             adjustWindowSize(fxmlName);
 
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {
-            System.err.println("Erreur lors du chargement de la scène " + fxmlName + " : " + e.getMessage());
+            System.err.println("Erreur chargement scène " + fxmlName + " : " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     /**
-     * NOUVEAUTÉ: Charge la feuille de style avec plusieurs tentatives
+     * Charge la feuille de style avec plusieurs tentatives
      */
     private static void loadStylesheet(Scene scene) {
-        // Liste des chemins possibles pour le CSS
         String[] cssPaths = {
                 "/css/style.css",
                 "/style.css",
@@ -58,23 +67,20 @@ public class SceneManager {
                     System.out.println("CSS chargé depuis : " + cssPath);
                     cssLoaded = true;
                     break;
-                } else {
-                    System.out.println("CSS non trouvé à : " + cssPath);
                 }
             } catch (Exception e) {
-                System.err.println("Erreur lors du chargement CSS " + cssPath + " : " + e.getMessage());
+                System.err.println("Erreur chargement CSS " + cssPath + " : " + e.getMessage());
             }
         }
 
         if (!cssLoaded) {
-            System.err.println("ATTENTION: Aucun fichier CSS trouvé. Le jeu fonctionnera avec les styles par défaut.");
-            // Appliquer des styles inline de base
+            System.err.println("ATTENTION: Aucun fichier CSS trouvé. Utilisation des styles par défaut.");
             applyFallbackStyles(scene);
         }
     }
 
     /**
-     * NOUVEAUTÉ: Applique des styles de base si le CSS n'est pas trouvé
+     * Applique des styles de base si le CSS n'est pas trouvé
      */
     private static void applyFallbackStyles(Scene scene) {
         String fallbackCSS =
@@ -88,13 +94,12 @@ public class SceneManager {
                         ".pause-button-danger { -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; }" +
                         ".pause-button-danger:hover { -fx-background-color: linear-gradient(to bottom, #ec7063, #e74c3c); }";
 
-        // Créer une feuille de style inline
         scene.getRoot().setStyle(fallbackCSS);
         System.out.println("Styles de fallback appliqués.");
     }
 
     /**
-     * Ajuste la taille de la fenêtre selon la scène chargée
+     * Ajuste la taille de la fenêtre selon la scène
      */
     private static void adjustWindowSize(String fxmlName) {
         switch (fxmlName) {
@@ -127,7 +132,7 @@ public class SceneManager {
                 break;
         }
 
-        // Centrer la fenêtre après redimensionnement
+        // Centre la fenêtre après redimensionnement
         primaryStage.centerOnScreen();
     }
 
